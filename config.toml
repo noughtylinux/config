@@ -1,8 +1,8 @@
 # Noughty Linux Configuration
 
 [user]
-username = "martin"
-home_directory = "/home/martin"
+name = "martin"
+home = "/home/martin"
 
 [terminal]
 shell = "fish"              # fish | zsh | bash

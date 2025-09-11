@@ -47,9 +47,8 @@
         config:
         assert builtins.hasAttr "user" config || throw "Missing [user] section in config.toml";
         assert builtins.hasAttr "terminal" config || throw "Missing [terminal] section in config.toml";
-        assert builtins.hasAttr "username" config.user || throw "Missing username in [user] section";
-        assert
-          builtins.hasAttr "home_directory" config.user || throw "Missing home_directory in [user] section";
+        assert builtins.hasAttr "name" config.user || throw "Missing name in [user] section";
+        assert builtins.hasAttr "home" config.user || throw "Missing home in [user] section";
         assert builtins.hasAttr "shell" config.terminal || throw "Missing shell in [terminal] section";
         config;
 
@@ -62,31 +61,30 @@
 
           corePackages = [
             inputs.determinate.packages.${system}.default
-            pkgs.git
             pkgs.curl
-            pkgs.just
-            pkgs.home-manager
+            pkgs.git
             pkgs.nh
+            pkgs.home-manager
+            pkgs.just
             pkgs.nil
             pkgs.nixfmt-rfc-style
             pkgs.nixpkgs-fmt
             pkgs.nix-output-monitor
+            pkgs.tomlq
           ];
         in
         pkgs.mkShell {
           buildInputs = corePackages;
-
           shellHook = ''
             echo "🐧 Noughty Linux"
-            echo "User: ${validatedConfig.user.username}"
-            echo "Home: ${validatedConfig.user.home_directory}"
+            echo "User: ${validatedConfig.user.name}"
+            echo "Home: ${validatedConfig.user.home}"
             echo "Shell: ${validatedConfig.terminal.shell}"
             echo "Architecture: ${system}"
             echo ""
             echo "Ready to go! 🚀"
           '';
         };
-
     in
     {
       devShells = forAllSystems (system: {
