@@ -133,7 +133,7 @@ check-os: _is_root
             ;;
     esac
 
-# Run all checks: OS, config, and flake
+# Run all checks: config, flake, and OS
 check:
     @just check-config
     @just check-flake
