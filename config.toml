@@ -1,14 +1,8 @@
 # Noughty Linux Configuration
 
-[defaults]
-shell = "fish"              # fish | zsh | bash
-browser = "firefox"         # firefox | chromium | brave
-terminal_editor = "neovim"  # neovim | helix | micro
-graphical_ide = "vscode"    # vscode | zed | none
-container_runtime = "docker" # docker | podman | none
+[user]
+username = "martin"
+home_directory = "/home/martin"
 
-[applications]
-obs_studio = true           # Heavy video production suite
-blender = false            # 3D modeling/animation
-gimp = true               # Image editing
-libreoffice = false       # Office suite
+[terminal]
+shell = "fish"              # fish | zsh | bash
