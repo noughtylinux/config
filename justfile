@@ -50,7 +50,7 @@ generate-config:
     fi
 
     # Generate config.toml by replacing placeholders
-    #echo "⊞ Generating config.toml from template..."
+    echo "⊞ Generating config.toml from template..."
     cp config.toml.in config.toml
     sd '@@USER@@' "${USER}" config.toml
     sd '@@HOME@@' "${HOME}" config.toml
@@ -76,7 +76,7 @@ check-config:
     fi
 
     # Extract values from config.toml
-    CONFIG_USER=$(tq -f config.toml user.name )
+    CONFIG_USER=$(tq -f config.toml user.name)
     CONFIG_HOME=$(tq -f config.toml user.home)
 
     # Check if username matches $USER

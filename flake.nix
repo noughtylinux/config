@@ -94,7 +94,23 @@
               else
                 ''
                   echo "🟖 config.toml not found"
-                  echo "  Run 'just generate-config' to create your personal config"
+                  just generate-config
+                  echo ""
+
+                  # Re-read and display the generated config
+                  if [[ -f "config.toml" ]]; then
+                    USER_NAME=$(tq -f config.toml user.name)
+                    USER_HOME=$(tq -f config.toml user.home)
+                    USER_SHELL=$(tq -f config.toml terminal.shell)
+                    echo "User: $USER_NAME"
+                    echo "Home: $USER_HOME"
+                    echo "Shell: $USER_SHELL"
+                    echo "Architecture: ${system}"
+                    echo ""
+                    echo "✪ Ready to go!"
+                  else
+                    echo "⨯ ERROR: Failed to generate config.toml"
+                  fi
                 ''
             }
           '';
