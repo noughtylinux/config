@@ -69,8 +69,8 @@ check-config: _is_root
 
     # Check if config.toml exists
     if [[ ! -f "config.toml" ]]; then
-        echo "⨯ ERROR: config.toml not found!"
-        exit 1
+        echo "⊖ config.toml not found"
+        just generate-config
     fi
 
     # Extract values from config.toml
@@ -136,8 +136,8 @@ check-os: _is_root
 # Run all checks: OS, config, and flake
 check:
     @just check-config
-    @just check-os
     @just check-flake
+    @just check-os
 
 # Check if running as root or with sudo
 [private]

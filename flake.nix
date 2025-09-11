@@ -58,18 +58,7 @@
           buildInputs = corePackages;
           shellHook = ''
             echo "🄍 Noughty Linux"
-            ${
-              if configExists then
-                ''
-                  just check-config
-                ''
-              else
-                ''
-                  echo "⊖ config.toml not found"
-                  just generate-config
-                  just check-config
-                ''
-            }
+            just check-config
           '';
         };
     in
