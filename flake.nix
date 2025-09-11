@@ -32,11 +32,11 @@
         };
 
       # Check if config.toml exists - provide fallback if missing
-      configPath = ./config.toml;
-      configExists = builtins.pathExists configPath;
+      tomlPath = ./config.toml;
+      tomlExists = builtins.pathExists tomlPath;
 
       # Use config.toml if it exists, otherwise use fallback
-      config = if configExists then builtins.fromTOML (builtins.readFile configPath) else { };
+      noughtyConfig = if tomlExists then builtins.fromTOML (builtins.readFile tomlPath) else { };
 
       makeDevShell =
         system:
