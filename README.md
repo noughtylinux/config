@@ -75,9 +75,10 @@ This roadmap is a work in progress 🚧
 - [x] Domain
 - [x] Placeholder Website
 - [ ] Logo
-- [ ] GitHub Organisation
-- [ ] GitHub Template
+- [x] GitHub Organisation
+- [x] GitHub Template
 - [ ] Deployment pipeline
+- [x] TOML parser PoC
 
 ### Phase 1️⃣
 
