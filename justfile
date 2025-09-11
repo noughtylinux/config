@@ -5,7 +5,7 @@ list:
     @just --list --unsorted
 
 # Update configuration repository while preserving user config
-update:
+update: _is_root
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -35,11 +35,11 @@ update:
     echo "🗸 SUCCESS: Update complete!"
 
 # Enter the development environment
-develop:
+develop: _is_root
     @nix develop --no-update-lock-file
 
 # Generate config.toml from config.toml.in template
-generate-config:
+generate-config: _is_root
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -59,11 +59,11 @@ generate-config:
     git add --force config.toml
 
 # Run flake checks
-check-flake:
+check-flake: _is_root
     @nix flake check --all-systems
 
 # Check config.toml exists and validate contents
-check-config:
+check-config: _is_root
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -99,12 +99,11 @@ check-config:
     echo "☻ User: ${CONFIG_USER}"
     echo "⌂ Home: ${CONFIG_HOME}"
     echo "𐇣 Shell: ${CONFIG_SHELL}"
-    #echo "🞕 Architecture: ${system}"
     echo ""
     echo "✪ Ready to go!"
 
 # Check operating system is supported Ubuntu version
-check-os:
+check-os: _is_root
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -139,3 +138,21 @@ check:
     @just check-config
     @just check-os
     @just check-flake
+
+# Check if running as root or with sudo
+[private]
+_is_root:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Check if running as root (UID 0)
+    if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+        echo "🟖 ERROR: Do not run this command as root!"
+        exit 1
+    fi
+
+    # Check if sudo was used (SUDO_USER environment variable exists)
+    if [[ -n "${SUDO_USER:-}" ]]; then
+        echo "🟖 ERROR! Do not run this command with sudo!"
+        exit 1
+    fi
