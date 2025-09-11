@@ -14,8 +14,8 @@ update: _is_root
     if [[ -f "config.toml" ]] && git diff --cached --name-only | grep -q "^config.toml$"; then
         echo "↷ Stashing config.toml..."
         # Temporarily unstage and stash config.toml
-        @git reset HEAD config.toml
-        @git stash push config.toml -m "stash: preserving config.toml"
+        git reset HEAD config.toml
+        git stash push config.toml -m "stash: preserving config.toml"
         STASHED_CONFIG=true
     else
         STASHED_CONFIG=false
