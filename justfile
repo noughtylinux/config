@@ -50,15 +50,13 @@ generate-config:
     fi
 
     # Generate config.toml by replacing placeholders
-    echo "⊞ Generating config.toml from template..."
+    echo "⊕ Generating config.toml from template..."
     cp config.toml.in config.toml
     sd '@@USER@@' "${USER}" config.toml
     sd '@@HOME@@' "${HOME}" config.toml
 
     # Add to git (but don't commit) - force add since it's in .gitignore
     git add --force config.toml
-
-    echo "🗸 SUCCESS: Generated config.toml with user=${USER}, home=${HOME}"
 
 # Run flake checks
 check-flake:
@@ -78,6 +76,7 @@ check-config:
     # Extract values from config.toml
     CONFIG_USER=$(tq -f config.toml user.name)
     CONFIG_HOME=$(tq -f config.toml user.home)
+    CONFIG_SHELL=$(tq -f config.toml terminal.shell)
 
     # Check if username matches $USER
     if [[ "${CONFIG_USER}" != "${USER}" ]]; then
@@ -96,7 +95,13 @@ check-config:
         echo "⨯ ERROR: user.home path '${CONFIG_HOME}' does not exist"
         exit 1
     fi
-    echo "🗸 SUCCESS: config.toml checks passed!"
+
+    echo "☻ User: ${CONFIG_USER}"
+    echo "⌂ Home: ${CONFIG_HOME}"
+    echo "𐇣 Shell: ${CONFIG_SHELL}"
+    #echo "🞕 Architecture: ${system}"
+    echo ""
+    echo "✪ Ready to go!"
 
 # Check operating system is supported Ubuntu version
 check-os:

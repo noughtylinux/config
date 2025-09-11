@@ -35,31 +35,8 @@
       configPath = ./config.toml;
       configExists = builtins.pathExists configPath;
 
-      # Provide fallback config when config.toml doesn't exist yet
-      fallbackConfig = {
-        user = {
-          name = "ubuntu";
-          home = "/home/ubuntu";
-        };
-        terminal = {
-          shell = "bash";
-        };
-      };
-
       # Use config.toml if it exists, otherwise use fallback
-      config = if configExists then builtins.fromTOML (builtins.readFile configPath) else fallbackConfig;
-
-      # Validate required config sections exist
-      validateConfig =
-        config:
-        assert builtins.hasAttr "user" config || throw "Missing [user] section in config.toml";
-        assert builtins.hasAttr "terminal" config || throw "Missing [terminal] section in config.toml";
-        assert builtins.hasAttr "name" config.user || throw "Missing name in [user] section";
-        assert builtins.hasAttr "home" config.user || throw "Missing home in [user] section";
-        assert builtins.hasAttr "shell" config.terminal || throw "Missing shell in [terminal] section";
-        config;
-
-      validatedConfig = validateConfig config;
+      config = if configExists then builtins.fromTOML (builtins.readFile configPath) else { };
 
       makeDevShell =
         system:
@@ -80,37 +57,17 @@
         pkgs.mkShell {
           buildInputs = corePackages;
           shellHook = ''
-            echo "Noughty Linux"
+            echo "🄍 Noughty Linux"
             ${
               if configExists then
                 ''
-                  echo "User: ${validatedConfig.user.name}"
-                  echo "Home: ${validatedConfig.user.home}"
-                  echo "Shell: ${validatedConfig.terminal.shell}"
-                  echo "Architecture: ${system}"
-                  echo ""
-                  echo "✪ Ready to go!"
+                  just check-config
                 ''
               else
                 ''
-                  echo "🟖 config.toml not found"
+                  echo "⊖ config.toml not found"
                   just generate-config
-                  echo ""
-
-                  # Re-read and display the generated config
-                  if [[ -f "config.toml" ]]; then
-                    USER_NAME=$(tq -f config.toml user.name)
-                    USER_HOME=$(tq -f config.toml user.home)
-                    USER_SHELL=$(tq -f config.toml terminal.shell)
-                    echo "User: $USER_NAME"
-                    echo "Home: $USER_HOME"
-                    echo "Shell: $USER_SHELL"
-                    echo "Architecture: ${system}"
-                    echo ""
-                    echo "✪ Ready to go!"
-                  else
-                    echo "⨯ ERROR: Failed to generate config.toml"
-                  fi
+                  just check-config
                 ''
             }
           '';
