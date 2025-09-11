@@ -46,7 +46,39 @@ check-config:
     fi
     echo "🗸 SUCCESS: config.toml checks passed!"
 
-# Run both flake and config checks
+# Check operating system is supported Ubuntu version
+check-os:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Check if /etc/os-release exists
+    if [[ ! -f "/etc/os-release" ]]; then
+        echo "⨯ ERROR: /etc/os-release not found!"
+        exit 1
+    fi
+
+    # Source the os-release file to get variables
+    source /etc/os-release
+
+    # Check if this is Ubuntu
+    if [[ "${ID:-}" != "ubuntu" ]]; then
+        echo "⨯ ERROR: This system is not Ubuntu (detected: ${ID:-unknown})"
+        exit 1
+    fi
+
+    # Check for supported Ubuntu versions
+    case "${VERSION_ID:-}" in
+        "24.04"|"25.04")
+            echo "🗸 SUCCESS: Ubuntu ${VERSION_ID} is supported!"
+            ;;
+        *)
+            echo "⨯ ERROR: Ubuntu ${VERSION_ID:-unknown} is not supported"
+            exit 1
+            ;;
+    esac
+
+# Run all checks: OS, config, and flake
 check:
     @just check-config
+    @just check-os
     @just check-flake
