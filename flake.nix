@@ -31,7 +31,16 @@
           };
         };
 
-      config = builtins.fromTOML (builtins.readFile ./config.toml);
+      # Check if config.toml exists - throw error if missing
+      configPath = ./config.toml;
+      configExists = builtins.pathExists configPath;
+
+      # Ensure config.toml exists before proceeding
+      config =
+        if configExists then
+          builtins.fromTOML (builtins.readFile configPath)
+        else
+          throw "config.toml not found! Please create a config.toml file before using this flake.";
 
       # Validate required config sections exist
       validateConfig =
@@ -50,15 +59,6 @@
         system:
         let
           pkgs = pkgsFor system;
-
-          # Map shell choice to package
-          shellPackage =
-            {
-              fish = pkgs.fish;
-              zsh = pkgs.zsh;
-              bash = pkgs.bash;
-            }
-            .${validatedConfig.terminal.shell};
 
           corePackages = [
             inputs.determinate.packages.${system}.default
