@@ -50,7 +50,7 @@ generate-config:
     fi
 
     # Generate config.toml by replacing placeholders
-    echo "📝 Generating config.toml from template..."
+    #echo "⊞ Generating config.toml from template..."
     cp config.toml.in config.toml
     sd '@@USER@@' "${USER}" config.toml
     sd '@@HOME@@' "${HOME}" config.toml

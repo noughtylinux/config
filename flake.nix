@@ -80,7 +80,7 @@
         pkgs.mkShell {
           buildInputs = corePackages;
           shellHook = ''
-            echo "🐧 Noughty Linux"
+            echo "Noughty Linux"
             ${
               if configExists then
                 ''
@@ -89,12 +89,12 @@
                   echo "Shell: ${validatedConfig.terminal.shell}"
                   echo "Architecture: ${system}"
                   echo ""
-                  echo "Ready to go! 🚀"
+                  echo "✪ Ready to go!"
                 ''
               else
                 ''
                   echo "🟖 config.toml not found"
-                  echo "   Run 'just generate-config' to create your personal config"
+                  echo "  Run 'just generate-config' to create your personal config"
                 ''
             }
           '';
