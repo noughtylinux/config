@@ -31,16 +31,23 @@
           };
         };
 
-      # Check if config.toml exists - throw error if missing
+      # Check if config.toml exists - provide fallback if missing
       configPath = ./config.toml;
       configExists = builtins.pathExists configPath;
 
-      # Ensure config.toml exists before proceeding
-      config =
-        if configExists then
-          builtins.fromTOML (builtins.readFile configPath)
-        else
-          throw "config.toml not found! Please create a config.toml file before using this flake.";
+      # Provide fallback config when config.toml doesn't exist yet
+      fallbackConfig = {
+        user = {
+          name = "ubuntu";
+          home = "/home/ubuntu";
+        };
+        terminal = {
+          shell = "bash";
+        };
+      };
+
+      # Use config.toml if it exists, otherwise use fallback
+      config = if configExists then builtins.fromTOML (builtins.readFile configPath) else fallbackConfig;
 
       # Validate required config sections exist
       validateConfig =
@@ -70,6 +77,7 @@
             pkgs.nixfmt-rfc-style
             pkgs.nixpkgs-fmt
             pkgs.nix-output-monitor
+            pkgs.sd
             pkgs.tomlq
           ];
         in
@@ -77,12 +85,22 @@
           buildInputs = corePackages;
           shellHook = ''
             echo "🐧 Noughty Linux"
-            echo "User: ${validatedConfig.user.name}"
-            echo "Home: ${validatedConfig.user.home}"
-            echo "Shell: ${validatedConfig.terminal.shell}"
-            echo "Architecture: ${system}"
-            echo ""
-            echo "Ready to go! 🚀"
+            ${
+              if configExists then
+                ''
+                  echo "User: ${validatedConfig.user.name}"
+                  echo "Home: ${validatedConfig.user.home}"
+                  echo "Shell: ${validatedConfig.terminal.shell}"
+                  echo "Architecture: ${system}"
+                  echo ""
+                  echo "Ready to go! 🚀"
+                ''
+              else
+                ''
+                  echo "🟖 config.toml not found"
+                  echo "   Run 'just generate-config' to create your personal config"
+                ''
+            }
           '';
         };
     in

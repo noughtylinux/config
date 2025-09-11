@@ -1,0 +1,8 @@
+# Noughty Linux Configuration
+
+[user]
+name = "@@USER@@"
+home = "@@HOME@@"
+
+[terminal]
+shell = "fish"              # fish | zsh | bash

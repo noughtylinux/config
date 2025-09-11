@@ -8,6 +8,28 @@ list:
 develop:
     @nix develop --no-update-lock-file
 
+# Generate config.toml from config.toml.in template
+generate-config:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Check if config.toml.in exists
+    if [[ ! -f "config.toml.in" ]]; then
+        echo "⨯ ERROR: config.toml.in template not found!"
+        exit 1
+    fi
+
+    # Generate config.toml by replacing placeholders
+    echo "📝 Generating config.toml from template..."
+    cp config.toml.in config.toml
+    sd '@@USER@@' "${USER}" config.toml
+    sd '@@HOME@@' "${HOME}" config.toml
+
+    # Add to git (but don't commit) - force add since it's in .gitignore
+    git add --force config.toml
+
+    echo "🗸 SUCCESS: Generated config.toml with user=${USER}, home=${HOME}"
+
 # Run flake checks
 check-flake:
     @nix flake check --all-systems
