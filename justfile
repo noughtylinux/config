@@ -4,6 +4,36 @@
 list:
     @just --list --unsorted
 
+# Update configuration repository while preserving user config
+update:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    echo "🗘 Updating configuration repository..."
+    # Check if config.toml exists and is staged
+    if [[ -f "config.toml" ]] && git diff --cached --name-only | grep -q "^config.toml$"; then
+        echo "↷ Stashing config.toml..."
+        # Temporarily unstage and stash config.toml
+        @git reset HEAD config.toml
+        @git stash push config.toml -m "stash: preserving config.toml"
+        STASHED_CONFIG=true
+    else
+        STASHED_CONFIG=false
+    fi
+
+    # Pull updates
+    echo "🠧 Pulling latest changes..."
+    git pull -rebase
+
+    # Restore config.toml if it was stashed
+    if [[ "${STASHED_CONFIG}" == "true" ]]; then
+        echo "↶ Restoring config.toml..."
+        git stash pop
+        git add --force config.toml
+    fi
+
+    echo "🗸 SUCCESS: Update complete!"
+
 # Enter the development environment
 develop:
     @nix develop --no-update-lock-file

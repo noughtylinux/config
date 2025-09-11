@@ -70,13 +70,9 @@
             inputs.determinate.packages.${system}.default
             pkgs.curl
             pkgs.git
-            pkgs.nh
+            pkgs.gnugrep
             pkgs.home-manager
             pkgs.just
-            pkgs.nil
-            pkgs.nixfmt-rfc-style
-            pkgs.nixpkgs-fmt
-            pkgs.nix-output-monitor
             pkgs.sd
             pkgs.tomlq
           ];
