@@ -93,8 +93,7 @@ status: _is_compatible _has_config
 
     echo -e "▣ Hostname:\t$(tq -f config.toml system.hostname)"
     echo -e "☻ User:\t\t$(tq -f config.toml user.name)"
-    echo -e "⌂ Home:\t\t$(tq -f config.toml user.home)"
-    echo -e "𐇣 Shell:\t$(tq -f config.toml terminal.shell)"
+    echo -e "⌂ Home:\t\t/home/$(tq -f config.toml user.name)"
     echo ""
     echo "🟊 Ready to go!"
 
@@ -154,13 +153,14 @@ _is_compatible:
         exit 1
     fi
 
+# Check if config.toml exists and is valid
 [private]
 _has_config:
     #!/usr/bin/env bash
     set -euo pipefail
 
     if [[ ! -f "config.toml" ]]; then
-        echo -e "{{ERROR}}: config.toml not found! Please run 'just generate-config' first."
+        echo -e "{{ERROR}}: config.toml not found! Please run 'just generate-config'."
         exit 1
     fi
 
@@ -169,7 +169,7 @@ _has_config:
     CONFIG_USER=$(tq -f config.toml user.name)
     CONFIG_HOME="/home/$(tq -f config.toml user.name)"
 
-    # Check if hostname matches $(hostname)
+    # Check if hostname matches $(hostname -s)
     if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
         echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname -s) '$(hostname -s)'"
         exit 1
@@ -181,14 +181,8 @@ _has_config:
         exit 1
     fi
 
-    # Check if home_directory matches $HOME
-    if [[ "${CONFIG_HOME}" != "${HOME}" ]]; then
-        echo -e "{{ERROR}}: config.toml user.home '${CONFIG_HOME}' does not match \$HOME '${HOME}'"
-        exit 1
-    fi
-
     # Check if home_directory path exists
     if [[ ! -d "${CONFIG_HOME}" ]]; then
-        echo -e "{{ERROR}}: user.home path '${CONFIG_HOME}' does not exist"
+        echo -e "{{ERROR}}: '${CONFIG_HOME}' does not exist"
         exit 1
     fi
