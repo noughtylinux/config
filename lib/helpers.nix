@@ -17,7 +17,8 @@ in
 {
   inherit pkgsFor;
 
-  # TOML configuration management - independent function
+  # Helper to generate the noughtyConfig from config.toml
+  # Use builtins.getEnv (impure) to ensure the flake evaluates when config.toml is missing
   mkNoughtyConfig =
     {
       tomlPath ? ../config.toml,
@@ -29,7 +30,6 @@ in
     {
       system = {
         hostname = builtins.getEnv "HOSTNAME";
-        platform = builtins.currentSystem;
       };
       user = {
         name = builtins.getEnv "USER";
@@ -38,13 +38,14 @@ in
     }
     // tomlConfig;
 
-  # Helper function for generating home-manager configs - needs noughtyConfig
+  # Helper function for generating home-manager configs
   mkHome =
     {
       noughtyConfig,
+      system,
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = pkgsFor noughtyConfig.system.platform;
+      pkgs = pkgsFor system;
       extraSpecialArgs = {
         inherit
           inputs

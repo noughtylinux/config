@@ -55,7 +55,6 @@ generate-config: _is_compatible
     echo "⊕ Generating config.toml from template..."
     cp config.toml.in config.toml
     sd '@@HOSTNAME@@' "$(hostname -s)" config.toml
-    sd '@@PLATFORM@@' "$(uname -m)-linux" config.toml
     sd '@@USER@@' "${USER}" config.toml
     sd '@@HOME@@' "${HOME}" config.toml
     echo -e "{{SUCCESS}}: config.toml generated!"
@@ -86,7 +85,6 @@ status: _is_compatible _has_config
     set -euo pipefail
 
     echo -e "▣ Hostname:\t$(tq -f config.toml system.hostname)"
-    echo -e "▢ Platform:\t$(tq -f config.toml system.platform)"
     echo -e "☻ User:\t\t$(tq -f config.toml user.name)"
     echo -e "⌂ Home:\t\t$(tq -f config.toml user.home)"
     echo -e "𐇣 Shell:\t$(tq -f config.toml terminal.shell)"
@@ -95,8 +93,8 @@ status: _is_compatible _has_config
 
 # Run flake checks
 check: _is_compatible _has_config
-    @nix flake check --all-systems {{NIX_OPTS}} 2>&1 | head -10
-    @nix flake show {{NIX_OPTS}}
+    @nix flake check --all-systems {{NIX_OPTS}} 2>&1 | cat
+    @nix flake show --all-systems {{NIX_OPTS}}
 
 # Check if running as root or with sudo
 [private]
@@ -160,18 +158,12 @@ _has_config:
 
     # Extract values from config.toml
     CONFIG_HOSTNAME=$(tq -f config.toml system.hostname)
-    CONFIG_PLATFORM=$(tq -f config.toml system.platform)
     CONFIG_USER=$(tq -f config.toml user.name)
     CONFIG_HOME=$(tq -f config.toml user.home)
 
     # Check if hostname matches $(hostname)
     if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
         echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname -s) '$(hostname -s)'"
-        exit 1
-    fi
-
-    if [[ "${CONFIG_PLATFORM}" != "$(uname -m)-linux" ]]; then
-        echo -e "{{ERROR}}: config.toml system.platform '${CONFIG_PLATFORM}' does not match \$(uname -m)-linux '$(uname -m)-linux'"
         exit 1
     fi
 

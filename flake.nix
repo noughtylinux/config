@@ -17,7 +17,6 @@
     let
       inherit (self) outputs;
       helper = import ./lib { inherit inputs outputs; };
-      noughtyConfig = helper.mkNoughtyConfig { };
 
       makeDevShell =
         system:
@@ -49,10 +48,18 @@
       });
 
       # Home Manager configurations
-      homeConfigurations = {
-        "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
-          inherit noughtyConfig;
-        };
-      };
+      homeConfigurations =
+        let
+          noughtyConfig = helper.mkNoughtyConfig { };
+          # Generate configs for all systems
+          systemConfigs = helper.forAllSystems (system: {
+            "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
+              inherit noughtyConfig;
+              inherit system;
+            };
+          });
+        in
+        # Flatten the nested structure: merge all system-specific configs
+        builtins.foldl' (acc: systemAttrs: acc // systemAttrs) { } (builtins.attrValues systemConfigs);
     };
 }
