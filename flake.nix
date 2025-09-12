@@ -51,15 +51,12 @@
       homeConfigurations =
         let
           noughtyConfig = helper.mkNoughtyConfig { };
-          # Generate configs for all systems
-          systemConfigs = helper.forAllSystems (system: {
-            "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
-              inherit noughtyConfig;
-              inherit system;
-            };
-          });
         in
-        # Flatten the nested structure: merge all system-specific configs
-        builtins.foldl' (acc: systemAttrs: acc // systemAttrs) { } (builtins.attrValues systemConfigs);
+        {
+          "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
+            inherit noughtyConfig;
+            system = builtins.currentSystem;
+          };
+        };
     };
 }
