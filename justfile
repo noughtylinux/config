@@ -26,7 +26,7 @@ update: _is_compatible
     echo -e "{{SUCCESS}}: Update complete!"
 
 # Enter the development environment
-develop: _is_compatible _has_config
+develop: _is_compatible
     @nom develop {{NIX_OPTS}}
 
 # Generate config.toml from config.toml.in template
@@ -57,11 +57,7 @@ generate-config: _is_compatible
     sd '@@HOSTNAME@@' "$(hostname -s)" config.toml
     sd '@@USER@@' "${USER}" config.toml
     sd '@@HOME@@' "${HOME}" config.toml
-
-# Run flake checks
-check-flake: _is_compatible _has_config
-    @nom flake check --all-systems {{NIX_OPTS}}
-    @nom flake show {{NIX_OPTS}}
+    echo -e "{{SUCCESS}}: config.toml generated!"
 
 # Build home-manager configuration
 build: _is_compatible _has_config
@@ -83,52 +79,22 @@ switch: _is_compatible _has_config
     export USER="${USER:-$(tq -f config.toml user.name)}"
     nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
-# Check config.toml exists and validate contents
-check-config: _is_compatible _has_config
+# Display config.toml status
+status: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Extract values from config.toml
-    CONFIG_HOSTNAME=$(tq -f config.toml system.hostname)
-    CONFIG_USER=$(tq -f config.toml user.name)
-    CONFIG_HOME=$(tq -f config.toml user.home)
-    CONFIG_SHELL=$(tq -f config.toml terminal.shell)
-
-    # Check if hostname matches $(hostname)
-    if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
-        echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname -s) '$(hostname -s)'"
-        exit 1
-    fi
-
-    # Check if username matches $USER
-    if [[ "${CONFIG_USER}" != "${USER}" ]]; then
-        echo -e "{{ERROR}}: config.toml user.name '${CONFIG_USER}' does not match \$USER '${USER}'"
-        exit 1
-    fi
-
-    # Check if home_directory matches $HOME
-    if [[ "${CONFIG_HOME}" != "${HOME}" ]]; then
-        echo -e "{{ERROR}}: config.toml user.home '${CONFIG_HOME}' does not match \$HOME '${HOME}'"
-        exit 1
-    fi
-
-    # Check if home_directory path exists
-    if [[ ! -d "${CONFIG_HOME}" ]]; then
-        echo -e "{{ERROR}}: user.home path '${CONFIG_HOME}' does not exist"
-        exit 1
-    fi
-
-    echo "▣ Hostname: ${CONFIG_HOSTNAME}"
-    echo "☻ User: ${CONFIG_USER}"
-    echo "⌂ Home: ${CONFIG_HOME}"
-    echo "𐇣 Shell: ${CONFIG_SHELL}"
+    echo -e "▣ Hostname:\t$(tq -f config.toml system.hostname)"
+    echo -e "☻ User:\t\t$(tq -f config.toml user.name)"
+    echo -e "⌂ Home:\t\t$(tq -f config.toml user.home)"
+    echo -e "𐇣 Shell:\t$(tq -f config.toml terminal.shell)"
     echo ""
     echo "🟊 Ready to go!"
 
-# Run all checks: config, flake, and OS
-check:
-    @just check-config
-    @just check-flake
+# Run flake checks
+check: _is_compatible _has_config
+    @nix flake check --all-systems {{NIX_OPTS}}
+    @nix flake show {{NIX_OPTS}}
 
 # Check if running as root or with sudo
 [private]
@@ -159,7 +125,7 @@ _is_compatible:
 
     # Check if this is Ubuntu
     if [[ "${ID:-}" != "ubuntu" ]]; then
-        echo -e "{{ERROR}}: This system is not Ubuntu (detected: ${ID:-unknown})"
+        echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! Only Ubuntu is supported."
         # TODO: Clean up after testing is done
         if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
             exit 1
@@ -172,7 +138,7 @@ _is_compatible:
             echo -e "{{SUCCESS}}: ${NAME} ${VERSION_ID} is supported!"
             ;;
         *)
-            echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported"
+            echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! Only Ubuntu 24.04 and 25.04 are supported."
             # TODO: Clean up after testing is done
             if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
                 exit 1
@@ -187,5 +153,34 @@ _has_config:
 
     if [[ ! -f "config.toml" ]]; then
         echo -e "{{ERROR}}: config.toml not found! Please run 'just generate-config' first."
+        exit 1
+    fi
+
+    # Extract values from config.toml
+    CONFIG_HOSTNAME=$(tq -f config.toml system.hostname)
+    CONFIG_USER=$(tq -f config.toml user.name)
+    CONFIG_HOME=$(tq -f config.toml user.home)
+
+    # Check if hostname matches $(hostname)
+    if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
+        echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname -s) '$(hostname -s)'"
+        exit 1
+    fi
+
+    # Check if username matches $USER
+    if [[ "${CONFIG_USER}" != "${USER}" ]]; then
+        echo -e "{{ERROR}}: config.toml user.name '${CONFIG_USER}' does not match \$USER '${USER}'"
+        exit 1
+    fi
+
+    # Check if home_directory matches $HOME
+    if [[ "${CONFIG_HOME}" != "${HOME}" ]]; then
+        echo -e "{{ERROR}}: config.toml user.home '${CONFIG_HOME}' does not match \$HOME '${HOME}'"
+        exit 1
+    fi
+
+    # Check if home_directory path exists
+    if [[ ! -d "${CONFIG_HOME}" ]]; then
+        echo -e "{{ERROR}}: user.home path '${CONFIG_HOME}' does not exist"
         exit 1
     fi
