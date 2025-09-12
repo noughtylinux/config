@@ -79,7 +79,6 @@
           buildInputs = corePackages;
           shellHook = ''
             echo "🄍 Noughty Linux"
-            just check-config
           '';
         };
     in

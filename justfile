@@ -15,20 +15,20 @@ list:
     @just --list --unsorted
 
 # Update configuration repository
-update: _is_root
+update: _is_compatible
     #!/usr/bin/env bash
     set -euo pipefail
 
-    echo "🗘 Updating configuration repository..."
+    echo "⟳ Updating configuration repository..."
     git pull --rebase
     echo -e "{{SUCCESS}}: Update complete!"
 
 # Enter the development environment
-develop: _is_root
+develop: _is_compatible _has_config
     @nix develop --impure --no-update-lock-file
 
 # Generate config.toml from config.toml.in template
-generate-config: _is_root
+generate-config: _is_compatible
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -57,52 +57,32 @@ generate-config: _is_root
     sd '@@HOME@@' "${HOME}" config.toml
 
 # Run flake checks
-check-flake: _is_root
+check-flake: _is_compatible _has_config
     @nix flake check --impure --all-systems
     @nix flake show --impure
 
 # Build home-manager configuration
-build: _is_root
+build: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
-
-    # Check if config.toml exists first
-    if [[ ! -f "config.toml" ]]; then
-        echo -e "{{ERROR}}: config.toml not found!"
-        echo "Run 'nix develop' first to generate configuration, then try building again."
-        exit 1
-    fi
-
-    # Set HOSTNAME if not already set (for NixOS compatibility)
-    export HOSTNAME="${HOSTNAME:-$(hostname)}"
-    nix build --impure ".#homeConfigurations.x86_64-linux.${USER}@${HOSTNAME}.activationPackage"
-
-# Switch to home-manager configuration
-switch: _is_root
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    # Check if config.toml exists first
-    if [[ ! -f "config.toml" ]]; then
-        echo -e "{{ERROR}}: config.toml not found!"
-        echo "Run 'nix develop' first to generate configuration, then try switching again."
-        exit 1
-    fi
 
     # Set HOSTNAME if not already set (for NixOS compatibility)
     export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
-    nix run --impure ".#homeConfigurations.x86_64-linux.${USER}@${HOSTNAME}.activationPackage"
+    nix build --impure ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
-# Check config.toml exists and validate contents
-check-config: _is_root
+# Switch to home-manager configuration
+switch: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Check if config.toml exists
-    if [[ ! -f "config.toml" ]]; then
-        echo "⊖ config.toml not found"
-        just generate-config
-    fi
+    # Set HOSTNAME if not already set (for NixOS compatibility)
+    export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
+    nix run --impure ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+
+# Check config.toml exists and validate contents
+check-config: _is_compatible _has_config
+    #!/usr/bin/env bash
+    set -euo pipefail
 
     # Extract values from config.toml
     CONFIG_HOSTNAME=$(tq -f config.toml system.hostname)
@@ -141,10 +121,28 @@ check-config: _is_root
     echo ""
     echo "🟊 Ready to go!"
 
-# Check operating system is supported Ubuntu version
-check-os: _is_root
+# Run all checks: config, flake, and OS
+check:
+    @just check-config
+    @just check-flake
+
+# Check if running as root or with sudo
+[private]
+_is_compatible:
     #!/usr/bin/env bash
     set -euo pipefail
+
+    # Check if running as root (UID 0)
+    if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
+        echo -e "{{ERROR}}: Do not run this command as root!"
+        exit 1
+    fi
+
+    # Check if sudo was used (SUDO_USER environment variable exists)
+    if [[ -n "${SUDO_USER:-}" ]]; then
+        echo -e "{{ERROR}}! Do not run this command with sudo!"
+        exit 1
+    fi
 
     # Check if /etc/os-release exists
     if [[ ! -f "/etc/os-release" ]]; then
@@ -158,7 +156,9 @@ check-os: _is_root
     # Check if this is Ubuntu
     if [[ "${ID:-}" != "ubuntu" ]]; then
         echo -e "{{ERROR}}: This system is not Ubuntu (detected: ${ID:-unknown})"
-        exit 1
+        if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
+            exit 1
+        fi
     fi
 
     # Check for supported Ubuntu versions
@@ -168,30 +168,18 @@ check-os: _is_root
             ;;
         *)
             echo -e "{{ERROR}}: Ubuntu ${VERSION_ID:-unknown} is not supported"
-            exit 1
+            if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
+                exit 1
+            fi
             ;;
     esac
 
-# Run all checks: config, flake, and OS
-check:
-    @just check-config
-    @just check-flake
-    @just check-os
-
-# Check if running as root or with sudo
 [private]
-_is_root:
+_has_config:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Check if running as root (UID 0)
-    if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-        echo -e "{{ERROR}}: Do not run this command as root!"
-        exit 1
-    fi
-
-    # Check if sudo was used (SUDO_USER environment variable exists)
-    if [[ -n "${SUDO_USER:-}" ]]; then
-        echo -e "{{ERROR}}! Do not run this command with sudo!"
+    if [[ ! -f "config.toml" ]]; then
+        echo -e "{{ERROR}}: config.toml not found! Please run 'just generate-config' first."
         exit 1
     fi
