@@ -39,8 +39,7 @@ develop: _is_compatible
 # Build home-manager configuration
 build-home: _is_compatible _has_config
     #!/usr/bin/env bash
-    set -euo pipefail
-
+    echo "⌂ Building home-manager configuration..."
     # Set HOSTNAME if not already set
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
@@ -49,8 +48,7 @@ build-home: _is_compatible _has_config
 # Switch to home-manager configuration
 switch-home: _is_compatible _has_config
     #!/usr/bin/env bash
-    set -euo pipefail
-
+    echo "⌂ Switching to new home-manager configuration..."
     # Set HOSTNAME if not already set
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
@@ -58,15 +56,13 @@ switch-home: _is_compatible _has_config
 
 # Build system-manager configuration
 build-system: _is_compatible _has_config
+    @echo "⯐ Building system-manager configuration..."
     @nom build {{NIX_OPTS}} ".#systemConfigs.default"
 
 # Switch to system-manager configuration
 switch-system: _is_compatible _has_config
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    echo "⊕ Switching to system configuration..."
-    sudo system-manager switch --flake '.' --nix-option pure-eval false
+    @echo "⯐ Switching to new system-manager configuration..."
+    sudo nix run 'github:numtide/system-manager' -- switch --flake '.' --nix-option pure-eval false
 
 build: build-home build-system
 switch: switch-home switch-system
