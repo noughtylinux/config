@@ -159,7 +159,7 @@ _has_config:
     # Extract values from config.toml
     CONFIG_HOSTNAME=$(tq -f config.toml system.hostname)
     CONFIG_USER=$(tq -f config.toml user.name)
-    CONFIG_HOME=$(tq -f config.toml user.home)
+    CONFIG_HOME="/home/$(tq -f config.toml user.name)"
 
     # Check if hostname matches $(hostname)
     if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then

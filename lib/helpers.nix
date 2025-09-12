@@ -33,7 +33,6 @@ in
       };
       user = {
         name = builtins.getEnv "USER";
-        home = builtins.getEnv "HOME";
       };
     }
     // tomlConfig;
