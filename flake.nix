@@ -39,16 +39,17 @@
       # Read TOML config if it exists, otherwise use empty set
       tomlConfig = if tomlExists then builtins.fromTOML (builtins.readFile tomlPath) else { };
 
-      # Merge TOML config with system facts from environment variables
-      noughtyConfig = tomlConfig // {
-        system = (tomlConfig.system or { }) // {
+      # Get system facts from environment variables and merge TOML config on top
+      noughtyConfig = {
+        system = {
           hostname = builtins.getEnv "HOSTNAME";
         };
-        user = (tomlConfig.user or { }) // {
+        user = {
           name = builtins.getEnv "USER";
           home = builtins.getEnv "HOME";
         };
-      };
+      }
+      // tomlConfig;
 
       # Helper library
       helper = import ./lib {
