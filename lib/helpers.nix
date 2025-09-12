@@ -44,6 +44,7 @@ in
       system,
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
+      # Home Manager has a required pkgs parameter in its function signature
       pkgs = pkgsFor system;
       extraSpecialArgs = {
         inherit
@@ -53,6 +54,26 @@ in
           ;
       };
       modules = [ ../home-manager ];
+    };
+
+  # Helper function for generating system-manager configs
+  mkSystem =
+    {
+      noughtyConfig,
+      system,
+    }:
+    inputs.system-manager.lib.makeSystemConfig {
+      extraSpecialArgs = {
+        inherit
+          inputs
+          outputs
+          noughtyConfig
+          ;
+        # system-manager doesn't have a direct pkgs parameter in its API, so pkgs
+        # must be provided through extraSpecialArgs for modules to access it
+        pkgs = pkgsFor system;
+      };
+      modules = [ ../system-manager ];
     };
 
   forAllSystems = inputs.nixpkgs.lib.genAttrs [

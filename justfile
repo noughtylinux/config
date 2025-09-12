@@ -37,7 +37,7 @@ develop: _is_compatible
     @nom develop {{NIX_OPTS}}
 
 # Build home-manager configuration
-build: _is_compatible _has_config
+build-home: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -47,7 +47,7 @@ build: _is_compatible _has_config
     nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Switch to home-manager configuration
-switch: _is_compatible _has_config
+switch-home: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -55,6 +55,21 @@ switch: _is_compatible _has_config
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
     nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+
+# Build system-manager configuration
+build-system: _is_compatible _has_config
+    @nom build {{NIX_OPTS}} ".#systemConfigs.default"
+
+# Switch to system-manager configuration
+switch-system: _is_compatible _has_config
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    echo "⊕ Switching to system configuration..."
+    system-manager switch --flake '.' --nix-option pure-eval false
+
+build: build-home build-system
+switch: switch-home switch-system
 
 # Generate config.toml from config.toml.in template
 generate-config: _is_compatible

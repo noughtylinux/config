@@ -2,10 +2,13 @@
   description = "Noughty Linux";
   inputs = {
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    determinate.inputs.nixpkgs.follows = "nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    system-manager.url = "github:numtide/system-manager";
+    system-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
   outputs =
@@ -17,7 +20,7 @@
     let
       inherit (self) outputs;
       helper = import ./lib { inherit inputs outputs; };
-
+      noughtyConfig = helper.mkNoughtyConfig { };
       makeDevShell =
         system:
         let
@@ -25,6 +28,7 @@
 
           corePackages = [
             inputs.determinate.packages.${system}.default
+            inputs.system-manager.packages.${system}.default
             pkgs.curl
             pkgs.git
             pkgs.gnugrep
@@ -47,16 +51,18 @@
         default = makeDevShell system;
       });
 
+      # System Manager configuration
+      systemConfigs.default = helper.mkSystem {
+        inherit noughtyConfig;
+        system = builtins.currentSystem;
+      };
+
       # Home Manager configurations
-      homeConfigurations =
-        let
-          noughtyConfig = helper.mkNoughtyConfig { };
-        in
-        {
-          "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
-            inherit noughtyConfig;
-            system = builtins.currentSystem;
-          };
+      homeConfigurations = {
+        "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
+          inherit noughtyConfig;
+          system = builtins.currentSystem;
         };
+      };
     };
 }

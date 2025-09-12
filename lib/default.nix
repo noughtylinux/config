@@ -16,6 +16,7 @@ in
     forAllSystems
     mkHome
     mkNoughtyConfig
+    mkSystem
     pkgsFor
     ;
 }
