@@ -1,17 +1,37 @@
 {
   inputs,
   outputs,
-  noughtyConfig,
   ...
 }:
 {
-  # Helper function for generating home-manager configs
+  # TOML configuration management - independent function
+  mkNoughtyConfig =
+    {
+      tomlPath ? ../config.toml,
+    }:
+    let
+      tomlExists = builtins.pathExists tomlPath;
+      tomlConfig = if tomlExists then builtins.fromTOML (builtins.readFile tomlPath) else { };
+    in
+    {
+      system = {
+        hostname = builtins.getEnv "HOSTNAME";
+        platform = builtins.currentSystem;
+      };
+      user = {
+        name = builtins.getEnv "USER";
+        home = builtins.getEnv "HOME";
+      };
+    }
+    // tomlConfig;
+
+  # Helper function for generating home-manager configs - needs noughtyConfig
   mkHome =
     {
-      system,
+      noughtyConfig,
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.${system};
+      pkgs = inputs.nixpkgs.legacyPackages.${noughtyConfig.system.platform};
       extraSpecialArgs = {
         inherit
           inputs

@@ -2,6 +2,7 @@
 
 [system]
 hostname = "@@HOSTNAME@@"
+platform = "@@PLATFORM@@"
 
 [user]
 name = "@@USER@@"

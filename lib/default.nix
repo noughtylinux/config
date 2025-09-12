@@ -1,7 +1,6 @@
 {
   inputs,
   outputs,
-  noughtyConfig,
   ...
 }:
 let
@@ -9,13 +8,13 @@ let
     inherit
       inputs
       outputs
-      noughtyConfig
       ;
   };
 in
 {
   inherit (helpers)
-    mkHome
     forAllSystems
+    mkHome
+    mkNoughtyConfig
     ;
 }
