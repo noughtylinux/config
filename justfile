@@ -93,7 +93,7 @@ status: _is_compatible _has_config
 
 # Run flake checks
 check: _is_compatible _has_config
-    @nix flake check --all-systems {{NIX_OPTS}}
+    @nix flake check --all-systems {{NIX_OPTS}} 2>&1 | head -10
     @nix flake show {{NIX_OPTS}}
 
 # Check if running as root or with sudo

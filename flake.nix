@@ -16,12 +16,9 @@
     }@inputs:
     let
       inherit (self) outputs;
-      supportedSystems = [
-        "x86_64-linux"
-        "aarch64-linux"
-      ];
 
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      helper = import ./lib { inherit inputs outputs noughtyConfig; };
+      inherit (helper) forAllSystems;
 
       pkgsFor =
         system:
@@ -50,15 +47,6 @@
         };
       }
       // tomlConfig;
-
-      # Helper library
-      helper = import ./lib {
-        inherit
-          inputs
-          outputs
-          noughtyConfig
-          ;
-      };
 
       makeDevShell =
         system:
