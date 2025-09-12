@@ -1,5 +1,4 @@
 {
-  noughtyConfig,
   pkgs,
   ...
 }:
@@ -10,8 +9,6 @@
   ];
 
   home = {
-    username = noughtyConfig.user.name;
-    homeDirectory = noughtyConfig.user.home;
     stateVersion = "25.05";
   };
 
