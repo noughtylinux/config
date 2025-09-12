@@ -146,6 +146,12 @@ _is_compatible:
             ;;
     esac
 
+    # Check architecture is x86_64 or aarch64
+    if uname -m | grep -vqE '^(x86_64|aarch64)$'; then
+        echo -e "{{ERROR}}: Unsupported architecture '$(uname -m)'! Only x86_64 and aarch64 are supported."
+        exit 1
+    fi
+
 [private]
 _has_config:
     #!/usr/bin/env bash
