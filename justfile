@@ -160,6 +160,7 @@ _is_compatible:
     # Check if this is Ubuntu
     if [[ "${ID:-}" != "ubuntu" ]]; then
         echo -e "{{ERROR}}: This system is not Ubuntu (detected: ${ID:-unknown})"
+        # TODO: Clean up after testing is done
         if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
             exit 1
         fi
@@ -172,6 +173,7 @@ _is_compatible:
             ;;
         *)
             echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported"
+            # TODO: Clean up after testing is done
             if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
                 exit 1
             fi
