@@ -19,19 +19,10 @@
       helper = import ./lib { inherit inputs outputs; };
       noughtyConfig = helper.mkNoughtyConfig { };
 
-      pkgsFor =
-        system:
-        import nixpkgs {
-          inherit system;
-          config = {
-            allowUnfree = true;
-          };
-        };
-
       makeDevShell =
         system:
         let
-          pkgs = pkgsFor system;
+          pkgs = helper.pkgsFor system;
 
           corePackages = [
             inputs.determinate.packages.${system}.default

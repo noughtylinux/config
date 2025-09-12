@@ -3,7 +3,20 @@
   outputs,
   ...
 }:
+let
+  # Create nixpkgs instances with allowUnfree enabled
+  pkgsFor =
+    system:
+    import inputs.nixpkgs {
+      inherit system;
+      config = {
+        allowUnfree = true;
+      };
+    };
+in
 {
+  inherit pkgsFor;
+
   # TOML configuration management - independent function
   mkNoughtyConfig =
     {
@@ -31,7 +44,7 @@
       noughtyConfig,
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = inputs.nixpkgs.legacyPackages.${noughtyConfig.system.platform};
+      pkgs = pkgsFor noughtyConfig.system.platform;
       extraSpecialArgs = {
         inherit
           inputs
