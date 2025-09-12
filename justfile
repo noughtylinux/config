@@ -9,6 +9,8 @@ ERROR := RED + '🗵 ERROR' + RESET
 WARNING := YELLOW + '🛆 WARNING' + RESET
 SUCCESS := GREEN + '🗹 SUCCESS' + RESET
 
+# Constants
+NIX_OPTS := "--no-update-lock-file --impure"
 
 # List recipes
 list:
@@ -25,7 +27,7 @@ update: _is_compatible
 
 # Enter the development environment
 develop: _is_compatible _has_config
-    @nix develop --impure --no-update-lock-file
+    @nom develop {{NIX_OPTS}}
 
 # Generate config.toml from config.toml.in template
 generate-config: _is_compatible
@@ -58,26 +60,28 @@ generate-config: _is_compatible
 
 # Run flake checks
 check-flake: _is_compatible _has_config
-    @nix flake check --impure --all-systems
-    @nix flake show --impure
+    @nom flake check --all-systems {{NIX_OPTS}}
+    @nom flake show {{NIX_OPTS}}
 
 # Build home-manager configuration
 build: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Set HOSTNAME if not already set (for NixOS compatibility)
-    export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
-    nix build --impure ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+    # Set HOSTNAME if not already set
+    export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
+    export USER="${USER:-$(tq -f config.toml user.name)}"
+    nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Switch to home-manager configuration
 switch: _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Set HOSTNAME if not already set (for NixOS compatibility)
-    export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
-    nix run --impure ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+    # Set HOSTNAME if not already set
+    export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
+    export USER="${USER:-$(tq -f config.toml user.name)}"
+    nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Check config.toml exists and validate contents
 check-config: _is_compatible _has_config
@@ -91,8 +95,8 @@ check-config: _is_compatible _has_config
     CONFIG_SHELL=$(tq -f config.toml terminal.shell)
 
     # Check if hostname matches $(hostname)
-    if [[ "${CONFIG_HOSTNAME}" != "$(hostname)" ]]; then
-        echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname) '$(hostname)'"
+    if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
+        echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname -s) '$(hostname -s)'"
         exit 1
     fi
 
@@ -114,7 +118,7 @@ check-config: _is_compatible _has_config
         exit 1
     fi
 
-    echo "🞴 Hostname: ${CONFIG_HOSTNAME}"
+    echo "▣ Hostname: ${CONFIG_HOSTNAME}"
     echo "☻ User: ${CONFIG_USER}"
     echo "⌂ Home: ${CONFIG_HOME}"
     echo "𐇣 Shell: ${CONFIG_SHELL}"
@@ -164,10 +168,10 @@ _is_compatible:
     # Check for supported Ubuntu versions
     case "${VERSION_ID:-}" in
         "24.04"|"25.04")
-            echo -e "{{SUCCESS}}: Ubuntu ${VERSION_ID} is supported!"
+            echo -e "{{SUCCESS}}: ${NAME} ${VERSION_ID} is supported!"
             ;;
         *)
-            echo -e "{{ERROR}}: Ubuntu ${VERSION_ID:-unknown} is not supported"
+            echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported"
             if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
                 exit 1
             fi
