@@ -66,7 +66,7 @@ switch-system: _is_compatible _has_config
     set -euo pipefail
 
     echo "⊕ Switching to system configuration..."
-    system-manager switch --flake '.' --nix-option pure-eval false
+    sudo system-manager switch --flake '.' --nix-option pure-eval false
 
 build: build-home build-system
 switch: switch-home switch-system
