@@ -88,8 +88,10 @@
       });
 
       # Home Manager configurations
-      homeConfigurations = forAllSystems (system: {
-        "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome { inherit system; };
-      });
+      homeConfigurations = {
+        "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
+          system = builtins.currentSystem;
+        };
+      };
     };
 }
