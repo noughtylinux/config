@@ -1,5 +1,8 @@
 # Noughty Linux Configuration
 
+[system]
+hostname = "@@HOSTNAME@@"
+
 [user]
 name = "@@USER@@"
 home = "@@HOME@@"

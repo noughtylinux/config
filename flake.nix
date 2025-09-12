@@ -15,6 +15,7 @@
       ...
     }@inputs:
     let
+      inherit (self) outputs;
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -35,8 +36,28 @@
       tomlPath = ./config.toml;
       tomlExists = builtins.pathExists tomlPath;
 
-      # Use config.toml if it exists, otherwise use fallback
-      noughtyConfig = if tomlExists then builtins.fromTOML (builtins.readFile tomlPath) else { };
+      # Read TOML config if it exists, otherwise use empty set
+      tomlConfig = if tomlExists then builtins.fromTOML (builtins.readFile tomlPath) else { };
+
+      # Merge TOML config with system facts from environment variables
+      noughtyConfig = tomlConfig // {
+        system = (tomlConfig.system or { }) // {
+          hostname = builtins.getEnv "HOSTNAME";
+        };
+        user = (tomlConfig.user or { }) // {
+          name = builtins.getEnv "USER";
+          home = builtins.getEnv "HOME";
+        };
+      };
+
+      # Helper library
+      helper = import ./lib {
+        inherit
+          inputs
+          outputs
+          noughtyConfig
+          ;
+      };
 
       makeDevShell =
         system:
@@ -65,6 +86,11 @@
     {
       devShells = forAllSystems (system: {
         default = makeDevShell system;
+      });
+
+      # Home Manager configurations
+      homeConfigurations = forAllSystems (system: {
+        "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome { inherit system; };
       });
     };
 }
