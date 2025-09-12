@@ -1,10 +1,12 @@
 # Noughty Linux justfile
 
-# Color variables
+# Colours
 RED := '\033[31m'
 GREEN := '\033[32m'
 YELLOW := '\033[33m'
 RESET := '\033[0m'
+
+# Status messages
 ERROR := RED + '🗵 ERROR' + RESET
 WARNING := YELLOW + '🛆 WARNING' + RESET
 SUCCESS := GREEN + '🗹 SUCCESS' + RESET
@@ -25,9 +27,34 @@ update: _is_compatible
     git pull --rebase
     echo -e "{{SUCCESS}}: Update complete!"
 
+# Run flake checks
+check: _is_compatible _has_config
+    @nix flake check --all-systems {{NIX_OPTS}} 2>&1 | cat
+    @nix flake show --all-systems {{NIX_OPTS}}
+
 # Enter the development environment
 develop: _is_compatible
     @nom develop {{NIX_OPTS}}
+
+# Build home-manager configuration
+build: _is_compatible _has_config
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Set HOSTNAME if not already set
+    export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
+    export USER="${USER:-$(tq -f config.toml user.name)}"
+    nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+
+# Switch to home-manager configuration
+switch: _is_compatible _has_config
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Set HOSTNAME if not already set
+    export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
+    export USER="${USER:-$(tq -f config.toml user.name)}"
+    nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Generate config.toml from config.toml.in template
 generate-config: _is_compatible
@@ -59,26 +86,6 @@ generate-config: _is_compatible
     sd '@@HOME@@' "${HOME}" config.toml
     echo -e "{{SUCCESS}}: config.toml generated!"
 
-# Build home-manager configuration
-build: _is_compatible _has_config
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    # Set HOSTNAME if not already set
-    export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
-    export USER="${USER:-$(tq -f config.toml user.name)}"
-    nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
-
-# Switch to home-manager configuration
-switch: _is_compatible _has_config
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    # Set HOSTNAME if not already set
-    export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
-    export USER="${USER:-$(tq -f config.toml user.name)}"
-    nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
-
 # Display config.toml status
 status: _is_compatible _has_config
     #!/usr/bin/env bash
@@ -90,11 +97,6 @@ status: _is_compatible _has_config
     echo -e "𐇣 Shell:\t$(tq -f config.toml terminal.shell)"
     echo ""
     echo "🟊 Ready to go!"
-
-# Run flake checks
-check: _is_compatible _has_config
-    @nix flake check --all-systems {{NIX_OPTS}} 2>&1 | cat
-    @nix flake show --all-systems {{NIX_OPTS}}
 
 # Check if running as root or with sudo
 [private]
