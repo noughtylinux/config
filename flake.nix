@@ -20,12 +20,11 @@
     let
       inherit (self) outputs;
       helper = import ./lib { inherit inputs outputs; };
-      noughtyConfig = helper.mkNoughtyConfig { };
+      noughtyConfig = helper.mkConfig { };
       makeDevShell =
         system:
         let
           pkgs = helper.pkgsFor system;
-
           corePackages = [
             inputs.determinate.packages.${system}.default
             inputs.system-manager.packages.${system}.default
@@ -51,18 +50,18 @@
         default = makeDevShell system;
       });
 
-      # System Manager configuration
-      systemConfigs.default = helper.mkSystem {
-        inherit noughtyConfig;
-        system = builtins.currentSystem;
-      };
-
       # Home Manager configurations
       homeConfigurations = {
         "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
           inherit noughtyConfig;
           system = builtins.currentSystem;
         };
+      };
+
+      # System Manager configuration
+      systemConfigs.default = helper.mkSystem {
+        inherit noughtyConfig;
+        system = builtins.currentSystem;
       };
     };
 }

@@ -14,8 +14,8 @@ in
 {
   inherit (helpers)
     forAllSystems
+    mkConfig
     mkHome
-    mkNoughtyConfig
     mkSystem
     pkgsFor
     ;

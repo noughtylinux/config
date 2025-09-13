@@ -17,9 +17,15 @@ in
 {
   inherit pkgsFor;
 
+  # Helper to generate attributes for all supported systems
+  forAllSystems = inputs.nixpkgs.lib.genAttrs [
+    "x86_64-linux"
+    "aarch64-linux"
+  ];
+
   # Helper to generate the noughtyConfig from config.toml
   # Use builtins.getEnv (impure) to ensure the flake evaluates when config.toml is missing
-  mkNoughtyConfig =
+  mkConfig =
     {
       tomlPath ? ../config.toml,
     }:
@@ -75,9 +81,4 @@ in
       };
       modules = [ ../system-manager ];
     };
-
-  forAllSystems = inputs.nixpkgs.lib.genAttrs [
-    "x86_64-linux"
-    "aarch64-linux"
-  ];
 }
