@@ -1,111 +1,137 @@
 # Noughty Linux justfile
 
 # Colours
+BLACK := '\033[30m'
 RED := '\033[31m'
 GREEN := '\033[32m'
 YELLOW := '\033[33m'
+BLUE := '\033[34m'
+MAGENTA := '\033[35m'
+CYAN := '\033[36m'
+WHITE := '\033[37m'
+
+# Formatting
 RESET := '\033[0m'
+BOLD := '\033[1m'
+DIM := '\033[2m'
+ITALIC := '\033[3m'
+UNDERLINE := '\033[4m'
+BLINK := '\033[5m'
+REVERSE := '\033[7m'
+HIDDEN := '\033[8m'
+STRIKETHROUGH := '\033[9m'
 
 # Status messages
-ERROR := RED + '🗵 ERROR' + RESET
-WARNING := YELLOW + '🛆 WARNING' + RESET
-SUCCESS := GREEN + '🗹 SUCCESS' + RESET
+ERROR := RED + '🗵 ' + UNDERLINE + DIM + 'ERROR' + RESET + BOLD + ': ' + RESET
+WARNING := YELLOW + '🛆 ' + DIM + 'WARNING' + RESET + BOLD + ': ' + RESET
+SUCCESS := GREEN + '🗹 ' + DIM + 'SUCCESS' + RESET + BOLD + ': ' + RESET
+
+# Glyphs
+GLYPH_CANCEL := MAGENTA + '⊘ ' + RESET
+GLYPH_CONFIG := BLUE + '✦ ' + RESET
+GLYPH_FLAKE := BLUE + '❆ ' + RESET
+GLYPH_HOME := BLUE + '≋ ' + RESET
+GLYPH_LOGO := CYAN + '🄍 ' + RESET
+GLYPH_SYSTEM := BLUE + '▣ ' + RESET
+GLYPH_UPDATE := BLUE + '⇩ ' + RESET
+GLYPH_USER := BLUE + '☻ ' + RESET
 
 # Constants
 NIX_OPTS := "--no-update-lock-file --impure"
+VERSION := "0.0.0"
 
 # List recipes
-list:
+list: _header
     @just --list --unsorted
 
 # Update configuration repository
-update: _is_compatible
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    echo "⟳ Updating configuration repository..."
-    git pull --rebase
-    echo -e "{{SUCCESS}}: Update complete!"
+update: _header _is_compatible
+    @echo -e "{{GLYPH_UPDATE}}Updating configuration repository..."
+    @git pull --rebase
+    @echo -e "{{SUCCESS}}Update complete!"
 
 # Run flake checks
-check: _is_compatible _has_config
+check: _header _is_compatible _has_config
+    @echo -e "{{GLYPH_FLAKE}}Running flake checks..."
     @nix flake check --log-format internal-json -v --all-systems {{NIX_OPTS}} |& nom --json
     @nix flake show --all-systems {{NIX_OPTS}}
 
 # Enter the development environment
-develop: _is_compatible
+develop: _header _is_compatible
     @nom develop {{NIX_OPTS}}
 
 # Build home-manager configuration
-build-home: _is_compatible _has_config
+build-home: _header _is_compatible _has_config
     #!/usr/bin/env bash
-    echo "⌂ Building home-manager configuration..."
-    # Set HOSTNAME if not already set
+    echo -e "{{GLYPH_HOME}}Building {{BOLD}}home-manager{{RESET}} configuration..."
+    # Set HOSTNAME and USER if not already set
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
     nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Switch to home-manager configuration
-switch-home: _is_compatible _has_config
+switch-home: _header _is_compatible _has_config
     #!/usr/bin/env bash
-    echo "⌂ Switching to new home-manager configuration..."
-    # Set HOSTNAME if not already set
+    echo -e "{{GLYPH_HOME}}Switching to new {{BOLD}}home-manager{{RESET}} configuration..."
+    # Set HOSTNAME and USER if not already set
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
     nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Build system-manager configuration
-build-system: _is_compatible _has_config
-    @echo "⯐ Building system-manager configuration..."
+build-system: _header _is_compatible _has_config
+    @echo -e "{{GLYPH_SYSTEM}}Building {{BOLD}}system-manager{{RESET}} configuration..."
     @nom build {{NIX_OPTS}} ".#systemConfigs.default"
 
 # Switch to system-manager configuration
-switch-system: _is_compatible _has_config
-    @echo "⯐ Switching to new system-manager configuration..."
+switch-system: _header _is_compatible _has_config
+    @echo -e "{{GLYPH_SYSTEM}}Switching to new {{BOLD}}system-manager{{RESET}} configuration..."
     sudo nix run 'github:numtide/system-manager' -- switch --flake '.' --nix-option pure-eval false
 
+# Build home and system configurations
 build: build-home build-system
+
+# Switch to new home and system configurations
 switch: switch-home switch-system
 
 # Generate config.toml from config.toml.in template
-generate-config: _is_compatible
+generate-config: _header _is_compatible
     #!/usr/bin/env bash
     set -euo pipefail
+    echo -e "{{GLYPH_CONFIG}}Generating {{DIM}}config.toml{{RESET}} from template..."
 
     # Check if config.toml.in exists
     if [[ ! -f "config.toml.in" ]]; then
-        echo -e "{{ERROR}}: config.toml.in template not found!"
+        echo -e "{{ERROR}}config.toml.in template not found!"
         exit 1
     fi
 
     # Safety check: prompt if config.toml already exists
     if [[ -f "config.toml" ]]; then
-        echo -e "{{WARNING}}: config.toml already exists!"
-        echo "This will overwrite your existing configuration."
-        read -p "Continue? [N/y]: " -r
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo "⊘ Operation cancelled."
+        echo -e "{{WARNING}}{{DIM}}config.toml{{RESET}} already exists!"
+        echo -en "{{YELLOW}}{{BOLD}}⬢ {{RESET}}{{YELLOW}}{{DIM}}Overwrite your existing configuration? {{RESET}}"
+        read -p "[N/y]: " -r
+        if [[ ! ${REPLY} =~ ^[Yy]$ ]]; then
+            echo -e "{{GLYPH_CANCEL}}Aborting. No changes made."
             exit 0
         fi
     fi
 
     # Generate config.toml by replacing placeholders
-    echo "✦ Generating config.toml from template..."
     cp config.toml.in config.toml
     sd '@@HOSTNAME@@' "$(hostname -s)" config.toml
     sd '@@USER@@' "${USER}" config.toml
-    echo -e "{{SUCCESS}}: config.toml generated!"
+    echo -e "{{SUCCESS}}{{DIM}}config.toml{{RESET}} generated!"
 
 # Display config.toml status
-status: _is_compatible _has_config
-    #!/usr/bin/env bash
-    set -euo pipefail
+status: _header _is_compatible _has_config
+    @echo -e "{{GLYPH_SYSTEM}}Hostname:\t{{DIM}}$(tq -f config.toml system.hostname){{RESET}}"
+    @echo -e "{{GLYPH_USER}}User:\t\t{{DIM}}$(tq -f config.toml user.name){{RESET}}"
+    @echo -e "{{GLYPH_HOME}}Home:\t\t{{DIM}}/home/$(tq -f config.toml user.name){{RESET}}"
 
-    echo -e "▣ Hostname:\t$(tq -f config.toml system.hostname)"
-    echo -e "☻ User:\t\t$(tq -f config.toml user.name)"
-    echo -e "⌂ Home:\t\t/home/$(tq -f config.toml user.name)"
-    echo ""
-    echo "🟊 Ready to go!"
+[private]
+_header:
+    @echo -e "{{GLYPH_LOGO}}{{BOLD}}{{UNDERLINE}}Noughty Linux - {{RESET}}{{UNDERLINE}}v{{VERSION}}{{RESET}}"
 
 # Check if running as root or with sudo
 [private]
@@ -114,20 +140,20 @@ _is_compatible:
     set -euo pipefail
 
     # Check if running as root (UID 0)
-    if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
-        echo -e "{{ERROR}}: Do not run this command as root!"
+    if [[ "${EUID:-$(id -u)}" -eq 1 ]]; then
+        echo -e "{{ERROR}}{{BOLD}}{{UNDERLINE}}Do not{{RESET}} run this command as {{DIM}}root{{RESET}}!"
         exit 1
     fi
 
     # Check if sudo was used (SUDO_USER environment variable exists)
     if [[ -n "${SUDO_USER:-}" ]]; then
-        echo -e "{{ERROR}}! Do not run this command with sudo!"
+        echo -e "{{ERROR}}{{BOLD}}{{UNDERLINE}}Do not{{RESET}} run this command with {{DIM}}sudo{{RESET}}!"
         exit 1
     fi
 
     # Check if /etc/os-release exists
     if [[ ! -f "/etc/os-release" ]]; then
-        echo -e "{{ERROR}}: /etc/os-release not found!"
+        echo -e "{{ERROR}}{{DIM}}/etc/os-release{{RESET}} not found!"
         exit 1
     fi
 
@@ -136,7 +162,7 @@ _is_compatible:
 
     # Check if this is Ubuntu
     if [[ "${ID:-}" != "ubuntu" ]]; then
-        echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! Only Ubuntu is supported."
+        echo -e "{{ERROR}}${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! {{BOLD}}Only Ubuntu is supported.{{RESET}}"
         # TODO: Clean up after testing is done
         if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
             exit 1
@@ -146,10 +172,10 @@ _is_compatible:
     # Check for supported Ubuntu versions
     case "${VERSION_ID:-}" in
         "24.04"|"25.04")
-            echo -e "{{SUCCESS}}: ${NAME} ${VERSION_ID} is supported!"
+            echo -e "{{SUCCESS}}${NAME} ${VERSION_ID} is supported!"
             ;;
         *)
-            echo -e "{{ERROR}}: ${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! Only Ubuntu 24.04 and 25.04 are supported."
+            echo -e "{{ERROR}}${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! {{BOLD}}Only Ubuntu 24.04 and 25.04 are supported.{{RESET}}"
             # TODO: Clean up after testing is done
             if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
                 exit 1
@@ -159,7 +185,7 @@ _is_compatible:
 
     # Check architecture is x86_64 or aarch64
     if uname -m | grep -vqE '^(x86_64|aarch64)$'; then
-        echo -e "{{ERROR}}: Unsupported architecture '$(uname -m)'! Only x86_64 and aarch64 are supported."
+        echo -e "{{ERROR}}Unsupported architecture {{DIM}}$(uname -m){{RESET}}! {{BOLD}}Only x86_64 and aarch64 are supported.{{RESET}}"
         exit 1
     fi
 
@@ -170,7 +196,7 @@ _has_config:
     set -euo pipefail
 
     if [[ ! -f "config.toml" ]]; then
-        echo -e "{{ERROR}}: config.toml not found! Please run 'just generate-config'."
+        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} not found! Please run: {{BOLD}}just generate-config{{RESET}}."
         exit 1
     fi
 
@@ -181,18 +207,18 @@ _has_config:
 
     # Check if hostname matches $(hostname -s)
     if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
-        echo -e "{{ERROR}}: config.toml system.hostname '${CONFIG_HOSTNAME}' does not match \$(hostname -s) '$(hostname -s)'"
+        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} system.hostname '${CONFIG_HOSTNAME}' {{UNDERLINE}}does not match{{RESET}} \$(hostname -s) '$(hostname -s)'"
         exit 1
     fi
 
     # Check if username matches $USER
     if [[ "${CONFIG_USER}" != "${USER}" ]]; then
-        echo -e "{{ERROR}}: config.toml user.name '${CONFIG_USER}' does not match \$USER '${USER}'"
+        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} user.name '${CONFIG_USER}' {{UNDERLINE}}does not match{{RESET}} \$USER '${USER}'"
         exit 1
     fi
 
     # Check if home_directory path exists
     if [[ ! -d "${CONFIG_HOME}" ]]; then
-        echo -e "{{ERROR}}: '${CONFIG_HOME}' does not exist"
+        echo -e "{{ERROR}}{{BOLD}}${CONFIG_HOME}{{DIM}} does not exist"
         exit 1
     fi

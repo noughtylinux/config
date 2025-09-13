@@ -40,9 +40,7 @@
         in
         pkgs.mkShell {
           buildInputs = corePackages;
-          shellHook = ''
-            echo "🄍 Noughty Linux"
-          '';
+          shellHook = '''';
         };
     in
     {
