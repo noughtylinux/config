@@ -32,9 +32,9 @@ curl -fsSL https://noughtylinux.org/bootstrap | bash
 ### User Experience Design 👤
 
 #### Target Audience
-🥇**Primary**: Linux enthusiasts wanting contemporary tools with a tightly integrated experience
-🥈**Secondary**: Give me the bling without the effort eye candy hunters
-🥉**Tertiary**: Users interested in Nix ecosystem without NixOS commitment
+-🥇**Primary**: Linux enthusiasts wanting contemporary tools with a tightly integrated experience
+-🥈**Secondary**: Give me the bling without the effort eye candy hunters
+-🥉**Tertiary**: Users interested in Nix ecosystem without NixOS commitment
 
 #### Configuration Philosophy
 - **Opinionated defaults**: Excellent *"out-of-box"* experience
