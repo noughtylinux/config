@@ -33,6 +33,7 @@ GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_HOME := BLUE + '≋ ' + RESET
 GLYPH_LOGO := CYAN + '🄍 ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
+GLYPH_TRANSFER := BLUE + '➲ ' + RESET
 GLYPH_UPDATE := BLUE + '⇩ ' + RESET
 GLYPH_USER := BLUE + '☻ ' + RESET
 
@@ -128,6 +129,27 @@ status: _header _is_compatible _has_config
     @echo -e "{{GLYPH_SYSTEM}}Hostname:\t{{DIM}}$(tq -f config.toml system.hostname){{RESET}}"
     @echo -e "{{GLYPH_USER}}User:\t\t{{DIM}}$(tq -f config.toml user.name){{RESET}}"
     @echo -e "{{GLYPH_HOME}}Home:\t\t{{DIM}}/home/$(tq -f config.toml user.name){{RESET}}"
+
+# Transfer project to remote host via SSH
+transfer host path="~/NoughtyLinux": _header
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo -e "{{GLYPH_UPDATE}}Copying project to {{BOLD}}{{host}}:{{path}}{{RESET}}..."
+
+    # Create temporary archive excluding sensitive files
+    TEMP_ARCHIVE=$(mktemp /tmp/noughty-linux.XXXXXX.tar.gz)
+    trap "rm -f ${TEMP_ARCHIVE}" EXIT
+
+    # Create archive using git (respects .gitignore automatically)
+    git archive --format=tar.gz HEAD > "${TEMP_ARCHIVE}"
+
+    # Copy archive to remote host
+    scp "${TEMP_ARCHIVE}" "{{host}}:/tmp/noughty-linux-payload.tar.gz"
+
+    # Extract on remote host
+    ssh "{{host}}" "mkdir -p {{path}} && cd {{path}} && tar -xzf /tmp/noughty-linux-deploy.tar.gz --strip-components=1 && rm -f /tmp/noughty-linux-payload.tar.gz"
+
+    echo -e "{{SUCCESS}}Project deployed to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
 
 [private]
 _header:
