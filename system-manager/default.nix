@@ -1,4 +1,5 @@
 {
+  inputs,
   pkgs,
   ...
 }:
@@ -11,7 +12,7 @@
     environment = {
       # System packages will be configured here
       systemPackages = [
-        pkgs.glow
+        inputs.system-manager.packages.${pkgs.system}.default
       ];
     };
     # Only allow NixOS and Ubuntu distributions

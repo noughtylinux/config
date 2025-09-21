@@ -88,7 +88,7 @@ build-system: _header _is_compatible _has_config
 # Switch to system-manager configuration
 switch-system: _header _is_compatible _has_config
     @echo -e "{{GLYPH_SYSTEM}}Switching to new {{BOLD}}system-manager{{RESET}} configuration..."
-    sudo env PATH="${PATH}" nix run 'github:numtide/system-manager' -- switch --flake . --nix-option pure-eval false
+    sudo env PATH="${PATH}" system-manager switch --flake . --nix-option pure-eval false
 
 # Build home and system configurations
 build: build-home build-system
