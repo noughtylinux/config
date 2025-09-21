@@ -53,7 +53,7 @@ update: _header _is_compatible
     @echo -e "{{SUCCESS}}Update complete!"
 
 # Run flake checks
-check: _header _is_compatible _has_config
+check: _header
     @echo -e "{{GLYPH_FLAKE}}Running flake checks..."
     @nix flake check --log-format internal-json -v --all-systems {{NIX_OPTS}} |& nom --json
     @nix flake show --all-systems {{NIX_OPTS}}
@@ -78,7 +78,7 @@ switch-home: _header _is_compatible _has_config
     # Set HOSTNAME and USER if not already set
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
-    nom run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+    nix run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Build system-manager configuration
 build-system: _header _is_compatible _has_config
@@ -88,7 +88,7 @@ build-system: _header _is_compatible _has_config
 # Switch to system-manager configuration
 switch-system: _header _is_compatible _has_config
     @echo -e "{{GLYPH_SYSTEM}}Switching to new {{BOLD}}system-manager{{RESET}} configuration..."
-    sudo nix run 'github:numtide/system-manager' -- switch --flake '.' --nix-option pure-eval false
+    sudo env PATH="${PATH}" nix run 'github:numtide/system-manager' -- switch --flake . --nix-option pure-eval false
 
 # Build home and system configurations
 build: build-home build-system
@@ -272,6 +272,7 @@ _is_compatible:
     # Check if this is Ubuntu
     if [[ "${ID:-}" != "ubuntu" ]]; then
         echo -e "{{ERROR}}${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! {{BOLD}}Only Ubuntu is supported.{{RESET}}"
+        exit 1
     fi
 
     # Check for supported Ubuntu versions
@@ -281,6 +282,7 @@ _is_compatible:
             ;;
         *)
             echo -e "{{ERROR}}${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! {{BOLD}}Only Ubuntu 24.04 and 25.04 are supported.{{RESET}}"
+            exit 1
             ;;
     esac
 

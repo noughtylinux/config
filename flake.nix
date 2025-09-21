@@ -20,6 +20,7 @@
     let
       inherit (self) outputs;
       helper = import ./lib { inherit inputs outputs; };
+      platform = builtins.currentSystem;
       noughtyConfig = helper.mkConfig { };
       makeDevShell =
         system:
@@ -31,7 +32,6 @@
             pkgs.curl
             pkgs.git
             pkgs.gnugrep
-            pkgs.home-manager
             pkgs.just
             pkgs.nix-output-monitor
             pkgs.sd
@@ -52,14 +52,14 @@
       homeConfigurations = {
         "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
           inherit noughtyConfig;
-          system = builtins.currentSystem;
+          system = platform;
         };
       };
 
       # System Manager configuration
       systemConfigs.default = helper.mkSystem {
         inherit noughtyConfig;
-        system = builtins.currentSystem;
+        system = platform;
       };
     };
 }
