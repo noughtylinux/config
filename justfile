@@ -147,7 +147,7 @@ transfer host path="~/NoughtyLinux": _header
     scp "${TEMP_ARCHIVE}" "{{host}}:/tmp/noughty-linux-payload.tar.gz"
 
     # Extract on remote host
-    ssh "{{host}}" "mkdir -p {{path}} && cd {{path}} && tar -xzf /tmp/noughty-linux-deploy.tar.gz --strip-components=1 && rm -f /tmp/noughty-linux-payload.tar.gz"
+    ssh "{{host}}" "mkdir -p {{path}} && cd {{path}} && tar -xzf /tmp/noughty-linux-payload.tar.gz --strip-components=1 && rm -f /tmp/noughty-linux-payload.tar.gz"
 
     echo -e "{{SUCCESS}}Project deployed to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
 
