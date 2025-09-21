@@ -8,3 +8,12 @@ name = "@@USER@@"
 
 [terminal]
 shell = "fish"              # fish | zsh | bash
+
+[ubuntu]
+
+# Ubuntu features to remove/disable
+[ubuntu.remove]
+snapd = false               # Remove Snap package manager
+apport = false              # Remove crash reporting
+pollinate = true            # Remove entropy seeding
+unattended-upgrades = false # Remove automatic updates

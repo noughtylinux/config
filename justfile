@@ -32,6 +32,7 @@ GLYPH_CONFIG := BLUE + '✦ ' + RESET
 GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_HOME := BLUE + '≋ ' + RESET
 GLYPH_LOGO := CYAN + '🄍 ' + RESET
+GLYPH_NET := BLUE + '🖧 ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
 GLYPH_TRANSFER := BLUE + '➲ ' + RESET
 GLYPH_UPDATE := BLUE + '⇩ ' + RESET
@@ -130,6 +131,56 @@ status: _header _is_compatible _has_config
     @echo -e "{{GLYPH_USER}}User:\t\t{{DIM}}$(tq -f config.toml user.name){{RESET}}"
     @echo -e "{{GLYPH_HOME}}Home:\t\t{{DIM}}/home/$(tq -f config.toml user.name){{RESET}}"
 
+# Remove unwanted Ubuntu packages based on config.toml
+cleanse: _header _is_compatible _has_config
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Array to collect packages to remove
+    PACKAGES_TO_REMOVE=()
+
+    # Check ubuntu configuration section
+    if tq -f config.toml ubuntu >/dev/null 2>&1; then
+        # Check each package option
+        if [[ "$(tq -f config.toml ubuntu.remove.snapd 2>/dev/null || echo 'false')" == "true" ]]; then
+            PACKAGES_TO_REMOVE+=("snapd")
+        fi
+
+        if [[ "$(tq -f config.toml ubuntu.remove.apport 2>/dev/null || echo 'false')" == "true" ]]; then
+            PACKAGES_TO_REMOVE+=("apport")
+        fi
+
+        if [[ "$(tq -f config.toml ubuntu.remove.pollinate 2>/dev/null || echo 'false')" == "true" ]]; then
+            PACKAGES_TO_REMOVE+=("pollinate")
+        fi
+
+        if [[ "$(tq -f config.toml ubuntu.remove.unattended-upgrades 2>/dev/null || echo 'false')" == "true" ]]; then
+            PACKAGES_TO_REMOVE+=("unattended-upgrades")
+        fi
+    else
+        echo -e "{{WARNING}}No {{DIM}}[ubuntu]{{RESET}} section found in config.toml - no packages will be removed."
+        exit 0
+    fi
+
+    # Remove packages if any are configured for removal
+    if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]]; then
+        echo -e "{{GLYPH_CANCEL}}Removing unwanted Ubuntu packages..."
+        echo -e "{{YELLOW}}{{DIM}}Packages to remove: ${PACKAGES_TO_REMOVE[*]}{{RESET}}"
+        sudo apt-get update
+        sudo apt-get -y remove --purge "${PACKAGES_TO_REMOVE[@]}"
+        sudo apt-get -y autoremove --purge
+        sudo apt-get -y autoclean
+        # If snapd was removed, also remove snap directories
+        if [[ " ${PACKAGES_TO_REMOVE[*]} " == *" snapd "* ]]; then
+            sudo rm -rf \
+                /snap \
+                /usr/lib/snapd \
+                /var/snap \
+                /var/lib/snapd
+        fi
+        echo -e "{{SUCCESS}}Successfully removed ${#PACKAGES_TO_REMOVE[@]} packages!"
+    fi
+
 # Transfer project to remote host via SSH
 transfer host path="~/NoughtyLinux": _header
     #!/usr/bin/env bash
@@ -147,7 +198,7 @@ transfer host path="~/NoughtyLinux": _header
     scp "${TEMP_ARCHIVE}" "{{host}}:/tmp/noughty-linux-payload.tar.gz"
 
     # Extract on remote host
-    ssh "{{host}}" "mkdir -p {{path}} && cd {{path}} && tar -xzf /tmp/noughty-linux-payload.tar.gz --strip-components=1 && rm -f /tmp/noughty-linux-payload.tar.gz"
+    ssh "{{host}}" "mkdir -p {{path}} && cd {{path}} && tar -xzf /tmp/noughty-linux-payload.tar.gz && rm -f /tmp/noughty-linux-payload.tar.gz"
 
     echo -e "{{SUCCESS}}Project deployed to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
 
