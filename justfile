@@ -151,6 +151,40 @@ transfer host path="~/NoughtyLinux": _header
 
     echo -e "{{SUCCESS}}Project deployed to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
 
+# Bootstrap Noughty Linux on remote Ubuntu host
+bootstrap host: _header
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo -e "{{GLYPH_SYSTEM}}Bootstrapping Noughty Linux on {{BOLD}}{{host}}{{RESET}}..."
+
+    # Check if bootstrap script exists
+    if [[ ! -f "../bootstrap/bootstrap.sh" ]]; then
+        echo -e "{{ERROR}}Bootstrap script not found at ../bootstrap/bootstrap.sh"
+        exit 1
+    fi
+
+    # Transfer bootstrap script to remote host
+    echo -e "{{GLYPH_TRANSFER}}Transferring bootstrap script..."
+    scp "../bootstrap/bootstrap.sh" "{{host}}:/tmp/noughty-bootstrap.sh"
+
+    # Make bootstrap script executable and run it
+    echo -e "{{GLYPH_SYSTEM}}Executing bootstrap on remote host..."
+    if ! ssh -t "{{host}}" "chmod +x /tmp/noughty-bootstrap.sh && /tmp/noughty-bootstrap.sh"; then
+        echo ""
+        echo -e "{{ERROR}}Bootstrap failed on remote host."
+        echo "Check the output above for specific error details."
+        echo ""
+        # Clean up bootstrap script even on failure
+        ssh "{{host}}" "rm -f /tmp/noughty-bootstrap.sh" 2>/dev/null || true
+        exit 1
+    fi
+
+    # Clean up bootstrap script
+    ssh "{{host}}" "rm -f /tmp/noughty-bootstrap.sh"
+
+    echo -e "{{SUCCESS}}Bootstrap completed on {{BOLD}}{{host}}{{RESET}}!"
+    echo -e "{{GLYPH_HOME}}You can now SSH to {{BOLD}}{{host}}{{RESET}} and run {{DIM}}just{{RESET}} commands."
+
 [private]
 _header:
     @echo -e "{{GLYPH_LOGO}}{{BOLD}}{{UNDERLINE}}Noughty Linux - {{RESET}}{{UNDERLINE}}v{{VERSION}}{{RESET}}"
