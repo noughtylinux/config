@@ -181,7 +181,7 @@ cleanse: _header _is_compatible _has_config
         echo -e "{{SUCCESS}}Successfully removed ${#PACKAGES_TO_REMOVE[@]} packages!"
     fi
 
-# Transfer project to remote host via SSH
+# Transfer Noughty Linux configuration to remote Ubuntu host
 transfer host path="~/NoughtyLinux": _header
     #!/usr/bin/env bash
     set -euo pipefail
@@ -202,7 +202,7 @@ transfer host path="~/NoughtyLinux": _header
 
     echo -e "{{SUCCESS}}Project deployed to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
 
-# Bootstrap Noughty Linux on remote Ubuntu host
+# Bootstrap Noughty Linux on remote Ubuntu host via SSH
 bootstrap host: _header
     #!/usr/bin/env bash
     set -euo pipefail
@@ -272,10 +272,6 @@ _is_compatible:
     # Check if this is Ubuntu
     if [[ "${ID:-}" != "ubuntu" ]]; then
         echo -e "{{ERROR}}${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! {{BOLD}}Only Ubuntu is supported.{{RESET}}"
-        # TODO: Clean up after testing is done
-        if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
-            exit 1
-        fi
     fi
 
     # Check for supported Ubuntu versions
@@ -285,10 +281,6 @@ _is_compatible:
             ;;
         *)
             echo -e "{{ERROR}}${NAME:-unknown} ${VERSION_ID:-unknown} is not supported! {{BOLD}}Only Ubuntu 24.04 and 25.04 are supported.{{RESET}}"
-            # TODO: Clean up after testing is done
-            if [[ "${ID}" == "nixos" ]] && [[ "${USER}" != "martin" ]]; then
-                exit 1
-            fi
             ;;
     esac
 
