@@ -214,6 +214,8 @@ bootstrap host: _header
         exit 1
     fi
 
+    just transfer {{host}}
+
     # Transfer bootstrap script to remote host
     echo -e "{{GLYPH_TRANSFER}}Transferring bootstrap script..."
     scp "../bootstrap/bootstrap.sh" "{{host}}:/tmp/noughty-bootstrap.sh"
