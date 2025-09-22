@@ -18,6 +18,7 @@
     # Enable system-graphics support
     system-graphics = {
       enable = true;
+      enable32Bit = true;
       extraPackages = [ ];
       extraPackages32 = [ ];
     };
