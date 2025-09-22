@@ -6,6 +6,10 @@ hostname = "@@HOSTNAME@@"
 [user]
 name = "@@USER@@"
 
+[catppuccin]
+accent = "blue"
+flavor = "mocha"
+
 [terminal]
 shell = "fish"              # fish | zsh | bash
 

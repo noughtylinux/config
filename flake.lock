@@ -1,5 +1,26 @@
 {
   "nodes": {
+    "catppuccin": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1758185809,
+        "narHash": "sha256-bdohJ5QVXbi2QjFNuFwjKmggJY7b8X1geA5w9OFYyt0=",
+        "owner": "catppuccin",
+        "repo": "nix",
+        "rev": "751b99dca72c7f9df5475c67dcf1059893564e32",
+        "type": "github"
+      },
+      "original": {
+        "owner": "catppuccin",
+        "repo": "nix",
+        "rev": "751b99dca72c7f9df5475c67dcf1059893564e32",
+        "type": "github"
+      }
+    },
     "determinate": {
       "inputs": {
         "determinate-nixd-aarch64-darwin": "determinate-nixd-aarch64-darwin",
@@ -269,6 +290,7 @@
     },
     "root": {
       "inputs": {
+        "catppuccin": "catppuccin",
         "determinate": "determinate",
         "home-manager": "home-manager",
         "nix-system-graphics": "nix-system-graphics",

@@ -1,6 +1,8 @@
 {
   description = "Noughty Linux";
   inputs = {
+    catppuccin.url = "github:catppuccin/nix?rev=751b99dca72c7f9df5475c67dcf1059893564e32";
+    catppuccin.inputs.nixpkgs.follows = "nixpkgs";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     determinate.inputs.nixpkgs.follows = "nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
