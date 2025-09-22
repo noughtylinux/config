@@ -33,6 +33,7 @@ GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_HOME := BLUE + '≋ ' + RESET
 GLYPH_LOGO := CYAN + '🄍 ' + RESET
 GLYPH_NET := BLUE + '🖧 ' + RESET
+GLYPH_SHELL := BLUE + '﹩ ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
 GLYPH_TRANSFER := BLUE + '➲ ' + RESET
 GLYPH_UPDATE := BLUE + '⇩ ' + RESET
