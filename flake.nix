@@ -50,6 +50,9 @@
         default = makeDevShell system;
       });
 
+      # Formatter for .nix files, available via 'nix fmt'
+      formatter = helper.forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+
       # Home Manager configurations
       homeConfigurations = {
         "${noughtyConfig.user.name}@${noughtyConfig.system.hostname}" = helper.mkHome {
@@ -57,6 +60,22 @@
           system = platform;
         };
       };
+
+      # Custom packages and modifications, exported as overlays
+      overlays = import ./overlays { inherit inputs; };
+
+      # Custom packages; accessible via 'nix build', 'nix shell', etc
+      packages = helper.forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            system = platform;
+            config.allowUnfree = true;
+            overlays = builtins.attrValues self.overlays;
+          };
+        in
+        import ./pkgs pkgs
+      );
 
       # System Manager configuration
       systemConfigs.default = helper.mkSystem {

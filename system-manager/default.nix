@@ -1,5 +1,6 @@
 {
   inputs,
+  outputs,
   pkgs,
   ...
 }:
@@ -15,13 +16,26 @@
     };
 
     nix = {
-      # Disable NixOS module management; Determinate Nix will handle it
+      # Disable NixOS module management; Determinate Nix will handle configuration
       enable = false;
       package = pkgs.nix;
     };
 
-    # Set the host platform architecture
-    nixpkgs.hostPlatform = pkgs.system;
+    nixpkgs = {
+      # Set the host platform architecture
+      hostPlatform = pkgs.system;
+      overlays = [
+        # Add overlays your own flake exports (from overlays and pkgs dir):
+        outputs.overlays.additions
+        outputs.overlays.modifications
+        outputs.overlays.unstable-packages
+        # Add overlays exported from other flakes:
+      ];
+      # Configure your nixpkgs instance
+      config = {
+        allowUnfree = true;
+      };
+    };
 
     # Enable system-graphics support
     system-graphics = {
