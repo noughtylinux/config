@@ -1,2 +1,3 @@
+.direnv*
 config.toml
 result*

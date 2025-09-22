@@ -18,6 +18,7 @@ in
     ./btop.nix
     ./cava.nix
     ./dircolors.nix
+    ./direnv.nix
     ./eza.nix
     ./starship.nix
   ];
