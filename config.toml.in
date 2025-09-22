@@ -9,6 +9,8 @@ name = "@@USER@@"
 [catppuccin]
 accent = "blue"
 flavor = "mocha"
+gtk = false
+qt = false
 
 [terminal]
 shell = "fish"              # fish | zsh | bash

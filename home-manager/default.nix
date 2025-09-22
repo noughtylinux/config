@@ -7,7 +7,9 @@
 }:
 {
   imports = [
+    inputs.catppuccin.homeModules.catppuccin
     ./user
+    ./desktop
     ./terminal
   ];
 

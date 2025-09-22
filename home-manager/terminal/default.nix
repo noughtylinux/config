@@ -1,6 +1,5 @@
 {
   config,
-  inputs,
   lib,
   noughtyConfig,
   ...
@@ -12,7 +11,6 @@ let
 in
 {
   imports = [
-    inputs.catppuccin.homeModules.catppuccin
     ./bat.nix
     ./bottom.nix
     ./btop.nix
