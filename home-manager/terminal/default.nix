@@ -19,6 +19,8 @@ in
     ./direnv.nix
     ./eza.nix
     ./fastfetch.nix
+    ./fd.nix
+    ./fzf.nix
     ./gpg.nix
     ./starship.nix
   ];
