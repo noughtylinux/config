@@ -16,6 +16,8 @@ in
     ./bat.nix
     ./bottom.nix
     ./btop.nix
+    ./dircolors.nix
+    ./eza.nix
     ./starship.nix
   ];
 
