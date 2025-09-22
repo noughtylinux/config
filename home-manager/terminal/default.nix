@@ -18,6 +18,7 @@ in
     ./dircolors.nix
     ./direnv.nix
     ./eza.nix
+    ./fastfetch.nix
     ./starship.nix
   ];
 
