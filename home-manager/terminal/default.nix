@@ -12,6 +12,7 @@ in
 {
   imports = [
     inputs.catppuccin.homeModules.catppuccin
+    ./bat.nix
   ];
 
   # Catppuccin is not enabled for everything by default
