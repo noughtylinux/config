@@ -16,6 +16,7 @@ in
     ./bat.nix
     ./bottom.nix
     ./btop.nix
+    ./starship.nix
   ];
 
   # Catppuccin is not enabled for everything by default
