@@ -22,6 +22,7 @@ in
     ./fd.nix
     ./fzf.nix
     ./gpg.nix
+    ./jq.nix
     ./micro.nix
     ./ripgrep.nix
     ./starship.nix
