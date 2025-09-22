@@ -1,13 +1,14 @@
 {
   config,
   inputs,
+  lib,
   noughtyConfig,
   ...
 }:
 let
-  selectedShell = noughtyConfig.terminal.shell or "fish";
   catppuccinAccent = noughtyConfig.catppuccin.accent or "blue";
   catppuccinFlavor = noughtyConfig.catppuccin.flavor or "mocha";
+  selectedShell = noughtyConfig.terminal.shell or "fish";
 in
 {
   imports = [
@@ -32,5 +33,29 @@ in
     fish.enable = selectedShell == "fish";
     bash.enable = true;
     zsh.enable = selectedShell == "zsh";
+  };
+
+  systemd = {
+    user = {
+      # Nicely reload system units when changing configs
+      startServices = "sd-switch";
+      # Create age keys directory for SOPS
+      tmpfiles = {
+        rules = [
+          "d ${config.home.homeDirectory}/.config/sops/age 0755 ${config.home.username} users - -"
+        ];
+      };
+    };
+  };
+
+  xdg = {
+    enable = true;
+    userDirs = {
+      enable = true;
+      createDirectories = lib.mkDefault true;
+      extraConfig = {
+        XDG_SCREENSHOTS_DIR = "${config.home.homeDirectory}/Pictures/Screenshots";
+      };
+    };
   };
 }
