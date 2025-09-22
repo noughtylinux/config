@@ -15,6 +15,8 @@
     stateVersion = "25.05";
   };
 
+  news.display = "silent";
+
   nix =
     let
       flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
