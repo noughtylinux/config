@@ -23,6 +23,7 @@ in
     ./fzf.nix
     ./gpg.nix
     ./micro.nix
+    ./ripgrep.nix
     ./starship.nix
   ];
 
