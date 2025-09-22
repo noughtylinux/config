@@ -13,7 +13,8 @@ gtk = false
 qt = false
 
 [terminal]
-shell = "fish"              # fish | zsh | bash
+# Your preferred shell (fish or zsh) - bash is always configured
+shell = "fish"
 
 [ubuntu]
 
