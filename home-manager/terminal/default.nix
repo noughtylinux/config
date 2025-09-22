@@ -16,6 +16,7 @@ in
     ./bat.nix
     ./bottom.nix
     ./btop.nix
+    ./cava.nix
     ./dircolors.nix
     ./eza.nix
     ./starship.nix
