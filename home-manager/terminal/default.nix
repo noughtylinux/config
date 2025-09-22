@@ -26,6 +26,7 @@ in
     ./ripgrep.nix
     ./starship.nix
     ./yazi.nix
+    ./yt-dlp.nix
     ./zoxide.nix
   ];
 
