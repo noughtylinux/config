@@ -13,6 +13,8 @@ in
   imports = [
     inputs.catppuccin.homeModules.catppuccin
     ./bat.nix
+    ./bottom.nix
+    ./btop.nix
   ];
 
   # Catppuccin is not enabled for everything by default
