@@ -25,9 +25,10 @@ in
   };
 
   # Terminal/shell configuration derived from TOML config
+  # Always enable bash for scripts and compatibility
   programs = {
     fish.enable = selectedShell == "fish";
-    bash.enable = selectedShell == "bash";
+    bash.enable = true;
     zsh.enable = selectedShell == "zsh";
   };
 }

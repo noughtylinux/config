@@ -41,6 +41,7 @@ GLYPH_USER := BLUE + '☻ ' + RESET
 
 # Constants
 NIX_OPTS := "--no-update-lock-file --impure"
+STAMP := `date +%Y%m%d-%H%M`
 VERSION := "0.0.0"
 
 # List recipes
@@ -79,7 +80,8 @@ switch-home: _header _is_compatible _has_config
     # Set HOSTNAME and USER if not already set
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
-    nix run {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+    home-manager --impure -b noughty-{{STAMP}} --flake ".#${USER}@${HOSTNAME}" switch
+
 
 # Build system-manager configuration
 build-system: _header _is_compatible _has_config
