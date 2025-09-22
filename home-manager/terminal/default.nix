@@ -25,6 +25,7 @@ in
     ./micro.nix
     ./ripgrep.nix
     ./starship.nix
+    ./yazi.nix
   ];
 
   # Catppuccin is not enabled for everything by default
