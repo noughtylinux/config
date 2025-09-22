@@ -26,6 +26,7 @@ in
     ./ripgrep.nix
     ./starship.nix
     ./yazi.nix
+    ./zoxide.nix
   ];
 
   # Catppuccin is not enabled for everything by default
