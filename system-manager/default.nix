@@ -15,6 +15,12 @@
         inputs.system-manager.packages.${pkgs.system}.default
       ];
     };
+    # Enable system-graphics support
+    system-graphics = {
+      enable = true;
+      extraPackages = [ ];
+      extraPackages32 = [ ];
+    };
     # Only allow NixOS and Ubuntu distributions
     system-manager.allowAnyDistro = false;
   };
