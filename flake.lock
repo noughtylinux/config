@@ -189,6 +189,26 @@
         "url": "https://flakehub.com/f/DeterminateSystems/nix-src/%2A"
       }
     },
+    "nix-index-database": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1758427679,
+        "narHash": "sha256-xwjWRJTKDCjQ0iwfh7WhDhgcS0Wt3d1Yscg83mKBCn4=",
+        "owner": "nix-community",
+        "repo": "nix-index-database",
+        "rev": "fd2569ca2ef7d69f244cd9ffcb66a0540772ff85",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nix-index-database",
+        "type": "github"
+      }
+    },
     "nix-system-graphics": {
       "inputs": {
         "nixpkgs": [
@@ -293,6 +313,7 @@
         "catppuccin": "catppuccin",
         "determinate": "determinate",
         "home-manager": "home-manager",
+        "nix-index-database": "nix-index-database",
         "nix-system-graphics": "nix-system-graphics",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-unstable": "nixpkgs-unstable",

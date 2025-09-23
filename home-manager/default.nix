@@ -8,6 +8,7 @@
 {
   imports = [
     inputs.catppuccin.homeModules.catppuccin
+    inputs.nix-index-database.homeModules.nix-index
     ./user
     ./desktop
     ./terminal
@@ -47,5 +48,8 @@
     };
   };
 
-  programs.home-manager.enable = true;
+  programs = {
+    home-manager.enable = true;
+    nix-index.enable = true;
+  };
 }

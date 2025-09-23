@@ -9,6 +9,8 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nix-index-database.url = "github:nix-community/nix-index-database";
+    nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     nix-system-graphics.url = "github:soupglasses/nix-system-graphics?rev=9c875e0c56cf2eb272b9102a4f3e24e4e31629fd";
     nix-system-graphics.inputs.nixpkgs.follows = "nixpkgs-unstable";
     system-manager.url = "github:numtide/system-manager?rev=e271eedac9a24678ca6cfc61677837422bf474e0";
