@@ -38,6 +38,7 @@
             pkgs.curl
             pkgs.git
             pkgs.gnugrep
+            pkgs.home-manager
             pkgs.just
             pkgs.nix-output-monitor
             pkgs.sd

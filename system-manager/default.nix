@@ -5,10 +5,13 @@
   ...
 }:
 {
+  imports = [
+    ./fonts.nix
+    ./kmscon.nix
+  ];
+
   config = {
-    # Basic system configuration placeholder
     environment = {
-      # System packages will be configured here
       systemPackages = [
         inputs.determinate.packages.${pkgs.system}.default
         inputs.system-manager.packages.${pkgs.system}.default
@@ -26,9 +29,9 @@
       hostPlatform = pkgs.system;
       overlays = [
         # Overlays defined via overlays/default.nix and pkgs/default.nix
-        outputs.overlays.additions
-        outputs.overlays.modifications
-        outputs.overlays.unstable-packages
+        outputs.overlays.localPackages
+        outputs.overlays.modifiedPackages
+        outputs.overlays.unstablePackages
       ];
       config = {
         allowUnfree = true;

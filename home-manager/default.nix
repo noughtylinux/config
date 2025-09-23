@@ -46,9 +46,9 @@
   nixpkgs = {
     overlays = [
       # Overlays defined via overlays/default.nix and pkgs/default.nix
-      outputs.overlays.additions
-      outputs.overlays.modifications
-      outputs.overlays.unstable-packages
+      outputs.overlays.localPackages
+      outputs.overlays.modifiedPackages
+      outputs.overlays.unstablePackages
     ];
     config = {
       allowUnfree = true;
