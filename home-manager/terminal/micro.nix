@@ -16,7 +16,7 @@
         savecursor = true;
         saveundo = true;
         scrollbar = true;
-        scrollbarchar = "░";
+        scrollbarchar = "┇";
         scrollmargin = 4;
         scrollspeed = 1;
       };
