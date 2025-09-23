@@ -74,7 +74,7 @@ build-home: _header _is_compatible _has_config
     nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
 
 # Switch to home-manager configuration
-switch-home: _header _is_compatible _has_config
+switch-home: _header _is_compatible _has_config build-home
     #!/usr/bin/env bash
     echo -e "{{GLYPH_HOME}}Switching to new {{BOLD}}home-manager{{RESET}} configuration..."
     # Set HOSTNAME and USER if not already set
@@ -89,7 +89,7 @@ build-system: _header _is_compatible _has_config
     @nom build {{NIX_OPTS}} ".#systemConfigs.default"
 
 # Switch to system-manager configuration
-switch-system: _header _is_compatible _has_config
+switch-system: _header _is_compatible _has_config build-system
     @echo -e "{{GLYPH_SYSTEM}}Switching to new {{BOLD}}system-manager{{RESET}} configuration..."
     @sudo env PATH="${PATH}" system-manager switch --flake '.#default' --nix-option pure-eval false
 
