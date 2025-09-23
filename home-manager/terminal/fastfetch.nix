@@ -190,7 +190,13 @@ in
       '';
     };
     packages = with pkgs; [
+      cpufetch
       fastfetch
+      foodfetch
+      ipfetch
+      microfetch
+      onefetch
+      ramfetch
     ];
   };
   programs = {

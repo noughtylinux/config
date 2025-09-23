@@ -23,7 +23,6 @@ in
     packages = with pkgs; [
       git-igitt # git log/graph
       gitsign # Sign Git commits and tags with Sigstore
-      onefetch # fetch git project info
       pre-commit # Git pre-commit hooks
     ];
     sessionVariables = {
