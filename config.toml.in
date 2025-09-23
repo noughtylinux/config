@@ -12,6 +12,9 @@ flavor = "mocha"
 gtk = false
 qt = false
 
+[fonts]
+configure = false
+
 [terminal]
 # Your preferred shell (fish or zsh) - bash is always configured
 shell = "fish"

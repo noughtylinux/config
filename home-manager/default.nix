@@ -11,6 +11,7 @@
     inputs.nix-index-database.homeModules.nix-index
     ./user
     ./desktop
+    ./fonts
     ./terminal
   ];
 
