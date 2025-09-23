@@ -21,6 +21,8 @@ in
     ./fastfetch.nix
     ./fd.nix
     ./fzf.nix
+    ./gh.nix
+    ./git.nix
     ./gpg.nix
     ./jq.nix
     ./micro.nix
