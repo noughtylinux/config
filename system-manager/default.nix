@@ -25,13 +25,11 @@
       # Set the host platform architecture
       hostPlatform = pkgs.system;
       overlays = [
-        # Add overlays your own flake exports (from overlays and pkgs dir):
+        # Overlays defined via overlays/default.nix and pkgs/default.nix
         outputs.overlays.additions
         outputs.overlays.modifications
         outputs.overlays.unstable-packages
-        # Add overlays exported from other flakes:
       ];
-      # Configure your nixpkgs instance
       config = {
         allowUnfree = true;
       };

@@ -45,7 +45,7 @@
 
   nixpkgs = {
     overlays = [
-      # Add overlays your own flake exports (from overlays and pkgs dir):
+      # Overlays defined via overlays/default.nix and pkgs/default.nix
       outputs.overlays.additions
       outputs.overlays.modifications
       outputs.overlays.unstable-packages
@@ -57,6 +57,14 @@
 
   programs = {
     home-manager.enable = true;
+    nh = {
+      enable = true;
+      clean = {
+        dates = "weekly";
+        enable = true;
+        extraArgs = "--keep 2 --keep-since 5d";
+      };
+    };
     nix-index.enable = true;
   };
 }
