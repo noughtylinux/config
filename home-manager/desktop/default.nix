@@ -19,6 +19,10 @@ let
   catppuccinThemeQt = noughtyConfig.catppuccin.qt or false;
 in
 {
+  imports = [
+    ./apps/terminal
+    ./shells/hyprland.nix
+  ];
   # Catppuccin is not enabled for everything by default
   # I have custom Catppuccin themes for some programs
   catppuccin = {
@@ -117,6 +121,9 @@ in
       name = "kvantum";
     };
   };
+
+  # https://nixos.wiki/wiki/Bluetooth#Using_Bluetooth_headsets_with_PulseAudio
+  services.mpris-proxy.enable = true;
 
   systemd.user.sessionVariables = lib.mkIf catppuccinThemeQt {
     QT_STYLE_OVERRIDE = "kvantum";

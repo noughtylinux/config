@@ -17,11 +17,9 @@
 
   home = {
     stateVersion = "25.05";
-    # WIP: For basic testing only
-    packages = with pkgs; [
-      firefox
-      unstable.hyprland
-      kitty
+    packages = [
+      pkgs.gpu-viewer
+      pkgs.wdisplays
     ];
   };
 

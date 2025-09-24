@@ -13,18 +13,9 @@ let
         allowUnfree = true;
       };
     };
-  unstablePkgsFor =
-    system:
-    import inputs.nixpkgs-unstable {
-      inherit system;
-      config = {
-        allowUnfree = true;
-      };
-    };
 in
 {
   inherit pkgsFor;
-  inherit unstablePkgsFor;
 
   # Helper to generate attributes for all supported systems
   forAllSystems = inputs.nixpkgs.lib.genAttrs [
@@ -87,7 +78,7 @@ in
         # system-manager doesn't have a direct pkgs parameter in its API, so pkgs
         # must be provided through extraSpecialArgs for modules to access it
         # system-manager and nix-system-graphics need unstable nixpkgs for newer features
-        pkgs = unstablePkgsFor system;
+        pkgs = pkgsFor system;
       };
       modules = [
         inputs.nix-system-graphics.systemModules.default
