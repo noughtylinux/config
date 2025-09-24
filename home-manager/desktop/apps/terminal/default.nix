@@ -1,7 +1,18 @@
 _: {
   imports = [
+    ./alacritty.nix
+    ./foot.nix
     ./kitty.nix
   ];
+
+  # TODO: Enable terminal-exec when available (Home Manager 25.11+ or unstable)
+  xdg = {
+    #terminal-exec = {
+    #  settings = {
+    #    default = [ "Alacritty.desktop" ];
+    #  };
+    #};
+  };
 
   xresources.properties = {
     "*background" = "#1E1E2E";

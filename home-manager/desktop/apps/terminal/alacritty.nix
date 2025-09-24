@@ -1,10 +1,14 @@
 {
   config,
   lib,
+  noughtyConfig,
   pkgs,
   ...
 }:
-{
+let
+  terminalEmulator = noughtyConfig.desktop.terminal-emulator or "";
+in
+lib.mkIf (terminalEmulator == "alacritty") {
   catppuccin = {
     alacritty.enable = config.programs.alacritty.enable;
   };
@@ -85,5 +89,14 @@
         "$mod, T, exec, ${pkgs.alacritty}/bin/alacritty"
       ];
     };
+  };
+
+  # TODO: Enable terminal-exec when available (Home Manager 25.11+ or unstable)
+  xdg = {
+    #terminal-exec = {
+    #  settings = {
+    #    default = [ "Alacritty.desktop" ];
+    #  };
+    #};
   };
 }

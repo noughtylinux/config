@@ -23,12 +23,9 @@ in
     ./apps/terminal
     ./shells/hyprland.nix
   ];
-  # Catppuccin is not enabled for everything by default
-  # I have custom Catppuccin themes for some programs
+
   catppuccin = {
-    accent = catppuccinAccent;
-    flavor = catppuccinFlavor;
-    kvantum.enable = config.qt.enable;
+    kvantum.enable = catppuccinThemeQt;
   };
 
   dconf.settings = with lib.hm.gvariant; {
@@ -54,8 +51,8 @@ in
     };
     enable = true;
     font = lib.mkIf catppuccinThemeGtk {
-      name = "Work Sans 12";
-      package = pkgs.work-sans;
+      name = "Fira Sans 12";
+      package = pkgs.fira-sans;
     };
     gtk2 = {
       configLocation = "${config.xdg.configHome}/.gtkrc-2.0";
@@ -114,10 +111,12 @@ in
     };
   };
 
-  qt = lib.mkIf catppuccinThemeQt {
+  qt = {
     enable = true;
-    platformTheme.name = "kvantum";
-    style = {
+    platformTheme = lib.mkIf catppuccinThemeQt {
+      name = "kvantum";
+    };
+    style = lib.mkIf catppuccinThemeQt {
       name = "kvantum";
     };
   };
@@ -129,22 +128,44 @@ in
     QT_STYLE_OVERRIDE = "kvantum";
   };
 
-  xdg.configFile = lib.mkIf catppuccinThemeQt {
-    qt5ct = {
-      target = "qt5ct/qt5ct.conf";
-      text = lib.generators.toINI { } {
-        Appearance = {
-          icon_theme = "Papirus-Dark";
+  xdg = {
+    autostart = {
+      enable = true;
+    };
+    configFile = {
+      qt5ct = lib.mkIf catppuccinThemeQt {
+        target = "qt5ct/qt5ct.conf";
+        text = lib.generators.toINI { } {
+          Appearance = {
+            icon_theme = "Papirus-Dark";
+          };
+        };
+      };
+      qt6ct = lib.mkIf catppuccinThemeQt {
+        target = "qt6ct/qt6ct.conf";
+        text = lib.generators.toINI { } {
+          Appearance = {
+            icon_theme = "Papirus-Dark";
+          };
         };
       };
     };
-    qt6ct = {
-      target = "qt6ct/qt6ct.conf";
-      text = lib.generators.toINI { } {
-        Appearance = {
-          icon_theme = "Papirus-Dark";
+
+    portal = {
+      config = {
+        common = {
+          default = [
+            "gtk"
+          ];
+          "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
         };
       };
+      # Add xset to satisfy xdg-screensaver requirements
+      configPackages = [
+        pkgs.xorg.xset
+      ];
+      enable = true;
+      xdgOpenUsePortal = true;
     };
   };
 }

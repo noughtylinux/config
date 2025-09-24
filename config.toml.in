@@ -6,6 +6,10 @@ hostname = "@@HOSTNAME@@"
 [user]
 name = "@@USER@@"
 
+[desktop]
+# One of alacritty, foot, kitty
+terminal-emulator = "kitty"
+
 [catppuccin]
 accent = "blue"
 flavor = "mocha"

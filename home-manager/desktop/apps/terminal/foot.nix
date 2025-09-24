@@ -1,10 +1,14 @@
 {
   config,
   lib,
+  noughtyConfig,
   pkgs,
   ...
 }:
-{
+let
+  terminalEmulator = noughtyConfig.deskop.terminal-emulator or "";
+in
+lib.mkIf (terminalEmulator == "foot") {
   catppuccin = {
     foot.enable = config.programs.foot.enable;
   };
@@ -39,5 +43,14 @@
         "$mod, T, exec, ${pkgs.foot}/bin/foot"
       ];
     };
+  };
+
+  # TODO: Enable terminal-exec when available (Home Manager 25.11+ or unstable)
+  xdg = {
+    #terminal-exec = {
+    #  settings = {
+    #    default = [ "foot.desktop" ];
+    #  };
+    #};
   };
 }

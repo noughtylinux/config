@@ -303,23 +303,23 @@ in
   };
   # https://github.com/hyprwm/hyprland-wiki/issues/409
   # https://github.com/nix-community/home-manager/pull/4707
-  xdg.portal = {
-    config = {
-      common = {
-        default = [
-          "hyprland"
-          "gtk"
-        ];
-        "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+  xdg = {
+    portal = {
+      config = {
+        hyprland = {
+          default = [
+            "hyprland"
+            "gtk"
+          ];
+          "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+        };
       };
+      configPackages = [ config.wayland.windowManager.hyprland.package ];
+      extraPortals = [
+        pkgs.xdg-desktop-portal
+        pkgs.xdg-desktop-portal-gtk
+        pkgs.xdg-desktop-portal-hyprland
+      ];
     };
-    configPackages = [ config.wayland.windowManager.hyprland.package ];
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal
-      pkgs.xdg-desktop-portal-gtk
-      #pkgs.unstable.xdg-desktop-portal-hyprland
-    ];
-    xdgOpenUsePortal = true;
   };
 }

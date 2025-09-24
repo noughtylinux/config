@@ -1,10 +1,14 @@
 {
   config,
   lib,
+  noughtyConfig,
   pkgs,
   ...
 }:
-{
+let
+  terminalEmulator = noughtyConfig.desktop.terminal-emulator or "";
+in
+lib.mkIf (terminalEmulator == "kitty") {
   catppuccin = {
     kitty.enable = config.programs.kitty.enable;
   };
@@ -52,15 +56,24 @@
       '';
     };
     fuzzel = lib.mkIf config.programs.fuzzel.enable {
-      settings.main.terminal = "kitty";
+      settings.main.terminal = "${pkgs.kitty}/bin/kitty";
     };
   };
 
   wayland.windowManager.hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
     settings = {
       bind = [
-        "$mod, T, exec, kitty"
+        "$mod, T, exec, ${pkgs.kitty}/bin/kitty"
       ];
     };
+  };
+
+  # TODO: Enable terminal-exec when available (Home Manager 25.11+ or unstable)
+  xdg = {
+    #terminal-exec = {
+    #  settings = {
+    #    default = [ "kitty.desktop" ];
+    #  };
+    #};
   };
 }
