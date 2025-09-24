@@ -10,7 +10,7 @@
 let
   catppuccinAccent = noughtyConfig.catppuccin.accent or "blue";
   catppuccinFlavor = noughtyConfig.catppuccin.flavor or "mocha";
-  selectedShell = noughtyConfig.terminal.shell or "fish";
+  selectedShell = noughtyConfig.terminal.shell or "bash";
 in
 {
   imports = [

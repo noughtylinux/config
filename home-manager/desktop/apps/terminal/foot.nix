@@ -6,7 +6,9 @@
   ...
 }:
 let
-  terminalEmulator = noughtyConfig.deskop.terminal-emulator or "";
+  selectedShell = noughtyConfig.terminal.shell or "bash";
+  shellArgs = if selectedShell == "fish" || selectedShell == "zsh" then "--interactive" else "";
+  terminalEmulator = noughtyConfig.desktop.terminal-emulator or "";
 in
 lib.mkIf (terminalEmulator == "foot") {
   catppuccin = {
@@ -21,6 +23,9 @@ lib.mkIf (terminalEmulator == "foot") {
       settings = {
         main = {
           font = "FiraCode Nerd Font Mono:size=16";
+          shell = lib.mkIf (
+            selectedShell != null && selectedShell != ""
+          ) "${pkgs.${selectedShell}}/bin/${selectedShell} ${shellArgs}";
           term = "xterm-256color";
         };
         cursor = {
@@ -28,7 +33,7 @@ lib.mkIf (terminalEmulator == "foot") {
           blink = "yes";
         };
         scrollback = {
-          lines = 10240;
+          lines = 65536;
         };
       };
     };

@@ -6,6 +6,8 @@
   ...
 }:
 let
+  selectedShell = noughtyConfig.terminal.shell or "bash";
+  shellArgs = if selectedShell == "fish" || selectedShell == "zsh" then "--interactive" else "";
   terminalEmulator = noughtyConfig.desktop.terminal-emulator or "";
 in
 lib.mkIf (terminalEmulator == "alacritty") {
@@ -54,13 +56,13 @@ lib.mkIf (terminalEmulator == "alacritty") {
           save_to_clipboard = true;
         };
         scrolling = {
-          history = 50000;
+          history = 65536;
           multiplier = 3;
         };
         terminal = {
-          shell = {
-            program = "${pkgs.fish}/bin/fish";
-            args = [ "--interactive" ];
+          shell = lib.mkIf (selectedShell != null && selectedShell != "") {
+            program = "${pkgs.${selectedShell}}/bin/${selectedShell}";
+            args = [ "${shellArgs}" ];
           };
         };
         window = {

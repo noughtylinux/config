@@ -6,6 +6,8 @@
   ...
 }:
 let
+  selectedShell = noughtyConfig.terminal.shell or "bash";
+  shellArgs = if selectedShell == "fish" || selectedShell == "zsh" then "--interactive" else "";
   terminalEmulator = noughtyConfig.desktop.terminal-emulator or "";
 in
 lib.mkIf (terminalEmulator == "kitty") {
@@ -28,7 +30,9 @@ lib.mkIf (terminalEmulator == "kitty") {
         hide_window_decorations = if config.wayland.windowManager.hyprland.enable then true else false;
         scrollback_indicator_opacity = 0.50;
         scrollback_lines = 65536;
-        shell = "${pkgs.fish}/bin/fish --interactive";
+        shell = lib.mkIf (
+          selectedShell != null && selectedShell != ""
+        ) "${pkgs.${selectedShell}}/bin/${selectedShell} ${shellArgs}";
         draw_minimal_borders = "yes";
         window_border_width = "0pt";
         window_margin_width = 0;

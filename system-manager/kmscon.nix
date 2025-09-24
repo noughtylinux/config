@@ -38,7 +38,7 @@ let
       palette-white=205,214,244
       palette-foreground=166,173,200
       palette-background=30,30,46
-      sb-size=10240
+      sb-size=65536
     '';
   };
 in
