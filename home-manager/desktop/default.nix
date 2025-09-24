@@ -21,7 +21,7 @@ in
 {
   imports = [
     ./apps/terminal
-    ./shells/hyprland.nix
+    ./compositor/hyprland
   ];
 
   catppuccin = {
