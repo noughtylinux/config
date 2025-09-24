@@ -19,6 +19,7 @@ in
     ./user
     ./desktop
     ./fonts
+    ./scripts
     ./terminal
   ];
 
