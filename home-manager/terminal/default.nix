@@ -20,7 +20,6 @@ let
     rsync-mirror = "${pkgs.rsync}/bin/rsync --archive --block-size=131072 --delete --human-readable --info=progress2 --no-compress --inplace --partial --stats";
     ruler = ''${pkgs.hr}/bin/hr "╭─³⁴⁵⁶⁷⁸─╮"'';
     speedtest = "${pkgs.speedtest-go}/bin/speedtest-go";
-    store-path = "${pkgs.coreutils}/bin/readlink (${pkgs.which}/bin/which $argv)";
     wormhole = "${pkgs.wormhole-rs}/bin/wormhole-rs";
     weather = "${lib.getExe pkgs.girouette} --quiet";
   };
