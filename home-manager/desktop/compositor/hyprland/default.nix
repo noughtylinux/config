@@ -19,17 +19,17 @@ in
   };
   # Hyprland is a Wayland compositor and dynamic tiling window manager
   # Additional applications are required to create a full desktop shell
-  #imports = [
-  #  ./avizo # on-screen display for audio and backlight
-  #  ./fuzzel # app launcher, emoji picker and clipboard manager
-  #  ./hyprlock # screen locker
-  #  ./hyprpaper # wallpaper setter
-  #  ./hyprshot # screenshot grabber and annotator
-  #  ./rofi # application launcher
-  #  ./swaync # notification center
-  #  ./waybar # status bar
-  #  ./wlogout # session menu
-  #];
+  imports = [
+    #  ./avizo # on-screen display for audio and backlight
+    #  ./fuzzel # app launcher, emoji picker and clipboard manager
+    #  ./hyprlock # screen locker
+    #  ./hyprpaper # wallpaper setter
+    #  ./hyprshot # screenshot grabber and annotator
+    ../components/rofi # application launcher
+    #  ./swaync # notification center
+    #  ./waybar # status bar
+    #  ./wlogout # session menu
+  ];
   services = {
     gpg-agent.pinentry.package = lib.mkForce pkgs.pinentry-gnome3;
     udiskie = {
