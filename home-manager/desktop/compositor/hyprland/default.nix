@@ -55,7 +55,6 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
-      #inherit (monitors) monitor workspace;
       "$mod" = "SUPER";
       # Work when input inhibitor (l) is active.
       bindl = [
@@ -227,6 +226,16 @@ in
           history_step = 2; # 2
         };
       };
+      workspace = [
+        "1, name:Web, persistent:true, monitor:*"
+        "2, name:Work, persistent:true, monitor:*"
+        "3, name:Chat, persistent:true, monitor:*"
+        "4, name:Code, persistent:true, monitor:*"
+        "5, name:Git, persistent:true, monitor:*"
+        "6, name:Note, persistent:true, monitor:*"
+        "7, name:Make, persistent:true, monitor:*"
+        "8, name:Fun, persistent:true, monitor:*"
+      ];
       windowrulev2 = [
         # only allow shadows for floating windows
         "noshadow, floating:0"
