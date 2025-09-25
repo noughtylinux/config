@@ -31,7 +31,7 @@
 
 ## justfile
 
-- [ ] Clean up `justfile`. Maybe break it up
-- [ ] Add `tarball` command to `justfile`
+- [x] Clean up `justfile`. Maybe break it up
+- [x] Relocate `bootstrap.sh` in the config repository
+- [x] Add `tarball` command to `justfile`
 - [ ] Use tarballs as the distribution/update mechanism
-- [ ] Relocate `bootstrap.sh` in the config repository
