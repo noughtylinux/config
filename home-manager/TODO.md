@@ -24,7 +24,7 @@
 
 - [x] Add screen clearing to `agetty`
 - [ ] ~~Use `agetty` in `kmscon` from Nixpkgs~~
-- [ ] Enable `kmscon` on all VTs
+- [x] Enable `kmscon` on all VTs
 - [ ] Add Symbola and Nerd Font symbols fonts in system-manager
 - [ ] Add option to enable/disable kernel mitigations
 - [ ] Theme kernel colors with Catppuccin
