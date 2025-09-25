@@ -22,9 +22,9 @@ HIDDEN := '\033[8m'
 STRIKETHROUGH := '\033[9m'
 
 # Status messages
-ERROR := RED + '🗵 ' + UNDERLINE + DIM + 'ERROR' + RESET + BOLD + ': ' + RESET
+ERROR := RED + '✘ ' + UNDERLINE + DIM + 'ERROR' + RESET + BOLD + ': ' + RESET
 WARNING := YELLOW + '🛆 ' + DIM + 'WARNING' + RESET + BOLD + ': ' + RESET
-SUCCESS := GREEN + '🗹 ' + DIM + 'SUCCESS' + RESET + BOLD + ': ' + RESET
+SUCCESS := GREEN + '✔ ' + DIM + 'SUCCESS' + RESET + BOLD + ': ' + RESET
 
 # Glyphs
 GLYPH_CANCEL := MAGENTA + '⊘ ' + RESET
@@ -32,7 +32,6 @@ GLYPH_CONFIG := BLUE + '✦ ' + RESET
 GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_FONT := BLUE + '🗚 ' + RESET
 GLYPH_HOME := BLUE + '≋ ' + RESET
-GLYPH_LOGO := CYAN + '∅ ' + RESET
 GLYPH_NET := BLUE + '🖧 ' + RESET
 GLYPH_SHELL := BLUE + '﹩ ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
