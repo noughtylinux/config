@@ -100,6 +100,7 @@ build: build-home build-system
 switch: ubuntu-setup switch-home switch-system
     @echo -e "{{GLYPH_FONT}}Updating font cache..."
     @sudo fc-cache --system-only --really-force
+    @sudo update-grub
 
 # Generate config.toml from the template
 generate-config: _header _is_compatible

@@ -27,7 +27,7 @@
 - [x] Enable `kmscon` on all VTs
 - [x] Add Symbola and Nerd Font symbols fonts in system-manager
 - [ ] Add option to enable/disable kernel mitigations
-- [ ] Theme kernel colors with Catppuccin
+- [x] Theme kernel colors with Catppuccin
 
 ## justfile
 
