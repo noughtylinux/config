@@ -3,12 +3,20 @@
   ...
 }:
 let
-  # Use Nixpkgs kmscon binary
+  # Use Ubuntu's agetty
+  agettyBin = "/sbin/agetty";
+  # Use Nixpkgs kmscon
   kmsconBin = "${pkgs.kmscon}/bin/kmscon";
   # Use /dev/tty1
   kmsconTTY = "tty1";
-  # Use Ubuntu's agetty
-  agettyBin = "/sbin/agetty";
+  noughtyIssue = pkgs.writeTextFile {
+    name = "noughty-issue";
+    text = ''
+      \e[2J\e[H\e[0m\e[36m∅\e[0m \e[37m\e[1mNoughty Linux - v${version}\e[0m (\e[34m\4\e[0m)
+
+    '';
+  };
+  version = builtins.getEnv "NOUGHTY_VERSION";
 
   # Create kmscon config directory like NixOS module does
   configDir = pkgs.writeTextFile {
@@ -17,6 +25,7 @@ let
     text = ''
       no-drm
       no-reset-env
+      no-switchvt
       font-name=FiraCode Nerd Font Mono
       font-size=16
       palette=custom
@@ -74,7 +83,7 @@ in
           ConditionPathExists = "/dev/tty0";
         };
         serviceConfig = {
-          ExecStart = "${kmsconBin} \"--vt=${kmsconTTY}\" --seats=seat0 --configdir ${configDir} --login -- ${agettyBin} -o '-p -- \\\\u' - xterm-256color";
+          ExecStart = "${kmsconBin} \"--vt=${kmsconTTY}\" --seats=seat0 --configdir ${configDir} --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
           Type = "idle";
           # Ensure D-Bus system bus is accessible and tools are in PATH
           Environment = [

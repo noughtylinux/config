@@ -22,8 +22,8 @@
 
 ## System Manager
 
-- [ ] Add `--clear-screen` to `agetty`
-- [ ] Use `agetty` in `kmscon` from Nixpkgs
+- [x] Add screen clearing to `agetty`
+- [ ] ~~Use `agetty` in `kmscon` from Nixpkgs~~
 - [ ] Enable `kmscon` on all VTs
 - [ ] Add Symbola and Nerd Font symbols fonts in system-manager
 - [ ] Add option to enable/disable kernel mitigations
@@ -34,3 +34,4 @@
 - [ ] Clean up `justfile`. Maybe break it up
 - [ ] Add `tarball` command to `justfile`
 - [ ] Use tarballs as the distribution/update mechanism
+- [ ] Relocate `bootstrap.sh` in the config repository
