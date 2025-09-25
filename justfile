@@ -260,7 +260,7 @@ bootstrap host: _header
 
 [private]
 _header:
-    @echo -e "{{GLYPH_LOGO}}{{BOLD}}{{UNDERLINE}}Noughty Linux - {{RESET}}{{UNDERLINE}}v{{VERSION}}{{RESET}}"
+    @echo -e "{{BOLD}}{{WHITE}}N{{CYAN}}ø{{WHITE}}ughty Linux{{RESET}} - {{DIM}}v{{VERSION}}{{RESET}}"
 
 # Check if running as root or with sudo
 [private]
