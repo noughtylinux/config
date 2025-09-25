@@ -1,7 +1,7 @@
 {
   description = "Noughty Linux";
   inputs = {
-    catppuccin.url = "github:catppuccin/nix?rev=751b99dca72c7f9df5475c67dcf1059893564e32";
+    catppuccin.url = "github:catppuccin/nix/release-25.05";
     catppuccin.inputs.nixpkgs.follows = "nixpkgs";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     determinate.inputs.nixpkgs.follows = "nixpkgs-unstable";
