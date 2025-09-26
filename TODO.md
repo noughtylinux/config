@@ -9,12 +9,12 @@
 ## Home Manager
 
 - [x] Add atuin
-- [ ] Rename `nore` to `nath`
+- [x] Rename `nore` to `nook`
 - [ ] Create `nork` to `setsid` things
 - [ ] Add all the dconf tweaks from my nix-config for theme and fonts
 - [ ] Add `nh search` text to config headers
 - [ ] Hide crufty desktop entries
-- [ ] Make `halo` find help flags other that `--help`
+- [ ] Make `halp` find help flags other that `--help`
 - [ ] Choose a browser
 - [ ] Choose a terminal editor
 - [ ] Pin Nixpkgs in `nosh` et al to the stable channel
