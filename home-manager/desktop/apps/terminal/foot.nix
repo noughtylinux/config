@@ -37,6 +37,9 @@ lib.mkIf (terminalEmulator == "foot") {
         };
       };
     };
+    rofi = lib.mkIf config.programs.rofi.enable {
+      terminal = "${pkgs.foot}/bin/foot";
+    };
     fuzzel = lib.mkIf config.programs.fuzzel.enable {
       settings.main.terminal = "${pkgs.foot}/bin/foot";
     };

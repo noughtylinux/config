@@ -80,6 +80,9 @@ lib.mkIf (terminalEmulator == "alacritty") {
         };
       };
     };
+    rofi = lib.mkIf config.programs.rofi.enable {
+      terminal = "${pkgs.alacritty}/bin/alacritty";
+    };
     fuzzel = lib.mkIf config.programs.fuzzel.enable {
       settings.main.terminal = "${pkgs.alacritty}/bin/alacritty";
     };

@@ -59,6 +59,9 @@ lib.mkIf (terminalEmulator == "kitty") {
         cursor_trail_start_threshold 2
       '';
     };
+    rofi = lib.mkIf config.programs.rofi.enable {
+      terminal = "${pkgs.kitty}/bin/kitty";
+    };
     fuzzel = lib.mkIf config.programs.fuzzel.enable {
       settings.main.terminal = "${pkgs.kitty}/bin/kitty";
     };
