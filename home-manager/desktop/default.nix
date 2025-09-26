@@ -124,17 +124,23 @@ in
         accent = config.catppuccin.accent;
         variant = config.catppuccin.flavor;
       })
+      celluloid
       dconf-editor
+      decibels
       file-roller
+      gnome-calculator
       gnome-disk-utility
       gnome-font-viewer
       libsForQt5.qtstyleplugin-kvantum
       libsForQt5.qt5ct
+      loupe
       nautilus
       papers
       papirus-folders
+      pwvucontrol
       resources
       seahorse
+      simple-scan
       wdisplays
       wlr-randr
       wl-clipboard
