@@ -43,6 +43,13 @@ in
     };
   };
 
+  home = {
+    packages = [
+      pkgs.gpu-viewer
+      pkgs.wdisplays
+    ];
+  };
+
   gtk = {
     cursorTheme = lib.mkIf catppuccinThemeGtk {
       name = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";

@@ -33,10 +33,6 @@ in
   };
 
   home = {
-    packages = [
-      pkgs.gpu-viewer
-      pkgs.wdisplays
-    ];
     sessionVariables = {
       NH_SEARCH_PLATFORM = 1;
     };
