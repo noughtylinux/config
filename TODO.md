@@ -11,7 +11,7 @@
 - [x] Add atuin
 - [x] Rename `nore` to `nook`
 - [x] Rename `norf` to `nout`
-- [ ] Create `nork` to `setsid` things
+- [x] Create `nope` to `setsid` things
 - [ ] Add all the dconf tweaks from my nix-config for theme and fonts
 - [x] Add `nh search` text to config headers
 - [ ] Hide crufty desktop entries
