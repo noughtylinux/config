@@ -6,6 +6,7 @@ let
     runtimeInputs = with pkgs; [
       coreutils
       bat
+      tlrc
     ];
     text = builtins.readFile ./${name}.sh;
   };
