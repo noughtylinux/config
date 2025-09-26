@@ -26,4 +26,4 @@ if ! command -v "${PROGRAM}" &> /dev/null; then
 fi
 
 # Use setsid to run the program in a new session, fully detached
-setsid --fork "${PROGRAM}" "$@" &>/dev/null &
+setsid --fork "${PROGRAM}" "$@" &>/dev/null
