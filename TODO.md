@@ -30,16 +30,21 @@
 - [x] Enable `kmscon` on all VTs
 - [x] Add Symbola and Nerd Font symbols fonts in system-manager
 - [x] Theme kernel colors with Catppuccin
+- [ ] Display Manager
 - [ ] Fix `sudo` finding executables from the user profile
 
 ## justfile
 
-- [ ] Ubuntu pre- and post- recipes
+- [x] Ubuntu pre- and post- recipes
 - [ ] Remove username and hostname from the `config.toml`
 - [ ] Add `[desktop]` section and use `shell` to enable desktop features
+- [x] Pipewire & WirePlumber
+- [x] CUPS
+- [x] BlueZ
 - [x] Clean up `justfile`. Maybe break it up
 - [x] Relocate `bootstrap.sh` in the config repository
 - [x] Add `tarball` command to `justfile`
+- [ ] Install `nala` and use it for `apt` operations
 - [ ] Put guard rails up to prevent installing on Ubuntu Desktop
 - [ ] Use tarballs as the distribution/update mechanism
 

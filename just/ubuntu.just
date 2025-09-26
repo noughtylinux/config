@@ -1,6 +1,6 @@
 # Perform Ubuntu setup based on config.toml
 [private]
-ubuntu-setup: _header _is_compatible _has_config
+ubuntu-pre: _header _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -9,17 +9,23 @@ ubuntu-setup: _header _is_compatible _has_config
         dpkg-query -W -f='${Status}' "${package}" 2>/dev/null | grep -q "install ok installed"
     }
 
-    PACKAGES_TO_INSTALL=()
     PACKAGES_TO_REMOVE=()
+    PACKAGES_TO_INSTALL=()
 
-    for PACKAGE in dconf-gsettings-backend fontconfig udisks2; do
+    for PACKAGE in kmscon pulseaudio-module-bluetooth; do
+        if is_package_installed "${PACKAGE}"; then
+            PACKAGES_TO_REMOVE+=("${PACKAGE}")
+        fi
+    done
+
+    for PACKAGE in bluez cups dconf-gsettings-backend fontconfig gstreamer1.0-pipewire \
+        libfdk-aac2 libldacbt-abr2 libldacbt-enc2 libopenaptx0 \
+        libspa-0.2-bluetooth libspa-0.2-jack pipewire-audio-client-libraries \
+        udisks2 wireplumber; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi
     done
-    if is_package_installed "kmscon"; then
-        PACKAGES_TO_REMOVE+=("kmscon")
-    fi
 
     # Check ubuntu configuration section
     if tq -f config.toml ubuntu >/dev/null 2>&1; then
@@ -42,12 +48,8 @@ ubuntu-setup: _header _is_compatible _has_config
         exit 0
     fi
 
-    if [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
-        echo -e "{{GLYPH_UPDATE}}Installing Ubuntu packages..."
-        echo -e "{{YELLOW}}{{DIM}}Packages to install: ${PACKAGES_TO_INSTALL[*]}{{RESET}}"
+    if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]] || [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
         sudo apt-get -y update
-        sudo apt-get -y install "${PACKAGES_TO_INSTALL[@]}"
-        echo -e "{{SUCCESS}}Successfully installed ${#PACKAGES_TO_INSTALL[@]} packages!"
     fi
 
     if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]]; then
@@ -62,3 +64,25 @@ ubuntu-setup: _header _is_compatible _has_config
         fi
         echo -e "{{SUCCESS}}Successfully removed ${#PACKAGES_TO_REMOVE[@]} packages!"
     fi
+
+    if [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
+        echo -e "{{GLYPH_UPDATE}}Installing Ubuntu packages..."
+        echo -e "{{YELLOW}}{{DIM}}Packages to install: ${PACKAGES_TO_INSTALL[*]}{{RESET}}"
+        sudo apt-get -y install "${PACKAGES_TO_INSTALL[@]}"
+        echo -e "{{SUCCESS}}Successfully installed ${#PACKAGES_TO_INSTALL[@]} packages!"
+    fi
+
+[private]
+ubuntu-post:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo -e "{{GLYPH_SHIELD}}Reloading AppArmor profiles for Nix..."
+    for profile in /etc/apparmor.d/nix_*; do
+        sudo apparmor_parser -r "$profile"
+    done
+    echo -e "{{SUCCESS}}AppArmor profiles reloaded!"
+
+    echo -e "{{GLYPH_FONT}}Updating font cache..."
+    sudo fc-cache --system-only --really-force
+    sudo update-grub &> /dev/null || true
+    echo -e "{{SUCCESS}}System is up to date!"

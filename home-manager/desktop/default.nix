@@ -135,12 +135,14 @@ in
       libsForQt5.qt5ct
       loupe
       nautilus
+      overskride
       papers
       papirus-folders
       pwvucontrol
       resources
       seahorse
       simple-scan
+      system-config-printer
       wdisplays
       wlr-randr
       wl-clipboard
@@ -168,8 +170,9 @@ in
 
   services = {
     # https://nixos.wiki/wiki/Bluetooth#Using_Bluetooth_headsets_with_PulseAudio
+    # This is managed by the Ubuntu-pre setup
     mpris-proxy = {
-      enable = true;
+      enable = false;
     };
     gnome-keyring = {
       enable = true;

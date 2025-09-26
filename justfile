@@ -25,19 +25,7 @@ check: _header
 build: build-system build-home
 
 # Switch to new configuration
-switch: ubuntu-setup switch-system switch-home
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo -e "{{GLYPH_SHIELD}}Reloading AppArmor profiles for Nix..."
-    for profile in /etc/apparmor.d/nix_*; do
-        sudo apparmor_parser -r "$profile"
-    done
-    echo -e "{{SUCCESS}}AppArmor profiles reloaded!"
-
-    echo -e "{{GLYPH_FONT}}Updating font cache..."
-    sudo fc-cache --system-only --really-force
-    sudo update-grub &> /dev/null || true
-    echo -e "{{SUCCESS}}System is up to date!"
+switch: ubuntu-pre switch-system switch-home ubuntu-post
 
 # Generate config.toml
 generate: _header _is_compatible
