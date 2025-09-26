@@ -12,7 +12,7 @@
 - [x] Rename `nore` to `nook`
 - [ ] Create `nork` to `setsid` things
 - [ ] Add all the dconf tweaks from my nix-config for theme and fonts
-- [ ] Add `nh search` text to config headers
+- [x] Add `nh search` text to config headers
 - [ ] Hide crufty desktop entries
 - [ ] Make `halp` find help flags other that `--help`
 - [ ] Choose a browser

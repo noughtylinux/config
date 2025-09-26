@@ -17,9 +17,9 @@ in
 
   home = {
     sessionVariables = lib.mkIf config.programs.bat.enable {
-      MANPAGER = "sh -c 'col --no-backspaces --spaces | bat --language man'";
+      MANPAGER = "sh -c 'col --no-backspaces --spaces | ${pkgs.bat}/bin/bat --language man'";
       MANROFFOPT = "-c";
-      PAGER = "bat";
+      PAGER = "${pkgs.bat}/bin/bat";
     };
   };
 

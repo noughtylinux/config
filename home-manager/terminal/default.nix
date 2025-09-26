@@ -26,30 +26,30 @@ let
 in
 {
   imports = [
-    ./atuin.nix
-    ./bat.nix
-    ./bottom.nix
-    ./btop.nix
-    ./cava.nix
-    ./dircolors.nix
-    ./direnv.nix
-    ./eza.nix
-    ./fastfetch.nix
-    ./fd.nix
-    ./fzf.nix
-    ./gh.nix
-    ./git.nix
-    ./gpg.nix
-    ./jq.nix
-    ./micro.nix
-    ./pueue.nix
-    ./rclone.nix
-    ./ripgrep.nix
-    ./starship.nix
-    ./tldr.nix
-    ./yazi.nix
-    ./yt-dlp.nix
-    ./zoxide.nix
+    ./atuin.nix # Modern Unix shell history
+    ./bat.nix # Modern Unix `cat`
+    ./bottom.nix # Modern Unix `top`
+    ./btop.nix # Modern Unix `htop`
+    ./cava.nix # Terminal audio visualizer
+    ./dircolors.nix # Terminal colors
+    ./direnv.nix # Modern Unix `env`
+    ./eza.nix # Modern Unix `ls`
+    ./fastfetch.nix # Modern Unix `neofetch`
+    ./fd.nix # Modern Unix `find`
+    ./fzf.nix # Terminal fuzzy finder
+    ./gh.nix # Terminal GitHub client`
+    ./git.nix # Terminal Git client
+    ./gpg.nix # Terminal GPG
+    ./jq.nix # Terminal JSON processor
+    ./micro.nix # Terminal text editor
+    ./pueue.nix # Terminal task manager
+    ./rclone.nix # Terminal cloud storage sync
+    ./ripgrep.nix # Modern Unix `grep`
+    ./starship.nix # Modern Unix prompt
+    ./tldr.nix # Modern Unix `man`
+    ./yazi.nix # Modern Unix `mc`
+    ./yt-dlp.nix # Terminal YouTube downloader
+    ./zoxide.nix # Modern Unix `cd`
   ];
   home = {
     packages = with pkgs; [
