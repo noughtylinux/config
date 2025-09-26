@@ -57,7 +57,7 @@ get_main_program() {
     local pkg="$1"
     local nixpkgs_channel="$2"
 
-    # Use the specified channel
+    echo "Determining main program for '$pkg' from '$nixpkgs_channel'..." >&2
     main_program=$(nix eval --impure github:nixos/nixpkgs/"$nixpkgs_channel"#"$pkg".meta.mainProgram --raw 2>/dev/null || echo "")
 
     if [ -n "$main_program" ] && [ "$main_program" != "null" ]; then
