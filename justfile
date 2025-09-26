@@ -79,16 +79,32 @@ transfer host path="~/NoughtyLinux": _header _has_git
 
     just tarball noughty-linux-payload.tar.gz
 
-    echo -e "{{GLYPH_UPDATE}}Copying project to {{BOLD}}{{host}}:{{path}}{{RESET}}..."
+    echo -e "{{GLYPH_UPDATE}}Copying configuration to {{BOLD}}{{host}}:{{path}}{{RESET}}..."
 
     # Copy archive to remote host
     scp "noughty-linux-payload.tar.gz" "{{host}}:/tmp/noughty-linux-payload.tar.gz"
     rm -f "noughty-linux-payload.tar.gz"
 
     # Extract on remote host
-    ssh "{{host}}" "mkdir -p {{path}} && cd {{path}} && tar -xzf /tmp/noughty-linux-payload.tar.gz && rm -f /tmp/noughty-linux-payload.tar.gz"
+    ssh "{{host}}" "
+        rm -f {{path}}/result 2>/dev/null || true &&
+        # Backup config.toml
+        if [[ -f {{path}}/config.toml ]]; then
+            cp {{path}}/config.toml /tmp/config.toml
+        fi &&
 
-    echo -e "{{SUCCESS}}Project deployed to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
+        # Extract payload
+        mkdir -p {{path}} &&
+        cd {{path}} &&
+        tar -xzf /tmp/noughty-linux-payload.tar.gz &&
+        rm -f /tmp/noughty-linux-payload.tar.gz &&
+
+        # Restore config.toml
+        if [[ -f /tmp/config.toml ]]; then
+            mv /tmp/config.toml config.toml
+        fi
+    "
+    echo -e "{{SUCCESS}}Configuration transferred to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
 
 # Bootstrap a remote Ubuntu host via SSH
 bootstrap host: _header _has_git
