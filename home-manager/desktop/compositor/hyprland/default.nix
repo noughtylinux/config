@@ -30,15 +30,6 @@ in
     #  ./waybar # status bar
     #  ./wlogout # session menu
   ];
-  services = {
-    gpg-agent.pinentry.package = lib.mkForce pkgs.pinentry-gnome3;
-    udiskie = {
-      enable = true;
-      automount = false;
-      tray = "auto";
-      notify = true;
-    };
-  };
 
   systemd.user.services.polkit-gnome-authentication-agent-1 = {
     Unit.Description = "polkit-gnome-authentication-agent-1";
@@ -190,8 +181,8 @@ in
       };
       group = {
         groupbar = {
-          font_family = "Fira Sans";
-          font_size = 12;
+          font_family = config.gtk.font.name or "Fira Sans";
+          font_size = config.gtk.font.size or 12;
           gradients = true;
         };
       };
@@ -217,6 +208,10 @@ in
         mouse_move_enables_dpms = true;
         vfr = true;
       };
+      # Sets all monitors to 1.0 scaling by default
+      monitor = [
+        ",preferred,auto,1.0"
+      ];
       plugin = {
         hyprtrails = {
           color = "rgba(a6e3a1aa)";

@@ -28,26 +28,44 @@ in
     kvantum.enable = catppuccinThemeQt;
   };
 
+  # Packages whose D-Bus configuration files should be included in the
+  # configuration of the D-Bus session-wide message bus.
+  # pinentry-gnome3 may not work on non-GNOME systems, but can be fixed by
+  # the following:
+  dbus = {
+    packages = [ pkgs.gcr ];
+  };
+
   dconf.settings = with lib.hm.gvariant; {
     "org/gnome/desktop/interface" = lib.mkIf catppuccinThemeGtk {
+      clock-format = "24h";
       color-scheme = "prefer-dark";
       cursor-size = 32;
       cursor-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
+      document-font-name = config.gtk.font.name or "Fira Sans 12";
+      gtk-enable-primary-paste = true;
       gtk-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
       icon-theme = "Papirus-Dark";
+      monospace-font-name = "FiraCode Nerd Font Mono Medium 13";
+      text-scaling-factor = 1.0;
+    };
+
+    "org/gnome/desktop/sound" = {
+      theme-name = "freedesktop";
     };
 
     "org/gnome/desktop/wm/preferences" = lib.mkIf catppuccinThemeGtk {
       button-layout = "${buttonLayout}";
       theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
     };
-  };
 
-  home = {
-    packages = [
-      pkgs.gpu-viewer
-      pkgs.wdisplays
-    ];
+    "org/gtk/gtk4/Settings/FileChooser" = {
+      clock-format = "24h";
+    };
+
+    "org/gtk/Settings/FileChooser" = {
+      clock-format = "24h";
+    };
   };
 
   gtk = {
@@ -58,7 +76,8 @@ in
     };
     enable = true;
     font = lib.mkIf catppuccinThemeGtk {
-      name = "Fira Sans 12";
+      name = "Fira Sans";
+      size = 12;
       package = pkgs.fira-sans;
     };
     gtk2 = {
@@ -104,9 +123,21 @@ in
         accent = config.catppuccin.accent;
         variant = config.catppuccin.flavor;
       })
+      dconf-editor
+      file-roller
+      gnome-disk-utility
+      gnome-font-viewer
       libsForQt5.qtstyleplugin-kvantum
       libsForQt5.qt5ct
+      nautilus
+      papers
       papirus-folders
+      resources
+      seahorse
+      wdisplays
+      wlr-randr
+      wl-clipboard
+      wtype
     ];
 
     pointerCursor = {
@@ -128,8 +159,21 @@ in
     };
   };
 
-  # https://nixos.wiki/wiki/Bluetooth#Using_Bluetooth_headsets_with_PulseAudio
-  services.mpris-proxy.enable = true;
+  services = {
+    # https://nixos.wiki/wiki/Bluetooth#Using_Bluetooth_headsets_with_PulseAudio
+    mpris-proxy = {
+      enable = true;
+    };
+    gnome-keyring = {
+      enable = true;
+    };
+    udiskie = {
+      enable = true;
+      automount = false;
+      tray = "auto";
+      notify = true;
+    };
+  };
 
   systemd.user.sessionVariables = lib.mkIf catppuccinThemeQt {
     QT_STYLE_OVERRIDE = "kvantum";

@@ -132,7 +132,7 @@ fi
 
 echo -e "${GLYPH_CONFIG}Installing dconf..."
 sudo apt-get -y update
-sudo apt-get install -y dconf-gsettings-backend fontconfig
+sudo apt-get install -y dconf-gsettings-backend fontconfig udisks2
 
 # Install and configure NetworkManager like Ubuntu Desktop does
 echo -e "${GLYPH_NET}Installing NetworkManager..."

@@ -12,7 +12,7 @@ ubuntu-setup: _header _is_compatible _has_config
     PACKAGES_TO_INSTALL=()
     PACKAGES_TO_REMOVE=()
 
-    for PACKAGE in dconf-gsettings-backend fontconfig; do
+    for PACKAGE in dconf-gsettings-backend fontconfig udisks2; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi

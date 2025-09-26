@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   ...
 }:
@@ -13,7 +14,8 @@
     gpg-agent = {
       enable = true;
       enableSshSupport = true;
-      pinentry.package = pkgs.pinentry-curses;
+      pinentry.package =
+        if config.wayland.windowManager.hyprland.enable then pkgs.pinentry-gnome3 else pkgs.pinentry-curses;
     };
   };
 }
