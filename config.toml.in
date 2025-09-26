@@ -20,7 +20,7 @@ qt = false
 configure = false
 
 [terminal]
-# Your preferred shell (fish or zsh) - bash is always configured
+# Your preferred shell (bash, fish or zsh)
 shell = "fish"
 
 [ubuntu]
