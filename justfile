@@ -26,10 +26,19 @@ build: build-system build-home
 
 # Switch to new configuration
 switch: ubuntu-setup switch-system switch-home
-    @echo -e "{{GLYPH_FONT}}Updating font cache..."
-    @sudo fc-cache --system-only --really-force
-    @sudo update-grub &> /dev/null || true
-    @echo -e "{{SUCCESS}}System is up to date!"
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # AppArmor profile management
+    echo -e "{{GLYPH_SHIELD}}Reloading Nix AppArmor profiles..."
+    for profile in /etc/apparmor.d/nix_*; do
+        sudo apparmor_parser -r "$profile"
+    done
+    echo -e "{{SUCCESS}}AppArmor profiles reloaded!"
+
+    echo -e "{{GLYPH_FONT}}Updating font cache..."
+    sudo fc-cache --system-only --really-force
+    sudo update-grub &> /dev/null || true
+    echo -e "{{SUCCESS}}System is up to date!"
 
 # Generate config.toml
 generate: _header _is_compatible

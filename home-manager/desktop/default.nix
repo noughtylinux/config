@@ -20,6 +20,7 @@ let
 in
 {
   imports = [
+    ./apps/browser
     ./apps/terminal
     ./compositor/hyprland
   ];

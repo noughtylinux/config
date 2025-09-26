@@ -6,15 +6,23 @@ hostname = "@@HOSTNAME@@"
 [user]
 name = "@@USER@@"
 
-[desktop]
-# One of alacritty, foot, kitty
-terminal-emulator = "kitty"
+[browser]
+brave = false
+firefox = true
+chromium = false
+google-chrome = false
+microsoft-edge = false
+vivaldi = false
 
 [catppuccin]
 accent = "blue"
 flavor = "mocha"
 gtk = false
 qt = false
+
+[desktop]
+# One of alacritty, foot, kitty
+terminal-emulator = "kitty"
 
 [fonts]
 configure = false
