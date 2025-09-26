@@ -3,7 +3,8 @@
   ...
 }:
 {
-  catppuccin.atuin.enable = config.programs.gh.extensions.atuin;
+  # Creates an infinite recursion if you do `catppuccin.atuin.enable = config.programs.atuin;`
+  catppuccin.atuin.enable = true;
 
   programs = {
     atuin = {
