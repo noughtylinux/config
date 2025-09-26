@@ -23,7 +23,7 @@
 
 ## System Manager
 
-- [ ] AppArmour profiles for Nix
+- [x] AppArmour profile for SUID binaries in the Nix store
 - [x] Add screen clearing to `agetty`
 - [ ] ~~Use `agetty` in `kmscon` from Nixpkgs~~
 - [x] Enable `kmscon` on all VTs

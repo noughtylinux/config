@@ -17,124 +17,14 @@ in
   config = {
     environment = {
       etc = {
-        # AppArmor profiles for Nix
-        "apparmor.d/nix_brave" = {
+        # AppArmor profile for SUID binaries in the Nix store
+        "apparmor.d/nix_store" = {
           text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
             abi <abi/4.0>,
             include <tunables/global>
 
-            profile nix_brave /nix/store/**/bin/brave flags=(unconfined) {
+            profile nix_brave /nix/store/**/bin/* flags=(unconfined) {
               userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/brave>
-            }
-          '';
-          mode = "0644";
-        };
-        "apparmor.d/nix_chrome" = {
-          text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
-            abi <abi/4.0>,
-            include <tunables/global>
-
-            profile nix_chrome /nix/store/**/bin/google-chrome-stable flags=(unconfined) {
-              userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/chrome>
-            }
-          '';
-          mode = "0644";
-        };
-        "apparmor.d/nix_chromium" = {
-          text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
-            abi <abi/4.0>,
-            include <tunables/global>
-
-            @{chromium} = {,ungoogled-}chromium{,-browser}
-
-            profile nix_chromium /nix/store/**/bin/@{chromium} flags=(unconfined) {
-              userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/chromium>
-            }
-          '';
-          mode = "0644";
-        };
-        "apparmor.d/nix_firefox" = {
-          text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
-            abi <abi/4.0>,
-            include <tunables/global>
-
-            profile nix_firefox /nix/store/**/bin/firefox{,-esr,-bin} flags=(unconfined) {
-              userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/firefox>
-            }
-          '';
-          mode = "0644";
-        };
-        "apparmor.d/nix_msedge" = {
-          text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
-            abi <abi/4.0>,
-            include <tunables/global>
-
-            profile nix_msedge /nix/store/**/bin/microsoft-edge flags=(unconfined) {
-              userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/msedge>
-            }
-          '';
-          mode = "0644";
-        };
-        "apparmor.d/nix_mullvad-browser" = {
-          text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
-            abi <abi/4.0>,
-            include <tunables/global>
-
-            profile nix_firefox /nix/store/**/bin/mullvad-browser flags=(unconfined) {
-              userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/firefox>
-            }
-          '';
-          mode = "0644";
-        };
-        "apparmor.d/nix_vivaldi" = {
-          text = ''
-            # This profile allows everything and only exists to give the
-            # application a name instead of having the label "unconfined"
-
-            abi <abi/4.0>,
-            include <tunables/global>
-
-            profile brave /nix/store/**/bin/vivaldi flags=(unconfined) {
-              userns,
-
-              # Site-specific additions and overrides. See local/README for details.
-              include if exists <local/vivaldi-bin>
             }
           '';
           mode = "0644";
