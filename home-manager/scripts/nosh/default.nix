@@ -14,7 +14,7 @@ let
       nix-output-monitor
     ];
     text = ''
-      export NOSH_SHELL="${noshShell}"
+      export SHELL="${noshShell}"
       ${builtins.readFile ./${name}.sh}
     '';
   };
