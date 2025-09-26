@@ -18,7 +18,7 @@
 - [x] Make `halp` find help flags other that `--help`
 - [ ] Choose a browser
 - [ ] Choose a terminal editor
-- [ ] Pin Nixpkgs in `nosh` et al to the stable channel
+- [x] Pin Nixpkgs in `nosh` et al to the stable channel
 - [ ] Create `nash` a Nix hash getter
 
 ## System Manager

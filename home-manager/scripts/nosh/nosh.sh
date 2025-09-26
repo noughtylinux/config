@@ -9,12 +9,15 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
+# Get current stable nixpkgs channel using shared norm command
+STABLE_NIXPKGS=$(norm 2>/dev/null || echo "nixos-unstable")
+
 # Build the command string starting with 'nix shell'
 cmd="nom shell --impure"
 
 # Loop through all arguments and prefix with nixpkgs#
 for pkg in "$@"; do
-    cmd+=" github:nixos/nixpkgs#${pkg}"
+    cmd+=" github:nixos/nixpkgs/${STABLE_NIXPKGS}#${pkg}"
 done
 
 export NIXPKGS_ALLOW_UNFREE=1

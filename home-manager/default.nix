@@ -33,11 +33,14 @@ in
   };
 
   home = {
-    stateVersion = "25.05";
     packages = [
       pkgs.gpu-viewer
       pkgs.wdisplays
     ];
+    sessionVariables = {
+      NH_SEARCH_PLATFORM = 1;
+    };
+    stateVersion = "25.05";
   };
 
   news.display = "silent";
@@ -83,9 +86,29 @@ in
     nix-index.enable = true;
     # Terminal/shell configuration derived from TOML config
     # Always enable bash for scripts and compatibility
-    fish.enable = selectedShell == "fish";
-    bash.enable = true;
-    zsh.enable = selectedShell == "zsh";
+    fish = {
+      enable = selectedShell == "fish";
+      shellInit = lib.mkIf config.programs.nh.enable ''
+        # Set nh search to use the stable channel
+        set -gx NH_SEARCH_CHANNEL (norm 2>/dev/null; or echo nixos-unstable)
+      '';
+    };
+    bash = {
+      enable = true;
+      initExtra = lib.mkIf config.programs.nh.enable ''
+        # Set nh search to use the stable channel
+        export NH_SEARCH_CHANNEL="$(norm 2>/dev/null || echo nixos-unstable)"
+      '';
+    };
+    zsh = {
+      enable = selectedShell == "zsh";
+      initContent = lib.mkIf config.programs.nh.enable (
+        lib.mkOrder 500 ''
+          # Set nh search to use the stable channel
+          export NH_SEARCH_CHANNEL="$(norm 2>/dev/null || echo nixos-unstable)"
+        ''
+      );
+    };
   };
 
   systemd = {

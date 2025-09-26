@@ -6,9 +6,13 @@ set -euo pipefail
 # Function to get the main program name from a Nixpkg
 get_main_program() {
     local pkg="$1"
+    local stable_nixpkgs
 
-    # Use github:nixos/nixpkgs directly (works with Determinate Nix)
-    main_program=$(nix eval --impure github:nixos/nixpkgs#"$pkg".meta.mainProgram --raw 2>/dev/null || echo "")
+    # Get current stable nixpkgs channel using shared norm command
+    stable_nixpkgs=$(norm 2>/dev/null || echo "nixos-unstable")
+
+    # Use the detected stable release
+    main_program=$(nix eval --impure github:nixos/nixpkgs/"$stable_nixpkgs"#"$pkg".meta.mainProgram --raw 2>/dev/null || echo "")
 
     if [ -n "$main_program" ] && [ "$main_program" != "null" ]; then
         echo "$main_program"
@@ -17,7 +21,7 @@ get_main_program() {
 
     # Fallback 1: Try with lib.getExe
     exe_name=$(nix eval --impure --expr "
-        let pkgs = (builtins.getFlake \"github:nixos/nixpkgs\").legacyPackages.\${builtins.currentSystem};
+        let pkgs = (builtins.getFlake \"github:nixos/nixpkgs/$stable_nixpkgs\").legacyPackages.\${builtins.currentSystem};
         in builtins.baseNameOf (pkgs.lib.getExe pkgs.\"$pkg\")" --raw 2>/dev/null || echo "")
 
     if [ -n "$exe_name" ]; then
@@ -38,10 +42,13 @@ fi
 # Get the actual executable name from the package
 PACKAGE_NAME="${1}"
 shift
-NORF_COMMAND=$(get_main_program "${PACKAGE_NAME}")
+NOUT_COMMAND=$(get_main_program "${PACKAGE_NAME}")
+
+# Get current stable nixpkgs channel using shared norm command
+STABLE_NIXPKGS=$(norm 2>/dev/null || echo "nixos-unstable")
 
 # Build the command string starting with 'nom shell'
-cmd="nom shell --impure github:nixos/nixpkgs#${PACKAGE_NAME} --command ${NORF_COMMAND}"
+cmd="nom shell --impure github:nixos/nixpkgs/${STABLE_NIXPKGS}#${PACKAGE_NAME} --command ${NOUT_COMMAND}"
 
 # Add remaining arguments if any
 if [ $# -gt 0 ]; then
