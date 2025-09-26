@@ -127,6 +127,16 @@ in
 
   xdg = {
     enable = true;
+    desktopEntries = {
+      cups = {
+        name = "Manage Printing";
+        noDisplay = true;
+      };
+      fish = {
+        name = "fish";
+        noDisplay = true;
+      };
+    };
     userDirs = {
       enable = true;
       extraConfig = {

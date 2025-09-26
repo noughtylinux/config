@@ -22,4 +22,13 @@
       };
     };
   };
+
+  xdg = {
+    desktopEntries = {
+      micro = {
+        name = "Micro";
+        noDisplay = true;
+      };
+    };
+  };
 }

@@ -14,7 +14,7 @@
 - [x] Create `nope` to `setsid` things
 - [ ] Add all the dconf tweaks from my nix-config for theme and fonts
 - [x] Add `nh search` text to config headers
-- [ ] Hide crufty desktop entries
+- [x] Hide crufty desktop entries
 - [x] Make `halp` find help flags other that `--help`
 - [ ] Choose a browser
 - [ ] Choose a terminal editor

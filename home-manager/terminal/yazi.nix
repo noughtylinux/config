@@ -319,4 +319,13 @@
       };
     };
   };
+
+  xdg = {
+    desktopEntries = {
+      yazi = {
+        name = "Yazi";
+        noDisplay = true;
+      };
+    };
+  };
 }

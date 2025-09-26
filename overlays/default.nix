@@ -17,6 +17,14 @@
         sha256 = "sha256-RwfFXGRPDlO5WYTD2JWsZnKs3QngbMjc6kWRzCUR1gw=";
       };
     });
+
+    # Override rofi-unwrapped to remove desktop entries (this is where they come from!)
+    rofi-unwrapped = prev.rofi-unwrapped.overrideAttrs (oldAttrs: {
+      postInstall = (oldAttrs.postInstall or "") + ''
+        rm -f $out/share/applications/rofi.desktop
+        rm -f $out/share/applications/rofi-theme-selector.desktop
+      '';
+    });
   };
 
   # When applied, Nixpkgs unstable  will be accessible via 'pkgs.unstable'
@@ -24,6 +32,17 @@
     unstable = import inputs.nixpkgs-unstable {
       inherit (final) system;
       config.allowUnfree = true;
+      overlays = [
+        # Apply the same rofi-unwrapped modification to unstable packages
+        (_final: _prev: {
+          rofi-unwrapped = _prev.rofi-unwrapped.overrideAttrs (oldAttrs: {
+            postInstall = (oldAttrs.postInstall or "") + ''
+              rm -f $out/share/applications/rofi.desktop
+              rm -f $out/share/applications/rofi-theme-selector.desktop
+            '';
+          });
+        })
+      ];
     };
   };
 }

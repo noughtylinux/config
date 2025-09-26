@@ -38,4 +38,13 @@ in
     fish.shellAliases = lib.mkIf config.programs.bottom.enable shellAliases;
     zsh.shellAliases = lib.mkIf config.programs.bottom.enable shellAliases;
   };
+
+  xdg = {
+    desktopEntries = {
+      bottom = {
+        name = "bottom";
+        noDisplay = true;
+      };
+    };
+  };
 }

@@ -150,7 +150,16 @@ in
         };
       };
     };
-
+    desktopEntries = {
+      kvantummanager = {
+        name = "Kvantum Manager";
+        noDisplay = true;
+      };
+      qt5ct = {
+        name = "Qt5 Settings";
+        noDisplay = true;
+      };
+    };
     portal = {
       config = {
         common = {
