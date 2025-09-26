@@ -26,6 +26,7 @@ let
 in
 {
   imports = [
+    ./atuin.nix
     ./bat.nix
     ./bottom.nix
     ./btop.nix

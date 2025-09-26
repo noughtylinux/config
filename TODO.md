@@ -8,7 +8,7 @@
 
 ## Home Manager
 
-- [ ] Add atuin
+- [x] Add atuin
 - [ ] Rename `nore` to `nath`
 - [ ] Create `nork` to `setsid` things
 - [ ] Add all the dconf tweaks from my nix-config for theme and fonts
