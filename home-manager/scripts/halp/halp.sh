@@ -11,7 +11,7 @@ Usage: halp <command> [args...]
 Displays help output with syntax highlighting using bat.
 
 Tries multiple help discovery methods:
-  1. Standard help arguments (--help, -h, help, --usage)
+  1. Standard help arguments (--help, -h, -help, help, --usage)
   2. Manual pages with bat formatting
   3. tldr/tlrc summaries as fallback
 
