@@ -17,13 +17,93 @@ in
   config = {
     environment = {
       etc = {
-        # AppArmor profile for SUID binaries in the Nix store
-        "apparmor.d/nix_store" = {
+        # AppArmor profile for bwrap in the Nix store
+        "apparmor.d/nix_bwrap" = {
+          text = ''
+            # This profile allows almost everything and only exists to allow bwrap
+            # to work on a system with user namespace restrictions being enforced.
+            # bwrap is allowed access to user namespaces and capabilities within
+            # the user namespace, but its children do not have capabilities,
+            # blocking bwrap from being able to be used to arbitrarily by-pass the
+            # user namespace restrictions.
+
+            # Note: the nix_bwrap child is stacked against the nix_bwrap profile
+            # due to bwrap's use of no-new-privs.
+
+            abi <abi/4.0>,
+            include <tunables/global>
+
+            profile nix_bwrap /nix/store/**/bin/*bwrap* flags=(attach_disconnected,mediate_deleted) {
+              allow capability,
+              # not allow all, to allow for pix stack on systems that don't support
+              # rule priority.
+              #
+              # sadly we have to allow 'm' every where to allow children to work under
+              # profile stacking atm.
+              allow file rwlkm /{**,},
+              allow network,
+              allow unix,
+              allow ptrace,
+              allow signal,
+              allow mqueue,
+              allow io_uring,
+              allow userns,
+              allow mount,
+              allow umount,
+              allow pivot_root,
+              allow dbus,
+
+              # stacked like this due to no-new-privs restriction
+              # this will stack a target profile against nix_bwrap and nix_unpriv_bwrap
+              # Ideally
+              # - there would be a transition at userns creation first. This would allow
+              #   for the bwrap profile to be tighter, and looser within the user
+              #   ns. nix_bwrap will still have to fairly loose until a transition at
+              #   namespacing in general (not just user ns) is available.
+              # - there would be an independent second target as fallback
+              #   This would allow for select target profiles to be used, and not
+              #   necessarily stack the nix_unpriv_bwrap in cases where this is desired
+              #
+              # the ix works here because stack will apply to ix fallback
+              # Ideally we would sanitize the environment across a privilege boundary
+              # (leaving bwrap into application) but flatpak etc use environment glibc
+              # sanitized environment variables as part of the sandbox setup.
+              allow pix /** -> &nix_bwrap//&nix_unpriv_bwrap,
+            }
+
+            # The unpriv_bwrap profile is used to strip capabilities within the userns
+            profile nix_unpriv_bwrap flags=(attach_disconnected,mediate_deleted) {
+              # not allow all, to allow for pix stack
+              allow file rwlkm /{**,},
+              allow network,
+              allow unix,
+              allow ptrace,
+              allow signal,
+              allow mqueue,
+              allow io_uring,
+              allow userns,
+              allow mount,
+              allow umount,
+              allow pivot_root,
+              allow dbus,
+
+              # nix_bwrap profile does stacking against itself this will keep the
+              # target profile from having elevated privileges in the container.
+              # If done recursively the stack will remove any duplicate
+              allow pix /** -> &nix_unpriv_bwrap,
+
+              audit deny capability,
+            }
+          '';
+          mode = "0644";
+        };
+        # AppArmor profile for Ubuntu compatibility of Nix store binaries
+        "apparmor.d/nix_store_compat" = {
           text = ''
             abi <abi/4.0>,
             include <tunables/global>
 
-            profile nix_brave /nix/store/**/bin/* flags=(unconfined) {
+            profile nix_store_compat /nix/store/**/bin/* flags=(unconfined) {
               userns,
             }
           '';

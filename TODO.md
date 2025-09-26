@@ -23,12 +23,14 @@
 
 ## System Manager
 
-- [x] AppArmour profile for SUID binaries in the Nix store
+- [x] AppArmor profile for SUID binaries in the Nix store
+- [x] AppArmor profile for bwrap
 - [x] Add screen clearing to `agetty`
 - [ ] ~~Use `agetty` in `kmscon` from Nixpkgs~~
 - [x] Enable `kmscon` on all VTs
 - [x] Add Symbola and Nerd Font symbols fonts in system-manager
 - [x] Theme kernel colors with Catppuccin
+- [ ] Fix `sudo` finding executables from the user profile
 
 ## justfile
 
@@ -41,9 +43,9 @@
 - [ ] Put guard rails up to prevent installing on Ubuntu Desktop
 - [ ] Use tarballs as the distribution/update mechanism
 
-## Blockers
+# Challenges
 
-### SUID Sandbox
+## SUID Sandbox and bwrap
 
 ```
 [31341:31341:0611/040512.056408:FATAL:setuid_sandbox_host.cc(158)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /nix/store/98a01h4pabdqsbf6ghny3chzgpp3z5h4-chromium-83.0.4103.97-sandbox/bin/__chromium-suid-sandbox is owned by root and has mode 4755.
@@ -51,7 +53,8 @@
 
 - 🐛 **[Google Chrome complains that its SUID sandbox isn't configured correctly](https://github.com/NixOS/nixpkgs/issues/89599)**
 
-The Ubuntu kernel is hardening and requires AppArmor profile to be created for applications that use the SUID sandbox. This includes:
+The Ubuntu kernel is hardened and requires AppArmor profiles for applications that use the SUID sandbox.
+This includes:
 - Brave
 - Chrome
 - Chromium
@@ -59,15 +62,17 @@ The Ubuntu kernel is hardening and requires AppArmor profile to be created for a
 - Microsoft Edge
 - Vivaldi
 
-...and many more application based on Chromium such and anything Electron.
+...and many more applications based on Chromium, such as Electron apps.
 
 Using `sudo sysctl kernel.unprivileged_userns_clone=1` may have been disabled in
 recent Ubuntu releases, so AppArmor profiles appear to be the only option.
-Ubuntu ships nearly 150 AppArmor profile in `/etc/apparmor.d` and they can often
-be used repurposed to create one for applications in the Nix store.
+Ubuntu ships nearly 150 AppArmor profiles in `/etc/apparmor.d` and they can often
+be used repurposed to create profiles for the Nix store.
 
 The post explaining [a permissive AppArmor profile](https://github.com/NixOS/nixpkgs/issues/89599#issuecomment-2922388555)
 was the clue to getting this working.
 
-The major browser has AppArmor profile for Nix currently configured via system-manager.
-**It works, but something more flexible/maintainable will be required.**
+The other option, that worked, was to use an Ubuntu mainline kernel due to the
+relaxed kernel hardening. The other drawback of using a mainline kernel is
+hardware support regressions, such a panel backlight not working correctly on my
+AMD Ryzen 5 PRO 5650U powered ThinkPad X13.

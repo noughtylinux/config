@@ -28,11 +28,11 @@ build: build-system build-home
 switch: ubuntu-setup switch-system switch-home
     #!/usr/bin/env bash
     set -euo pipefail
-    echo -e "{{GLYPH_SHIELD}}Reloading Nix Store AppArmor profile..."
-    for profile in /etc/apparmor.d/nix_store; do
+    echo -e "{{GLYPH_SHIELD}}Reloading AppArmor profiles for Nix..."
+    for profile in /etc/apparmor.d/nix_*; do
         sudo apparmor_parser -r "$profile"
     done
-    echo -e "{{SUCCESS}}AppArmor profile reloaded!"
+    echo -e "{{SUCCESS}}AppArmor profiles reloaded!"
 
     echo -e "{{GLYPH_FONT}}Updating font cache..."
     sudo fc-cache --system-only --really-force
