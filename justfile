@@ -1,4 +1,4 @@
-# Noughty Linux justfile
+# Nøughty Linux recipes
 import "just/constants.just"
 import "just/home-manager.just"
 import "just/private.just"
@@ -94,7 +94,7 @@ transfer host path="~/NoughtyLinux": _header _has_git
 bootstrap host: _header _has_git
     #!/usr/bin/env bash
     set -euo pipefail
-    echo -e "{{GLYPH_SYSTEM}}Bootstrapping Noughty Linux on {{BOLD}}{{host}}{{RESET}}..."
+    echo -e "{{GLYPH_SYSTEM}}Bootstrapping Nøughty Linux on {{BOLD}}{{host}}{{RESET}}..."
 
     # Check if bootstrap script exists
     if [[ ! -f "bootstrap.sh" ]]; then

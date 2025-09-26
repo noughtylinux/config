@@ -1,5 +1,5 @@
 {
-  description = "Noughty Linux";
+  description = "Nøughty Linux";
   inputs = {
     catppuccin.url = "github:catppuccin/nix/release-25.05";
     catppuccin.inputs.nixpkgs.follows = "nixpkgs";

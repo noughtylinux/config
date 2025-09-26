@@ -156,13 +156,14 @@ elif [[ -d "${NOUGHTYLINUX_DIR}/.git" ]] && [[ -f "${NOUGHTYLINUX_DIR}/.git/conf
     nix shell nixpkgs#git --command git pull --rebase
   popd 1>/dev/null
 else
-  echo -e "${INFO}Cloning NoughtyLinux configuration repository into ${NOUGHTYLINUX_DIR}..."
+  echo -e "${INFO}Cloning Nøughty Linux configuration repository into ${NOUGHTYLINUX_DIR}..."
   nix shell nixpkgs#git --command git clone https://github.com/noughtylinux/config "${NOUGHTYLINUX_DIR}"
 fi
 
-# This executes the flake shellHook which inturn runs `just check-config`
+# Run just generate and just switch
 pushd "${NOUGHTYLINUX_DIR}" 1>/dev/null
   if [[ ! -f "config.toml" ]]; then
-    nix develop --no-update-lock-file --impure --command just generate-config
+    nix develop --no-update-lock-file --impure --command just generate
+    nix develop --no-update-lock-file --impure --command just switch
   fi
 popd 1>/dev/null

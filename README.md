@@ -1,6 +1,6 @@
-# Noughty Linux 🐧
+# Nøughty Linux 🐧
 
-**Noughty Linux** is an unconventional Linux desktop experience that combines Ubuntu's familiarity and broad hardware compatibility with Nix's declarative configuration and vast software library all wrapped in a user-friendly interface that requires zero Nix knowledge.
+**Nøughty Linux** is an unconventional Linux desktop experience that combines Ubuntu's familiarity and broad hardware compatibility with Nix's declarative configuration and vast software library all wrapped in a user-friendly interface that requires zero Nix knowledge.
 
 > Maximum desktop. Minimum effort.
 
@@ -8,11 +8,11 @@
 
 ## Installation Journey 🧑‍💻
 1. Standard Ubuntu Server installation
-2. Bootstrap Noughty Linux
+2. Bootstrap Nøughty Linux
 ```shell
 curl -fsSL https://noughtylinux.org/bootstrap | bash
 ```
-3. Reboot into Noughty Linux
+3. Reboot into Nøughty Linux
 
 ## Project Overview ⛰️
 
@@ -49,10 +49,10 @@ curl -fsSL https://noughtylinux.org/bootstrap | bash
 - A few well choose configuration options, not exhaustive control.
 - Minimal project infrastructure. Ideally nought.
 
-## Why *"Noughty"*
+## Why *"Nøughty"*
 
 The name plays on *"nought"* (British English for zero) while embracing the rebellious spirit of doing things differently.
-For the developer audience, *noughty* creates a parallel to programming's truthy/falsy concepts because Noughty Linux is *nought* a distro and unlike traditional Linux distributions, distributes *nought* ISOs 📀
+For the developer audience, *noughty* creates a parallel to programming's truthy/falsy concepts because Nøughty Linux is *nought* a distro and unlike traditional Linux distributions, distributes *nought* ISOs 📀
 
 This architectural choice has the following benefits:
 
@@ -82,14 +82,16 @@ This roadmap is a work in progress 🚧
 
 ### Phase 1️⃣
 
-- [ ] Initial bootstrap script to prepare Ubuntu with required tooling.
-- [ ] Create templated `config.yaml` via system introspection.
-- [ ] Basic Nix flake providing essential terminal environment.
-- [ ] Choice of `bash`, `fish` or `zsh` as default shell.
+- [x] Initial bootstrap script to prepare Ubuntu with required tooling.
+- [x] Create templated `config.yaml` via system introspection.
+- [x] Basic Nix flake providing essential terminal environment.
+- [x] Choice of `bash`, `fish` or `zsh` as default shell.
 
 ### Phase 2️⃣
 
-- [ ] Create a display manager and basic desktop shell.
+- [x] Create kmscon
+- [ ] Create a display manager
+- [x] Create a basic desktop shell.
 - [ ] Comprehensive desktop shell.
 - [ ] Choice of web browser.
 - [ ] Update/upgrade mechanisms.

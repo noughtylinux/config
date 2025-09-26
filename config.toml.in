@@ -1,4 +1,4 @@
-# Noughty Linux Configuration
+# Nøughty Linux Configuration
 
 [system]
 hostname = "@@HOSTNAME@@"
