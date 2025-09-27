@@ -33,9 +33,6 @@ in
   };
 
   home = {
-    sessionVariables = {
-      NH_SEARCH_PLATFORM = 1;
-    };
     stateVersion = "25.05";
   };
 
