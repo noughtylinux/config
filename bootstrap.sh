@@ -35,7 +35,6 @@ INFO="${BLUE}🛈 ${DIM}INFO${RESET}${BOLD}: ${RESET}"
 GLYPH_CHECK="${CYAN}≟ ${RESET}"
 GLYPH_CONFIG="${BLUE}✦ ${RESET}"
 GLYPH_EYE="${CYAN}⏿ ${RESET}"
-GLYPH_INSTALL="${CYAN}⮯ ${RESET}"
 GLYPH_KEY="${YELLOW}⚿ ${RESET}"
 GLYPH_MINUS="${MAGENTA}⊟ ${RESET}"
 GLYPH_NIX="${BLUE}❆ ${RESET}"
@@ -122,7 +121,7 @@ function install_nala() {
   {
     sudo apt-get install -y "${tmp_dir}/${archive}" "${tmp_dir}/${keyring}" >/dev/null 2>>"$error_log" &&
     sudo apt-get update >/dev/null 2>>"$error_log" &&
-    sudo apt-get install -y nala >/dev/null 2>>"$error_log"
+    sudo apt-get install -y nala whiptail >/dev/null 2>>"$error_log"
   } &
   local install_pid=$!
   spinner $install_pid "Installing nala…"
@@ -152,8 +151,8 @@ function install_determinate_nix() {
 
 # Check if /etc/os-release exists
 if [[ ! -f "/etc/os-release" ]]; then
-    echo -e "${ERROR}/etc/os-release not found!"
-    exit 1
+  echo -e "${ERROR}/etc/os-release not found!"
+  exit 1
 fi
 
 # Source the os-release file to get variables
@@ -161,8 +160,8 @@ source /etc/os-release
 
 # Check if this is Ubuntu
 if [[ "${ID:-}" != "ubuntu" ]]; then
-    echo -e "${ERROR}This system is not Ubuntu (detected: ${ID:-unknown})"
-    exit 1
+  echo -e "${ERROR}This system is not Ubuntu (detected: ${ID:-unknown})"
+  exit 1
 fi
 
 # Check if running as root (UID 0)
@@ -203,10 +202,9 @@ fi
 
 if [[ ${#conflicting_packages[@]} -gt 0 ]]; then
   echo -e "${WARNING}Found conflicting Ubuntu Nix packages: ${conflicting_packages[*]}"
-
   for package in "${conflicting_packages[@]}"; do
     echo -e "${GLYPH_MINUS}Purging ${package}..."
-    sudo nala purge --assume-yes "${package}"
+    sudo nala purge --assume-yes --simple "${package}"
   done
 
   echo -e "${SUCCESS}Conflicting packages removed successfully."
@@ -226,17 +224,6 @@ fi
 if ! command -v determinate-nixd &> /dev/null; then
   echo -e "${ERROR}Determinate Nix installation failed or is not in your PATH. Run bootstrap.sh again."
   exit 1
-fi
-
-echo -e "${GLYPH_INSTALL}Installing essentials..."
-sudo nala update
-sudo nala install --assume-yes dconf-gsettings-backend fontconfig network-manager udisks2
-if [[ ! -e /usr/lib/netplan/00-network-manager-all.yaml ]]; then
-    sudo mkdir -p /usr/lib/netplan 2>/dev/null || true
-    echo -e "${INFO}Configuring netplan to use NetworkManager..."
-    echo -e "network:\n  version: 2\n  renderer: NetworkManager" | sudo tee /usr/lib/netplan/00-network-manager-all.yaml >/dev/null
-    sudo chmod 600 /usr/lib/netplan/00-network-manager-all.yaml
-    sudo systemctl disable systemd-networkd
 fi
 
 # Clone the repository if it doesn't exist

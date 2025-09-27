@@ -9,19 +9,25 @@ ubuntu-pre: _header _is_compatible _has_config
         dpkg-query -W -f='${Status}' "${package}" 2>/dev/null | grep -q "install ok installed"
     }
 
+    if ! is_package_installed "nala"; then
+        just install-nala
+    fi
+
     PACKAGES_TO_REMOVE=()
     PACKAGES_TO_INSTALL=()
 
-    for PACKAGE in kmscon pulseaudio-module-bluetooth; do
+    # Remove conflicting packages
+    for PACKAGE in kmscon nix-bin nix-setup-systemd pulseaudio-module-bluetooth; do
         if is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_REMOVE+=("${PACKAGE}")
         fi
     done
 
+    # Essential Ubuntu host packages that provide hardware support for Nix integration
     for PACKAGE in bluez cups dconf-gsettings-backend fontconfig gstreamer1.0-pipewire \
         libfdk-aac2 libldacbt-abr2 libldacbt-enc2 libopenaptx0 \
-        libspa-0.2-bluetooth libspa-0.2-jack pipewire-audio-client-libraries \
-        udisks2 wireplumber; do
+        libspa-0.2-bluetooth libspa-0.2-jack network-manager \
+        pipewire-audio-client-libraries udisks2 whiptail wireplumber; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi
@@ -55,8 +61,7 @@ ubuntu-pre: _header _is_compatible _has_config
     if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]]; then
         echo -e "{{GLYPH_CANCEL}}Removing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to remove: ${PACKAGES_TO_REMOVE[*]}{{RESET}}"
-        sudo nala remove --purge --assume-yes "${PACKAGES_TO_REMOVE[@]}"
-        sudo nala autoremove --purge --assume-yes
+        sudo nala remove --purge --simple --assume-yes "${PACKAGES_TO_REMOVE[@]}"
         sudo nala clean
         # If snapd was removed, also remove snap directories
         if [[ " ${PACKAGES_TO_REMOVE[*]} " == *" snapd "* ]]; then
@@ -68,8 +73,17 @@ ubuntu-pre: _header _is_compatible _has_config
     if [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
         echo -e "{{GLYPH_UPDATE}}Installing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to install: ${PACKAGES_TO_INSTALL[*]}{{RESET}}"
-        sudo nala install --assume-yes "${PACKAGES_TO_INSTALL[@]}"
+        sudo nala install --assume-yes --simple "${PACKAGES_TO_INSTALL[@]}"
         echo -e "{{SUCCESS}}Successfully installed ${#PACKAGES_TO_INSTALL[@]} packages!"
+    fi
+
+    if [[ ! -e /usr/lib/netplan/00-network-manager-all.yaml ]]; then
+        sudo mkdir -p /usr/lib/netplan 2>/dev/null || true
+        echo -e "{{GLYPH_NET}}Configuring netplan to use NetworkManager..."
+        echo -e "network:\n  version: 2\n  renderer: NetworkManager" | sudo tee /usr/lib/netplan/00-network-manager-all.yaml >/dev/null
+        sudo chmod 600 /usr/lib/netplan/00-network-manager-all.yaml
+        sudo systemctl disable systemd-networkd
+        echo -e "{{SUCCESS}}Successfully configured netplan to use NetworkManager!"
     fi
 
 [private]
@@ -86,3 +100,108 @@ ubuntu-post:
     sudo fc-cache --system-only --really-force
     sudo update-grub &> /dev/null || true
     echo -e "{{SUCCESS}}System is up to date!"
+
+[private]
+install-nala:
+    #!/usr/bin/env bash
+
+    function ensure_sudo_access() {
+        if sudo -n true 2>/dev/null; then
+            echo -e "{{GLYPH_KEY}}sudo credentials are already cached."
+            return 0
+        fi
+
+    echo -e "{{GLYPH_KEY}}This script requires elevated permissions for package management."
+    echo "Please enter your password to cache sudo credentials:"
+    if ! sudo -v; then
+        echo -e "{{ERROR}}Failed to obtain sudo credentials."
+        exit 1
+    fi
+    }
+
+    function spinner() {
+        local pid=$1
+        local delay=0.1
+        local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+        local message="${2:-Working...}"
+
+        while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+            local temp=${spinstr#?}
+            printf "\r%s %s " "${spinstr%"$temp"}" "$message"
+            local spinstr=$temp${spinstr%"$temp"}
+            sleep $delay
+        done
+        printf "\r\033[K"
+    }
+
+    if command -v nala &> /dev/null; then
+        echo -e "{{SUCCESS}}nala is already installed, skipping installation."
+        return 0
+    fi
+
+    # Create temporary directory for downloads
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    local base_url="https://deb.volian.org/volian/pool/main/v/volian-archive/"
+
+    # Buffer for error output
+    local error_log
+    error_log=$(mktemp)
+
+    # Dynamically get the latest version
+    echo -e "{{GLYPH_EYE}}Detecting latest nala version..."
+    local version
+    version=$(curl -sSfL "$base_url" 2>>"$error_log" | grep -o 'volian-archive-nala_[0-9]\+\.[0-9]\+\.[0-9]\+_all\.deb' | sed 's/volian-archive-nala_\([0-9]\+\.[0-9]\+\.[0-9]\+\)_all\.deb/\1/' | sort -V | tail -n1)
+
+    if [[ -z "$version" ]]; then
+        echo -e "{{ERROR}}Failed to detect nala version from ${base_url}"
+        cat "$error_log" 2>/dev/null
+        rm -rf "$tmp_dir" "$error_log"
+        exit 1
+    fi
+
+    local archive="volian-archive-nala_${version}_all.deb"
+    local keyring="volian-archive-keyring_${version}_all.deb"
+
+    # Download packages with spinner
+    echo -e "{{INFO}}Found nala version: ${version}"
+    {
+        curl -sSfL "${base_url}${archive}" -o "${tmp_dir}/${archive}" 2>>"$error_log" &&
+        curl -sSfL "${base_url}${keyring}" -o "${tmp_dir}/${keyring}" 2>>"$error_log"
+    } &
+    local download_pid=$!
+    spinner $download_pid "Downloading nala packages…"
+    wait $download_pid
+    local download_result=$?
+
+    if [ $download_result -ne 0 ]; then
+        echo -e "{{ERROR}}Failed to download nala packages:"
+        cat "$error_log"
+        rm -rf "$tmp_dir" "$error_log"
+        exit 1
+    fi
+
+    # Install packages with spinner
+    {
+        sudo apt-get install -y "${tmp_dir}/${archive}" "${tmp_dir}/${keyring}" >/dev/null 2>>"$error_log" &&
+        sudo apt-get update >/dev/null 2>>"$error_log" &&
+        sudo apt-get install -y nala whiptail >/dev/null 2>>"$error_log"
+    } &
+    local install_pid=$!
+    spinner $install_pid "Installing nala…"
+    wait $install_pid
+    local install_result=$?
+
+    # Clean up temporary files
+    rm -rf "$tmp_dir"
+
+    if [ $install_result -ne 0 ]; then
+        echo -e "{{ERROR}}Failed to install nala:"
+        cat "$error_log"
+        rm -f "$error_log"
+        exit 1
+    fi
+
+    rm -f "$error_log"
+    echo -e "{{SUCCESS}}nala package manager installed successfully."
+

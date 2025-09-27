@@ -25,6 +25,7 @@ curl -fsSL https://noughtylinux.org/bootstrap | bash
 - [**system-manager**](https://github.com/numtide/system-manager): Manage system config using Nix on any distro
 - [**nix-system-graphics**](https://github.com/soupglasses/nix-system-graphics): Run graphics accelerated programs built with Nix on any Linux distribution
 - [**home-manager**](https://github.com/nix-community/home-manager): Manage a user environment using Nix
+- [**nala**](https://gitlab.com/volian/nala): Beautiful and fast alternative to `apt-get`
 - [**just**](https://just.systems/): a command runner
 - [**TOML**](https://toml.io): a config file format for humans
 - [**Catppuccin**](https://catppuccin.com/): soothing pastel theme for the high-spirited!

@@ -23,14 +23,17 @@ STRIKETHROUGH := '\033[9m'
 ERROR := RED + BOLD + '🗴 ' + RESET + RED + UNDERLINE + DIM + 'ERROR' + RESET + BOLD + ': ' + RESET
 WARNING := YELLOW + '🛆 ' + DIM + 'WARNING' + RESET + BOLD + ': ' + RESET
 SUCCESS := GREEN + BOLD + '🗸 ' + RESET + GREEN + DIM + 'SUCCESS' + RESET + BOLD + ': ' + RESET
+INFO := BLUE + '🛈 ' + DIM + 'INFO' + RESET + BOLD + ': ' + RESET
 
 # Glyphs
 GLYPH_CANCEL := MAGENTA + '⌧ ' + RESET
 GLYPH_CONFIG := BLUE + '✦ ' + RESET
+GLYPH_EYE := BLUE + '⏿ ' + RESET
 GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_FONT := BLUE + '🗚 ' + RESET
 GLYPH_HOME := BLUE + BOLD + '⌂ ' + RESET
 GLYPH_INSTALL := BLUE + '⮯ ' + RESET
+GLYPH_KEY := YELLOW + '⚿ ' + RESET
 GLYPH_SHELL := BLUE + '﹩ ' + RESET
 GLYPH_SHIELD := BLUE + '⛨ ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
