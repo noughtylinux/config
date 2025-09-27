@@ -1,5 +1,23 @@
 # TODO
 
+## bootstrap / flake / justfile
+
+- [x] Ubuntu pre- and post- recipes
+- [ ] Remove username and hostname from the `config.toml`
+- [ ] Install `nala` and use it for `apt` operations
+- [ ] Put guard rails up to prevent installing on Ubuntu Desktop
+- [ ] Consolidate duplicated Ubuntu configuration tasks
+- [ ] Plymouth
+- [ ] Add `[desktop]` section and use `shell` to enable desktop features
+- [ ] Add `[boot]` section to set Kernel, GRUB and Plymouth options
+- [x] Pipewire & WirePlumber
+- [x] CUPS
+- [x] BlueZ
+- [x] Clean up `justfile`. Maybe break it up
+- [x] Relocate `bootstrap.sh` in the config repository
+- [x] Add `tarball` command to `justfile`
+- [ ] Use tarballs as the distribution/update mechanism
+
 ## Modules
 
 - [ ] Create a noughtyConfig module
@@ -18,6 +36,8 @@
 - [x] Make `halp` find help flags other that `--help`
 - [x] Choose a browser
 - [ ] Choose a terminal editor
+- [ ] User defined packages to install
+- [ ] User owned custom Nix config
 - [x] Pin Nixpkgs in `nosh` et al to the stable channel
 - [ ] Create `nash` a Nix hash getter
 
@@ -33,24 +53,9 @@
 - [ ] Display Manager
 - [ ] Fix `sudo` finding executables from the user profile
 
-## justfile
-
-- [x] Ubuntu pre- and post- recipes
-- [ ] Remove username and hostname from the `config.toml`
-- [ ] Add `[desktop]` section and use `shell` to enable desktop features
-- [x] Pipewire & WirePlumber
-- [x] CUPS
-- [x] BlueZ
-- [x] Clean up `justfile`. Maybe break it up
-- [x] Relocate `bootstrap.sh` in the config repository
-- [x] Add `tarball` command to `justfile`
-- [ ] Install `nala` and use it for `apt` operations
-- [ ] Put guard rails up to prevent installing on Ubuntu Desktop
-- [ ] Use tarballs as the distribution/update mechanism
-
 # Challenges
 
-## SUID Sandbox and bwrap
+## SUID sandbox and bwrap
 
 ```
 [31341:31341:0611/040512.056408:FATAL:setuid_sandbox_host.cc(158)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /nix/store/98a01h4pabdqsbf6ghny3chzgpp3z5h4-chromium-83.0.4103.97-sandbox/bin/__chromium-suid-sandbox is owned by root and has mode 4755.
@@ -72,12 +77,11 @@ This includes:
 Using `sudo sysctl kernel.unprivileged_userns_clone=1` may have been disabled in
 recent Ubuntu releases, so AppArmor profiles appear to be the only option.
 Ubuntu ships nearly 150 AppArmor profiles in `/etc/apparmor.d` and they can often
-be used repurposed to create profiles for the Nix store.
+be repurposed to create profiles for the Nix store.
 
-The post explaining [a permissive AppArmor profile](https://github.com/NixOS/nixpkgs/issues/89599#issuecomment-2922388555)
-was the clue to getting this working.
+The post explaining [a permissive AppArmor profile](https://github.com/NixOS/nixpkgs/issues/89599#issuecomment-2922388555) was the clue to getting this working.
 
-The other option, that worked, was to use an Ubuntu mainline kernel due to the
-relaxed kernel hardening. The other drawback of using a mainline kernel is
-hardware support regressions, such a panel backlight not working correctly on my
-AMD Ryzen 5 PRO 5650U powered ThinkPad X13.
+The other option, that worked, was to use an [Ubuntu mainline kernel](https://kernel.ubuntu.com/mainline/)
+due to their relaxed kernel hardening. The other drawback of using a mainline
+kernel is hardware support regressions, such a panel backlight not working
+correctly on my AMD Ryzen 5 PRO 5650U powered ThinkPad X13.
