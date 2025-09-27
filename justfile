@@ -17,9 +17,14 @@ update: _header _is_compatible
 
 # Check flake integrity
 check: _header
-    @echo -e "{{GLYPH_FLAKE}}Running flake checks..."
-    @nix flake check --log-format internal-json -v --all-systems {{NIX_OPTS}} |& nom --json
-    @nix flake show --all-systems {{NIX_OPTS}}
+    #!/usr/bin/env bash
+    echo -e "{{GLYPH_FLAKE}}Running flake checks..."
+    # Ensure environment variables are available to Nix
+    export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
+    export USER="${USER}"
+    export HOME="${HOME}"
+    nix flake check --log-format internal-json -v --all-systems {{NIX_OPTS}} |& nom --json
+    nix flake show --all-systems {{NIX_OPTS}}
 
 # Build configuration
 build: build-system build-home
