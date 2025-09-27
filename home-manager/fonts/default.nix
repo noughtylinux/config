@@ -37,7 +37,7 @@ in
           "Noto Color Emoji"
         ];
         sansSerif = [
-          "Fira Sans"
+          "Work Sans"
           "Noto Color Emoji"
         ];
         monospace = [

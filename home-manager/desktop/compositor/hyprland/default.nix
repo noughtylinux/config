@@ -181,8 +181,8 @@ in
       };
       group = {
         groupbar = {
-          font_family = config.gtk.font.name or "Fira Sans";
-          font_size = config.gtk.font.size or 12;
+          font_family = config.gtk.font.name or "Work Sans";
+          font_size = config.gtk.font.size or 13;
           gradients = true;
         };
       };

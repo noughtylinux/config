@@ -43,7 +43,7 @@ in
       color-scheme = "prefer-dark";
       cursor-size = 32;
       cursor-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
-      document-font-name = config.gtk.font.name or "Fira Sans 12";
+      document-font-name = config.gtk.font.name or "Work Sans 13";
       gtk-enable-primary-paste = true;
       gtk-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
       icon-theme = "Papirus-Dark";
@@ -77,9 +77,9 @@ in
     };
     enable = true;
     font = lib.mkIf catppuccinThemeGtk {
-      name = "Fira Sans";
-      size = 12;
-      package = pkgs.fira-sans;
+      name = "Work Sans";
+      size = 13;
+      package = pkgs.work-sans;
     };
     gtk2 = {
       configLocation = "${config.xdg.configHome}/.gtkrc-2.0";
