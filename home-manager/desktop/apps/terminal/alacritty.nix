@@ -56,7 +56,7 @@ lib.mkIf (terminalEmulator == "alacritty") {
           save_to_clipboard = true;
         };
         scrolling = {
-          history = 65536;
+          history = 16384;
           multiplier = 3;
         };
         terminal = {

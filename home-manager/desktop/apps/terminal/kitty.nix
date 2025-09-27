@@ -29,7 +29,7 @@ lib.mkIf (terminalEmulator == "kitty") {
         cursor_stop_blinking_after = 0;
         hide_window_decorations = if config.wayland.windowManager.hyprland.enable then true else false;
         scrollback_indicator_opacity = 0.50;
-        scrollback_lines = 65536;
+        scrollback_lines = 16384;
         shell = lib.mkIf (
           selectedShell != null && selectedShell != ""
         ) "${pkgs.${selectedShell}}/bin/${selectedShell} ${shellArgs}";
@@ -60,17 +60,17 @@ lib.mkIf (terminalEmulator == "kitty") {
       '';
     };
     rofi = lib.mkIf config.programs.rofi.enable {
-      terminal = "${pkgs.kitty}/bin/kitty";
+      terminal = "${pkgs.kitty}/bin/kitty --single-instance";
     };
     fuzzel = lib.mkIf config.programs.fuzzel.enable {
-      settings.main.terminal = "${pkgs.kitty}/bin/kitty";
+      settings.main.terminal = "${pkgs.kitty}/bin/kitty --single-instance";
     };
   };
 
   wayland.windowManager.hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
     settings = {
       bind = [
-        "$mod, T, exec, ${pkgs.kitty}/bin/kitty"
+        "$mod, T, exec, ${pkgs.kitty}/bin/kitty --single-instance"
       ];
     };
   };

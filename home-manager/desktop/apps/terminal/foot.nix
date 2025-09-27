@@ -33,7 +33,7 @@ lib.mkIf (terminalEmulator == "foot") {
           blink = "yes";
         };
         scrollback = {
-          lines = 65536;
+          lines = 16384;
         };
       };
     };
