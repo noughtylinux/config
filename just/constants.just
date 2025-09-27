@@ -25,19 +25,20 @@ WARNING := YELLOW + '🛆 ' + DIM + 'WARNING' + RESET + BOLD + ': ' + RESET
 SUCCESS := GREEN + BOLD + '🗸 ' + RESET + GREEN + DIM + 'SUCCESS' + RESET + BOLD + ': ' + RESET
 
 # Glyphs
-GLYPH_CANCEL := MAGENTA + '⊘ ' + RESET
+GLYPH_CANCEL := MAGENTA + '⌧ ' + RESET
 GLYPH_CONFIG := BLUE + '✦ ' + RESET
 GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_FONT := BLUE + '🗚 ' + RESET
-GLYPH_HOME := BLUE + '≋ ' + RESET
-GLYPH_NET := BLUE + '🖧 ' + RESET
+GLYPH_HOME := BLUE + BOLD + '⌂ ' + RESET
+GLYPH_NET := BLUE + '🖀 ' + RESET
 GLYPH_SHELL := BLUE + '﹩ ' + RESET
 GLYPH_SHIELD := BLUE + '⛨ ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
 GLYPH_TARBALL := BLUE + '🞋 ' + RESET
-GLYPH_TRANSFER := BLUE + '➲ ' + RESET
-GLYPH_UPDATE := BLUE + '⇩ ' + RESET
+GLYPH_TRANSFER := BLUE + '➥ ' + RESET
+GLYPH_UPDATE := BLUE + '♼ ' + RESET
 GLYPH_USER := BLUE + '☻ ' + RESET
+GLYPH_UPGRADE := CYAN + '⬈ ' + RESET
 
 # Constants
 NIX_OPTS := "--no-update-lock-file --impure"

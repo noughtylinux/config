@@ -73,7 +73,7 @@ transfer host path="~/NoughtyLinux": _header _has_git
 
     just tarball noughty-linux-payload.tar.gz
 
-    echo -e "{{GLYPH_UPDATE}}Copying configuration to {{BOLD}}{{host}}:{{path}}{{RESET}}..."
+    echo -e "{{GLYPH_TRANSFER}}Copying configuration to {{BOLD}}{{host}}:{{path}}{{RESET}}..."
 
     # Copy archive to remote host
     scp "noughty-linux-payload.tar.gz" "{{host}}:/tmp/noughty-linux-payload.tar.gz"
