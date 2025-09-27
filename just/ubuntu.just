@@ -49,15 +49,15 @@ ubuntu-pre: _header _is_compatible _has_config
     fi
 
     if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]] || [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
-        sudo apt-get -y update
+        sudo nala update
     fi
 
     if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]]; then
         echo -e "{{GLYPH_CANCEL}}Removing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to remove: ${PACKAGES_TO_REMOVE[*]}{{RESET}}"
-        sudo apt-get -y remove --purge "${PACKAGES_TO_REMOVE[@]}"
-        sudo apt-get -y autoremove --purge
-        sudo apt-get -y autoclean
+        sudo nala remove --purge --assume-yes "${PACKAGES_TO_REMOVE[@]}"
+        sudo nala autoremove --purge --assume-yes
+        sudo nala clean
         # If snapd was removed, also remove snap directories
         if [[ " ${PACKAGES_TO_REMOVE[*]} " == *" snapd "* ]]; then
             sudo rm -rf /usr/lib/snapd /snap /var/lib/snapd /var/snap
@@ -68,7 +68,7 @@ ubuntu-pre: _header _is_compatible _has_config
     if [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
         echo -e "{{GLYPH_UPDATE}}Installing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to install: ${PACKAGES_TO_INSTALL[*]}{{RESET}}"
-        sudo apt-get -y install "${PACKAGES_TO_INSTALL[@]}"
+        sudo nala install --assume-yes "${PACKAGES_TO_INSTALL[@]}"
         echo -e "{{SUCCESS}}Successfully installed ${#PACKAGES_TO_INSTALL[@]} packages!"
     fi
 

@@ -4,7 +4,7 @@
 
 - [x] Ubuntu pre- and post- recipes
 - [x] Remove username and hostname from the `config.toml`
-- [ ] Install `nala` and use it for `apt` operations
+- [x] Install `nala` and use it for `apt` operations
 - [ ] Put guard rails up to prevent installing on Ubuntu Desktop
 - [ ] Consolidate duplicated Ubuntu configuration tasks
 - [ ] Plymouth
