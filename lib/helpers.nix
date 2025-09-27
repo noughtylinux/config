@@ -24,7 +24,7 @@ in
   ];
 
   # Helper to generate the noughtyConfig from config.toml
-  # Use builtins.getEnv (impure) to ensure the flake evaluates when config.toml is missing
+  # Use builtins.getEnv (impure) to get system facts from environment
   mkConfig =
     {
       tomlPath ? ../config.toml,
@@ -32,16 +32,29 @@ in
     let
       tomlExists = builtins.pathExists tomlPath;
       tomlConfig = if tomlExists then builtins.fromTOML (builtins.readFile tomlPath) else { };
+
+      envHostname = builtins.getEnv "HOSTNAME";
+      envUsername = builtins.getEnv "USER";
+      envHome = builtins.getEnv "HOME";
     in
-    {
-      system = {
-        hostname = builtins.getEnv "HOSTNAME";
-      };
-      user = {
-        name = builtins.getEnv "USER";
-      };
-    }
-    // tomlConfig;
+    # Hard fail if critical environment variables are missing
+    if envHostname == "" then
+      throw "HOSTNAME environment variable is not set"
+    else if envUsername == "" then
+      throw "USER environment variable is not set"
+    else if envHome == "" then
+      throw "HOME environment variable is not set"
+    else
+      {
+        system = {
+          hostname = envHostname;
+        };
+        user = {
+          name = envUsername;
+          home = envHome;
+        };
+      }
+      // tomlConfig;
 
   # Helper function for generating home-manager configs
   mkHome =

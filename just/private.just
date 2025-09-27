@@ -59,30 +59,7 @@ _has_config:
     set -euo pipefail
 
     if [[ ! -f "config.toml" ]]; then
-        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} not found! Please run: {{BOLD}}just generate-config{{RESET}}."
-        exit 1
-    fi
-
-    # Extract values from config.toml
-    CONFIG_HOSTNAME=$(tq -f config.toml system.hostname)
-    CONFIG_USER=$(tq -f config.toml user.name)
-    CONFIG_HOME="/home/$(tq -f config.toml user.name)"
-
-    # Check if hostname matches $(hostname -s)
-    if [[ "${CONFIG_HOSTNAME}" != "$(hostname -s)" ]]; then
-        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} system.hostname '${CONFIG_HOSTNAME}' {{UNDERLINE}}does not match{{RESET}} \$(hostname -s) '$(hostname -s)'"
-        exit 1
-    fi
-
-    # Check if username matches $USER
-    if [[ "${CONFIG_USER}" != "${USER}" ]]; then
-        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} user.name '${CONFIG_USER}' {{UNDERLINE}}does not match{{RESET}} \$USER '${USER}'"
-        exit 1
-    fi
-
-    # Check if home_directory path exists
-    if [[ ! -d "${CONFIG_HOME}" ]]; then
-        echo -e "{{ERROR}}{{BOLD}}${CONFIG_HOME}{{DIM}} does not exist"
+        echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} not found! Please run: {{BOLD}}just generate{{RESET}}."
         exit 1
     fi
 

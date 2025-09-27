@@ -50,17 +50,15 @@ generate: _header _is_compatible
         fi
     fi
 
-    # Generate config.toml by replacing placeholders
+    # Generate config.toml from template (no substitution needed)
     cp config.toml.in config.toml
-    sd '@@HOSTNAME@@' "$(hostname -s)" config.toml
-    sd '@@USER@@' "${USER}" config.toml
     echo -e "{{SUCCESS}}{{DIM}}config.toml{{RESET}} generated!"
 
 # Show configuration summary
 show: _header _is_compatible _has_config
-    @echo -e "{{GLYPH_SYSTEM}}Hostname:\t{{DIM}}$(tq -f config.toml system.hostname){{RESET}}"
-    @echo -e "{{GLYPH_USER}}User:\t\t{{DIM}}$(tq -f config.toml user.name){{RESET}}"
-    @echo -e "{{GLYPH_HOME}}Home:\t\t{{DIM}}/home/$(tq -f config.toml user.name){{RESET}}"
+    @echo -e "{{GLYPH_SYSTEM}}Hostname:\t{{DIM}}${HOSTNAME}{{RESET}}"
+    @echo -e "{{GLYPH_USER}}User:\t\t{{DIM}}${USER}{{RESET}}"
+    @echo -e "{{GLYPH_HOME}}Home:\t\t{{DIM}}${HOME}{{RESET}}"
 
 # Create a tarball of the configuration
 tarball filename=("noughty-linux-" + VERSION + ".tar.gz"): _has_git

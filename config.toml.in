@@ -1,11 +1,5 @@
 # Nøughty Linux Configuration
 
-[system]
-hostname = "@@HOSTNAME@@"
-
-[user]
-name = "@@USER@@"
-
 [browser]
 brave = false
 firefox = true
