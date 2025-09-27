@@ -6,8 +6,9 @@ mischief: _header _is_compatible
         exit 0
     fi
     echo -e "{{GLYPH_DAMAGE}}I solemnly swear that I am up to no good..."
-    sudo apt-get -y purge --autoremove nala cups
-    sudo apt-get -y install --no-install-recommends pollinate
+    sudo nala remove --assume-yes --simple --purge cups
+    sudo nala install --assume-yes --simple pollinate
+    sudo apt-get -y purge --autoremove nala whiptail 2> /dev/null || true
     sudo rm -f /usr/lib/netplan/00-network-manager-all.yaml
     echo -e "{{GLYPH_DAMAGE}}Mischief managed!"
 

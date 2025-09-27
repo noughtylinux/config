@@ -47,8 +47,8 @@ curl -fsSL https://noughtylinux.org/bootstrap | bash
 - Catppuccin only.
 - Wayland only.
 - No full desktop environments.
-- A few well choose configuration options, not exhaustive control.
-- Minimal project infrastructure. Ideally nought.
+- A few well chosen configuration options, not exhaustive control.
+- Minimal project hosting requirements. Ideally nought.
 
 ## Why *"Nøughty"*
 
@@ -94,7 +94,7 @@ This roadmap is a work in progress 🚧
 - [ ] Create a display manager
 - [x] Create a basic desktop shell.
 - [ ] Comprehensive desktop shell.
-- [ ] Choice of web browser.
+- [x] Choice of web browser.
 - [ ] Update/upgrade mechanisms.
 
 ### Phase 3️⃣
