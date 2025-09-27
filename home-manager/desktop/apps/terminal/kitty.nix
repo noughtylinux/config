@@ -43,7 +43,7 @@ lib.mkIf (terminalEmulator == "kitty") {
         copy_on_select = true;
         mouse_hide_wait = 0;
         strip_trailing_spaces = "smart";
-        wheel_scroll_multiplier = 2;
+        wheel_scroll_multiplier = 5;
         # Bell
         enable_audio_bell = "no";
         visual_bell = 0.25;

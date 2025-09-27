@@ -63,7 +63,7 @@ show: _header _is_compatible _has_config
     @echo -e "{{GLYPH_HOME}}Home:\t\t{{DIM}}/home/$(tq -f config.toml user.name){{RESET}}"
 
 # Create a tarball of the configuration
-tarball filename=("noughty-linux-" + VERSION + ".tar.gz"): _header _has_git
+tarball filename=("noughty-linux-" + VERSION + ".tar.gz"): _has_git
     @echo -e "{{GLYPH_TARBALL}}Creating tarball of the configuration..."
     @git archive --format=tar.gz HEAD > "{{filename}}"
     @echo -e "{{SUCCESS}}Tarball created at {{DIM}}{{filename}}{{RESET}}!"

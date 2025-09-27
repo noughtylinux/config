@@ -7,6 +7,7 @@ build-home: _header _is_compatible _has_config
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
     nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
+    rm result 2> /dev/null || true
 
 # Switch to home-manager configuration
 [private]
@@ -17,3 +18,4 @@ switch-home: build-home
     export HOSTNAME="${HOSTNAME:-$(tq -f config.toml system.hostname)}"
     export USER="${USER:-$(tq -f config.toml user.name)}"
     home-manager --impure -b noughty-{{STAMP}} --flake ".#${USER}@${HOSTNAME}" switch
+    rm result 2> /dev/null || true
