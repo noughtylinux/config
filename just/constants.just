@@ -26,16 +26,20 @@ SUCCESS := GREEN + BOLD + '🗸 ' + RESET + GREEN + DIM + 'SUCCESS' + RESET + BO
 INFO := BLUE + '🛈 ' + DIM + 'INFO' + RESET + BOLD + ': ' + RESET
 
 # Glyphs
+GLYPH_BUILD := BLUE + '☭ ' + RESET
 GLYPH_CANCEL := MAGENTA + '⌧ ' + RESET
-GLYPH_CONFIG := BLUE + '✦ ' + RESET
+GLYPH_CONFIG := BLUE + '🖬 ' + RESET
+GLYPH_DAMAGE := YELLOW + '🗲 ' + RESET
 GLYPH_EYE := BLUE + '⏿ ' + RESET
 GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_FONT := BLUE + '🗚 ' + RESET
 GLYPH_HOME := BLUE + BOLD + '⌂ ' + RESET
 GLYPH_INSTALL := BLUE + '⮯ ' + RESET
 GLYPH_KEY := YELLOW + '⚿ ' + RESET
+GLYPH_NET := BLUE + '🖀 ' + RESET
 GLYPH_SHELL := BLUE + '﹩ ' + RESET
 GLYPH_SHIELD := BLUE + '⛨ ' + RESET
+GLYPH_SWITCH := BLUE + '⤮ ' + RESET
 GLYPH_SYSTEM := BLUE + '▣ ' + RESET
 GLYPH_TARBALL := BLUE + '🞋 ' + RESET
 GLYPH_TRANSFER := BLUE + '⮩ ' + RESET

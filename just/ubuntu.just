@@ -1,3 +1,16 @@
+# I solemnly swear that I am up to no good
+mischief: _header _is_compatible
+    #!/usr/bin/env bash
+    if [[ "${USER}" != "martin" ]]; then
+        echo -e "{{GLYPH_CANCEL}}Only the user {{BOLD}}martin{{RESET}} can get up to mischief! {{GLYPH_DAMAGE}}"
+        exit 0
+    fi
+    echo -e "{{GLYPH_DAMAGE}}I solemnly swear that I am up to no good..."
+    sudo apt-get -y purge --autoremove nala cups
+    sudo apt-get -y install --no-install-recommends pollinate
+    sudo rm -f /usr/lib/netplan/00-network-manager-all.yaml
+    echo -e "{{GLYPH_DAMAGE}}Mischief managed!"
+
 # Perform Ubuntu setup based on config.toml
 [private]
 ubuntu-pre: _header _is_compatible _has_config
@@ -139,18 +152,14 @@ install-nala:
         return 0
     fi
 
-    # Create temporary directory for downloads
-    local tmp_dir
     tmp_dir=$(mktemp -d)
-    local base_url="https://deb.volian.org/volian/pool/main/v/volian-archive/"
+    base_url="https://deb.volian.org/volian/pool/main/v/volian-archive/"
 
     # Buffer for error output
-    local error_log
     error_log=$(mktemp)
 
     # Dynamically get the latest version
     echo -e "{{GLYPH_EYE}}Detecting latest nala version..."
-    local version
     version=$(curl -sSfL "$base_url" 2>>"$error_log" | grep -o 'volian-archive-nala_[0-9]\+\.[0-9]\+\.[0-9]\+_all\.deb' | sed 's/volian-archive-nala_\([0-9]\+\.[0-9]\+\.[0-9]\+\)_all\.deb/\1/' | sort -V | tail -n1)
 
     if [[ -z "$version" ]]; then
@@ -160,8 +169,8 @@ install-nala:
         exit 1
     fi
 
-    local archive="volian-archive-nala_${version}_all.deb"
-    local keyring="volian-archive-keyring_${version}_all.deb"
+    archive="volian-archive-nala_${version}_all.deb"
+    keyring="volian-archive-keyring_${version}_all.deb"
 
     # Download packages with spinner
     echo -e "{{INFO}}Found nala version: ${version}"
@@ -169,10 +178,10 @@ install-nala:
         curl -sSfL "${base_url}${archive}" -o "${tmp_dir}/${archive}" 2>>"$error_log" &&
         curl -sSfL "${base_url}${keyring}" -o "${tmp_dir}/${keyring}" 2>>"$error_log"
     } &
-    local download_pid=$!
+    download_pid=$!
     spinner $download_pid "Downloading nala packages…"
     wait $download_pid
-    local download_result=$?
+    download_result=$?
 
     if [ $download_result -ne 0 ]; then
         echo -e "{{ERROR}}Failed to download nala packages:"
@@ -187,10 +196,10 @@ install-nala:
         sudo apt-get update >/dev/null 2>>"$error_log" &&
         sudo apt-get install -y nala whiptail >/dev/null 2>>"$error_log"
     } &
-    local install_pid=$!
+    install_pid=$!
     spinner $install_pid "Installing nala…"
     wait $install_pid
-    local install_result=$?
+    install_result=$?
 
     # Clean up temporary files
     rm -rf "$tmp_dir"

@@ -6,7 +6,7 @@
 - [x] Remove username and hostname from the `config.toml`
 - [x] Install `nala` and use it for `apt` operations
 - [ ] Put guard rails up to prevent installing on Ubuntu Desktop
-- [ ] Consolidate duplicated Ubuntu configuration tasks
+- [x] Consolidate duplicated Ubuntu configuration tasks
 - [ ] Plymouth
 - [ ] Add `[desktop]` section and use `shell` to enable desktop features
 - [ ] Add `[boot]` section to set Kernel, GRUB and Plymouth options
