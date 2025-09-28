@@ -37,7 +37,7 @@
 - [x] Choose a browser
 - [ ] Choose a terminal editor
 - [x] User defined packages to install
-- [ ] User owned custom Nix config
+- [x] User owned custom Nix config
 - [x] Pin Nixpkgs in `nosh` et al to the stable channel
 - [ ] Create `nash` a Nix hash getter
 

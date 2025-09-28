@@ -1,0 +1,44 @@
+# Example custom.nix for user-owned Nix configuration
+# Copy this file to custom.nix (without .example) to use
+# This file allows you to add your own Home Manager configuration
+# without modifying the managed Noughty Linux files
+
+{
+  config,
+  lib,
+  noughtyConfig,
+  pkgs,
+  ...
+}:
+{
+  # Example: Add custom packages
+  # home.packages = with pkgs; [
+  #   your-favorite-package
+  #   another-package
+  # ];
+
+  # Example: Configure programs not covered by Noughty Linux
+  # programs.your-program = {
+  #   enable = true;
+  #   # your configuration here
+  # };
+
+  # Example: Add custom environment variables
+  # home.sessionVariables = {
+  #   CUSTOM_VAR = "value";
+  # };
+
+  # Example: Add custom shell aliases
+  # programs.bash.shellAliases = {
+  #   ll = "ls -la";
+  # };
+
+  # Example: Add custom files to home directory
+  # home.file.".custom-config".text = ''
+  #   your custom configuration content
+  # '';
+
+  # You have access to all Home Manager options and the noughtyConfig
+  # from your config.toml file. For documentation, see:
+  # https://nix-community.github.io/home-manager/options.html
+}

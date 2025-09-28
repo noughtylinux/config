@@ -2,3 +2,4 @@
 config.toml
 result*
 *.tar.gz
+home-manager/user/custom.nix

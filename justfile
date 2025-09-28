@@ -92,6 +92,11 @@ transfer host path="~/NoughtyLinux": _header _has_git
             cp {{path}}/config.toml /tmp/config.toml
         fi &&
 
+        # Backup custom.nix
+        if [[ -f {{path}}/home-manager/user/custom.nix ]]; then
+            cp {{path}}/home-manager/user/custom.nix /tmp/custom.nix
+        fi &&
+
         # Extract payload
         mkdir -p {{path}} &&
         cd {{path}} &&
@@ -101,6 +106,12 @@ transfer host path="~/NoughtyLinux": _header _has_git
         # Restore config.toml
         if [[ -f /tmp/config.toml ]]; then
             mv /tmp/config.toml config.toml
+        fi &&
+
+        # Restore custom.nix
+        if [[ -f /tmp/custom.nix ]]; then
+            mkdir -p {{path}}/home-manager/user &&
+            mv /tmp/custom.nix {{path}}/home-manager/user/custom.nix
         fi
     "
     echo -e "{{SUCCESS}}Configuration transferred to {{BOLD}}{{host}}:{{path}}{{RESET}}!"
