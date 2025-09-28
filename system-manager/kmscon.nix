@@ -1,5 +1,6 @@
 {
   pkgs,
+  noughtyConfig,
   ...
 }:
 let
@@ -7,6 +8,17 @@ let
   agettyBin = "/sbin/agetty";
   # Use Nixpkgs kmscon
   kmsconBin = "${pkgs.kmscon}/bin/kmscon";
+
+  # Access Catppuccin palette from noughtyConfig
+  palette = noughtyConfig.catppuccin.palette;
+
+  # Helper function to convert RGB array to comma-separated string for kmscon
+  rgbToKmscon =
+    colorName:
+    let
+      rgb = palette.getRGB colorName;
+    in
+    "${toString rgb.r},${toString rgb.g},${toString rgb.b}";
   noughtyIssue = pkgs.writeTextFile {
     name = "noughty-issue";
     text = ''
@@ -26,24 +38,24 @@ let
       font-name=FiraCode Nerd Font Mono
       font-size=16
       palette=custom
-      palette-black=69,71,90
-      palette-red=243,139,168
-      palette-green=166,227,161
-      palette-yellow=249,226,175
-      palette-blue=137,180,250
-      palette-magenta=245,194,231
-      palette-cyan=148,226,213
-      palette-light-grey=127,132,156
-      palette-dark-grey=88,91,112
-      palette-light-red=243,139,168
-      palette-light-green=166,227,161
-      palette-light-yellow=249,226,175
-      palette-light-blue=137,180,250
-      palette-light-magenta=245,194,231
-      palette-light-cyan=148,226,213
-      palette-white=205,214,244
-      palette-foreground=166,173,200
-      palette-background=30,30,46
+      palette-black=${rgbToKmscon "surface1"}
+      palette-red=${rgbToKmscon "red"}
+      palette-green=${rgbToKmscon "green"}
+      palette-yellow=${rgbToKmscon "yellow"}
+      palette-blue=${rgbToKmscon "blue"}
+      palette-magenta=${rgbToKmscon "pink"}
+      palette-cyan=${rgbToKmscon "teal"}
+      palette-light-grey=${rgbToKmscon "subtext0"}
+      palette-dark-grey=${rgbToKmscon "surface2"}
+      palette-light-red=${rgbToKmscon "red"}
+      palette-light-green=${rgbToKmscon "green"}
+      palette-light-yellow=${rgbToKmscon "yellow"}
+      palette-light-blue=${rgbToKmscon "blue"}
+      palette-light-magenta=${rgbToKmscon "pink"}
+      palette-light-cyan=${rgbToKmscon "teal"}
+      palette-white=${rgbToKmscon "text"}
+      palette-foreground=${rgbToKmscon "subtext1"}
+      palette-background=${rgbToKmscon "base"}
       sb-size=16384
     '';
   };
