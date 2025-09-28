@@ -2,6 +2,7 @@
   inputs,
   outputs,
   pkgs,
+  noughtyConfig,
   ...
 }:
 let
@@ -115,6 +116,16 @@ in
             GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ${catppuccinKernelParams}"
           '';
           mode = "0644";
+        };
+        # Sudoers configuration to allow Nix-managed executables
+        "sudoers.d/nix-paths" = {
+          text = ''
+            # Enable sudo to find executables from user Nix profiles
+            # Root already has system Nix paths via /etc/profile (Determinate Nix installer)
+            # Extend secure_path to include user-specific and system-manager paths
+            Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/run/current-system/sw/bin:${noughtyConfig.user.home}/.nix-profile/bin"
+          '';
+          mode = "0440";
         };
       };
       systemPackages = [
