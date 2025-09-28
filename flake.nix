@@ -27,7 +27,7 @@
       inherit (self) outputs;
       helper = import ./lib { inherit inputs outputs; };
       platform = builtins.currentSystem;
-      noughtyConfig = helper.mkConfig { };
+      noughtyConfig = helper.mkConfig { system = platform; };
       makeDevShell =
         system:
         let

@@ -14,9 +14,6 @@ let
 in
 {
   imports = [
-    inputs.catppuccin.homeModules.catppuccin
-    inputs.nix-index-database.homeModules.nix-index
-    ./catppuccin-palette.nix
     ./user
     ./desktop
     ./fonts

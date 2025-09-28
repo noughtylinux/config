@@ -28,6 +28,7 @@ in
   mkConfig =
     {
       tomlPath ? ../config.toml,
+      system,
     }:
     let
       tomlExists = builtins.pathExists tomlPath;
@@ -36,25 +37,115 @@ in
       envHostname = builtins.getEnv "HOSTNAME";
       envUsername = builtins.getEnv "USER";
       envHome = builtins.getEnv "HOME";
+
+      # Base config with environment facts and TOML
+      baseConfig =
+        if envHostname == "" then
+          throw "HOSTNAME environment variable is not set"
+        else if envUsername == "" then
+          throw "USER environment variable is not set"
+        else if envHome == "" then
+          throw "HOME environment variable is not set"
+        else
+          {
+            system = {
+              hostname = envHostname;
+            };
+            user = {
+              name = envUsername;
+              home = envHome;
+            };
+          }
+          // tomlConfig;
+
+      # Extract Catppuccin palette if flavor and accent are set
+      catppuccinFlavor = baseConfig.catppuccin.flavor or "mocha";
+      catppuccinAccent = baseConfig.catppuccin.accent or "blue";
+
+      # Read palette.json from catppuccin package
+      paletteJson = builtins.fromJSON (
+        builtins.readFile "${inputs.catppuccin.packages.${system}.palette}/palette.json"
+      );
+      palette = paletteJson.${catppuccinFlavor}.colors;
+
+      # Helper functions for palette access
+      getColor = colorName: palette.${colorName}.hex;
+      getRGB = colorName: palette.${colorName}.rgb;
+      getHSL = colorName: palette.${colorName}.hsl;
+
+      # Build complete palette structure
+      catppuccinPalette = {
+        # Export the complete palette
+        colors = palette;
+
+        # Current flavor and accent info
+        flavor = catppuccinFlavor;
+        accent = catppuccinAccent;
+
+        # Export convenient access functions
+        inherit getColor getRGB getHSL;
+
+        # Current user's selected accent
+        selectedAccent = getColor catppuccinAccent;
+
+        # Pre-defined color sets for common use cases
+        backgrounds = {
+          primary = getColor "base";
+          secondary = getColor "mantle";
+          tertiary = getColor "crust";
+        };
+
+        texts = {
+          primary = getColor "text";
+          secondary = getColor "subtext1";
+          muted = getColor "subtext0";
+        };
+
+        surfaces = {
+          primary = getColor "surface0";
+          secondary = getColor "surface1";
+          tertiary = getColor "surface2";
+        };
+
+        overlays = {
+          primary = getColor "overlay0";
+          secondary = getColor "overlay1";
+          tertiary = getColor "overlay2";
+        };
+
+        # All accent colors for reference
+        accents = builtins.listToAttrs (
+          map
+            (color: {
+              name = color;
+              value = getColor color;
+            })
+            [
+              "rosewater"
+              "flamingo"
+              "pink"
+              "mauve"
+              "red"
+              "maroon"
+              "peach"
+              "yellow"
+              "green"
+              "teal"
+              "sky"
+              "sapphire"
+              "blue"
+              "lavender"
+            ]
+        );
+      };
     in
-    # Hard fail if critical environment variables are missing
-    if envHostname == "" then
-      throw "HOSTNAME environment variable is not set"
-    else if envUsername == "" then
-      throw "USER environment variable is not set"
-    else if envHome == "" then
-      throw "HOME environment variable is not set"
-    else
-      {
-        system = {
-          hostname = envHostname;
-        };
-        user = {
-          name = envUsername;
-          home = envHome;
-        };
-      }
-      // tomlConfig;
+    # Return base config with palette embedded
+    baseConfig
+    // {
+      catppuccin = (baseConfig.catppuccin or { }) // {
+        palette = catppuccinPalette;
+      };
+    };
 
   # Helper function for generating home-manager configs
   mkHome =
@@ -72,7 +163,11 @@ in
           noughtyConfig
           ;
       };
-      modules = [ ../home-manager ];
+      modules = [
+        inputs.catppuccin.homeModules.catppuccin
+        inputs.nix-index-database.homeModules.nix-index
+        ../home-manager
+      ];
     };
 
   # Helper function for generating system-manager configs
