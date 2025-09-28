@@ -38,6 +38,97 @@
   #   your custom configuration content
   # '';
 
+  # Example: Using Catppuccin colors in custom configurations
+  # The palette is available via noughtyConfig.catppuccin.palette
+  # Uncomment these lines to test palette access:
+  # home.file.".config/noughty-palette-test.conf".text = 
+  #   let
+  #     palette = noughtyConfig.catppuccin.palette;
+  #   in
+  #   if palette != null then ''
+  #     # Noughty Linux Catppuccin Palette Test
+  #     # Current flavor: ${palette.flavor}
+  #     # Selected accent: ${palette.accent}
+  #     
+  #     # Background colors
+  #     background_primary=${palette.backgrounds.primary}
+  #     background_secondary=${palette.backgrounds.secondary}
+  #     background_tertiary=${palette.backgrounds.tertiary}
+  #     
+  #     # Text colors  
+  #     text_primary=${palette.texts.primary}
+  #     text_secondary=${palette.texts.secondary}
+  #     text_muted=${palette.texts.muted}
+  #     
+  #     # Surface colors
+  #     surface_primary=${palette.surfaces.primary}
+  #     surface_secondary=${palette.surfaces.secondary}
+  #     surface_tertiary=${palette.surfaces.tertiary}
+  #     
+  #     # Your selected accent color
+  #     accent_color=${palette.selectedAccent}
+  #     
+  #     # Individual color access
+  #     base=${palette.getColor "base"}
+  #     text=${palette.getColor "text"}
+  #     blue=${palette.getColor "blue"}
+  #     red=${palette.getColor "red"}
+  #     green=${palette.getColor "green"}
+  #     yellow=${palette.getColor "yellow"}
+  #     
+  #     # All accent colors
+  #     rosewater=${palette.accents.rosewater}
+  #     flamingo=${palette.accents.flamingo}
+  #     pink=${palette.accents.pink}
+  #     mauve=${palette.accents.mauve}
+  #     maroon=${palette.accents.maroon}
+  #     peach=${palette.accents.peach}
+  #     teal=${palette.accents.teal}
+  #     sky=${palette.accents.sky}
+  #     sapphire=${palette.accents.sapphire}
+  #     lavender=${palette.accents.lavender}
+  #   '' else ''
+  #     # Catppuccin palette not available
+  #     error=palette_not_loaded
+  #   '';
+
+  # home.file.".config/custom-app/theme.conf".text = 
+  #   let
+  #     palette = noughtyConfig.catppuccin.palette;
+  #   in
+  #   lib.optionalString (palette != null) ''
+  #     # Current flavor: ${palette.flavor}
+  #     # Selected accent: ${palette.accent}
+  #     
+  #     background=${palette.backgrounds.primary}
+  #     foreground=${palette.texts.primary}
+  #     accent=${palette.selectedAccent}
+  #     
+  #     # Individual colors by name
+  #     base=${palette.getColor "base"}
+  #     text=${palette.getColor "text"}
+  #     blue=${palette.getColor "blue"}
+  #     
+  #     # Accent colors
+  #     red=${palette.accents.red}
+  #     green=${palette.accents.green}
+  #     yellow=${palette.accents.yellow}
+  #   '';
+
+  # Example: Using colors in program configuration
+  # programs.kitty = lib.mkIf (noughtyConfig.catppuccin.palette != null) {
+  #   extraConfig = 
+  #     let 
+  #       p = noughtyConfig.catppuccin.palette;
+  #     in ''
+  #       background ${p.backgrounds.primary}
+  #       foreground ${p.texts.primary}
+  #       selection_background ${p.surfaces.secondary}
+  #       selection_foreground ${p.texts.primary}
+  #       cursor ${p.selectedAccent}
+  #     '';
+  # };
+
   # You have access to all Home Manager options and the noughtyConfig
   # from your config.toml file. For documentation, see:
   # https://nix-community.github.io/home-manager/options.html

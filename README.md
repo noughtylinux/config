@@ -42,6 +42,7 @@ curl -fsSL https://noughtylinux.org/bootstrap | bash
 - **User agency**: Meaningful choices without overwhelming options
 - **Zero Nix knowledge**: TOML configuration and simple CLI
 - **Power user escape hatch**: Advanced users can add custom Nix configuration via `home-manager/user/custom.nix`
+- **Theme consistency**: Catppuccin color palette exposed for custom application theming
 
 ### Scope 🔭
 
