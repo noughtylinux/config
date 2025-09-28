@@ -6,8 +6,53 @@
   ...
 }:
 let
-  # Catppuccin kernel parameters for boot-time VT theming
-  catppuccinKernelParams = "vt.default_red=30,243,166,249,137,245,148,186,88,243,166,249,137,245,148,166 vt.default_grn=30,139,227,226,180,194,226,194,91,139,227,226,180,194,226,173 vt.default_blu=46,168,161,175,250,231,213,222,112,168,161,175,250,231,213,200";
+  # Access Catppuccin palette from noughtyConfig
+  palette = noughtyConfig.catppuccin.palette;
+
+  # VT color mapping (16 colors: 0-15)
+  # Standard ANSI colors followed by bright variants
+  vtColorMap = [
+    "surface1" # 0: black
+    "red" # 1: red
+    "green" # 2: green
+    "yellow" # 3: yellow
+    "blue" # 4: blue
+    "pink" # 5: magenta
+    "teal" # 6: cyan
+    "subtext0" # 7: light grey
+    "surface2" # 8: dark grey (bright black)
+    "red" # 9: bright red
+    "green" # 10: bright green
+    "yellow" # 11: bright yellow
+    "blue" # 12: bright blue
+    "pink" # 13: bright magenta
+    "teal" # 14: bright cyan
+    "text" # 15: white
+  ];
+
+  # Helper to extract RGB values for VT kernel parameters
+  getRGBForVT = colorName: palette.getRGB colorName;
+
+  # Generate VT kernel parameters with dynamic Catppuccin colors
+  generateVTParams =
+    let
+      # Get RGB values for all 16 colors
+      rgbValues = map getRGBForVT vtColorMap;
+
+      # Extract red, green, blue components separately
+      reds = map (rgb: toString rgb.r) rgbValues;
+      greens = map (rgb: toString rgb.g) rgbValues;
+      blues = map (rgb: toString rgb.b) rgbValues;
+
+      # Join with commas for kernel parameters
+      redParams = builtins.concatStringsSep "," reds;
+      greenParams = builtins.concatStringsSep "," greens;
+      blueParams = builtins.concatStringsSep "," blues;
+    in
+    "vt.default_red=${redParams} vt.default_grn=${greenParams} vt.default_blu=${blueParams}";
+
+  # Dynamic Catppuccin kernel parameters for boot-time VT theming
+  catppuccinKernelParams = generateVTParams;
 in
 {
   imports = [
@@ -112,7 +157,7 @@ in
         };
         "default/grub.d/99-catppuccin.cfg" = {
           text = ''
-            # Catppuccin Mocha theme for kernel VT - managed by Nix
+            # Dynamic Catppuccin theme for kernel VT - managed by Nix
             GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ${catppuccinKernelParams}"
           '';
           mode = "0644";
