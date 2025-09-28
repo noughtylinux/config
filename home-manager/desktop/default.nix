@@ -119,35 +119,38 @@ in
   };
 
   home = lib.mkIf (catppuccinThemeQt || catppuccinThemeGtk) {
-    packages = with pkgs; [
-      (catppuccin-kvantum.override {
-        accent = config.catppuccin.accent;
-        variant = config.catppuccin.flavor;
-      })
-      celluloid
-      dconf-editor
-      decibels
-      file-roller
-      gnome-calculator
-      gnome-disk-utility
-      gnome-font-viewer
-      libsForQt5.qtstyleplugin-kvantum
-      libsForQt5.qt5ct
-      loupe
-      nautilus
-      overskride
-      papers
-      papirus-folders
-      pwvucontrol
-      resources
-      seahorse
-      simple-scan
-      system-config-printer
-      wdisplays
-      wlr-randr
-      wl-clipboard
-      wtype
-    ];
+    packages =
+      with pkgs;
+      [
+        (catppuccin-kvantum.override {
+          accent = config.catppuccin.accent;
+          variant = config.catppuccin.flavor;
+        })
+        celluloid
+        dconf-editor
+        decibels
+        file-roller
+        gnome-calculator
+        gnome-disk-utility
+        gnome-font-viewer
+        libsForQt5.qtstyleplugin-kvantum
+        libsForQt5.qt5ct
+        loupe
+        nautilus
+        overskride
+        papers
+        papirus-folders
+        pwvucontrol
+        resources
+        seahorse
+        simple-scan
+        system-config-printer
+        wdisplays
+        wlr-randr
+        wl-clipboard
+        wtype
+      ]
+      ++ (map (pkg: pkgs.${pkg}) (noughtyConfig.desktop.packages or [ ]));
 
     pointerCursor = {
       name = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";

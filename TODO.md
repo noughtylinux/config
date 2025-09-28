@@ -36,7 +36,7 @@
 - [x] Make `halp` find help flags other that `--help`
 - [x] Choose a browser
 - [ ] Choose a terminal editor
-- [ ] User defined packages to install
+- [x] User defined packages to install
 - [ ] User owned custom Nix config
 - [x] Pin Nixpkgs in `nosh` et al to the stable channel
 - [ ] Create `nash` a Nix hash getter
