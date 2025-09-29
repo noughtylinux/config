@@ -28,37 +28,33 @@ let
   };
   version = builtins.getEnv "NOUGHTY_VERSION";
 
-  # Create kmscon config directory like NixOS module does
-  configDir = pkgs.writeTextFile {
-    name = "kmscon-config";
-    destination = "/kmscon.conf";
-    text = ''
-      no-drm
-      no-reset-env
-      font-name=FiraCode Nerd Font Mono
-      font-size=16
-      palette=custom
-      palette-black=${rgbToKmscon "surface1"}
-      palette-red=${rgbToKmscon "red"}
-      palette-green=${rgbToKmscon "green"}
-      palette-yellow=${rgbToKmscon "yellow"}
-      palette-blue=${rgbToKmscon "blue"}
-      palette-magenta=${rgbToKmscon "pink"}
-      palette-cyan=${rgbToKmscon "teal"}
-      palette-light-grey=${rgbToKmscon "subtext0"}
-      palette-dark-grey=${rgbToKmscon "surface2"}
-      palette-light-red=${rgbToKmscon "red"}
-      palette-light-green=${rgbToKmscon "green"}
-      palette-light-yellow=${rgbToKmscon "yellow"}
-      palette-light-blue=${rgbToKmscon "blue"}
-      palette-light-magenta=${rgbToKmscon "pink"}
-      palette-light-cyan=${rgbToKmscon "teal"}
-      palette-white=${rgbToKmscon "text"}
-      palette-foreground=${rgbToKmscon "subtext1"}
-      palette-background=${rgbToKmscon "base"}
-      sb-size=16384
-    '';
-  };
+  # Generate kmscon config content
+  kmsconConfig = ''
+    no-drm
+    no-reset-env
+    font-name=FiraCode Nerd Font Mono
+    font-size=16
+    palette=custom
+    palette-black=${rgbToKmscon "surface1"}
+    palette-red=${rgbToKmscon "red"}
+    palette-green=${rgbToKmscon "green"}
+    palette-yellow=${rgbToKmscon "yellow"}
+    palette-blue=${rgbToKmscon "blue"}
+    palette-magenta=${rgbToKmscon "pink"}
+    palette-cyan=${rgbToKmscon "teal"}
+    palette-light-grey=${rgbToKmscon "subtext0"}
+    palette-dark-grey=${rgbToKmscon "surface2"}
+    palette-light-red=${rgbToKmscon "red"}
+    palette-light-green=${rgbToKmscon "green"}
+    palette-light-yellow=${rgbToKmscon "yellow"}
+    palette-light-blue=${rgbToKmscon "blue"}
+    palette-light-magenta=${rgbToKmscon "pink"}
+    palette-light-cyan=${rgbToKmscon "teal"}
+    palette-white=${rgbToKmscon "text"}
+    palette-foreground=${rgbToKmscon "subtext1"}
+    palette-background=${rgbToKmscon "base"}
+    sb-size=16384
+  '';
 in
 {
   config = {
@@ -66,6 +62,8 @@ in
       systemPackages = [
         pkgs.kmscon
       ];
+
+      etc."kmscon/kmscon.conf".text = kmsconConfig;
     };
 
     # Create kmsconvt@ttyX.services that closely mimics Ubuntu's implementation
@@ -98,7 +96,7 @@ in
                 "PATH=${pkgs.dbus}/bin:${pkgs.coreutils}/bin:/usr/bin:/bin"
                 "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket"
               ];
-              ExecStart = "${kmsconBin} \"--vt=${tty}\" --seats=seat0 --configdir ${configDir} --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
+              ExecStart = "${kmsconBin} \"--vt=${tty}\" --seats=seat0 --configdir /etc/kmscon --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
               TTYPath = "/dev/${tty}";
               TTYReset = "yes";
               TTYVHangup = "yes";
@@ -107,6 +105,7 @@ in
               UtmpIdentifier = "${tty}";
             };
             wantedBy = [ "getty.target" ];
+            restartIfChanged = false;
           };
         })
         [

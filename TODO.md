@@ -43,6 +43,8 @@
 
 ## System Manager
 
+- [x] Fix kmscon restart on theme change
+- [ ] Fix kernel VT colour not preserving on reboot/shutdown
 - [x] AppArmor profile for SUID binaries in the Nix store
 - [x] AppArmor profile for bwrap
 - [x] Add screen clearing to `agetty`
