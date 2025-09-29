@@ -40,7 +40,7 @@ in
   dconf.settings = with lib.hm.gvariant; {
     "org/gnome/desktop/interface" = lib.mkIf catppuccinThemeGtk {
       clock-format = "24h";
-      color-scheme = "prefer-dark";
+      color-scheme = if noughtyConfig.catppuccin.palette.isDark then "prefer-dark" else "prefer-light";
       cursor-size = 32;
       cursor-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
       document-font-name = config.gtk.font.name or "Work Sans 13";

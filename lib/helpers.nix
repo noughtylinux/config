@@ -82,6 +82,9 @@ in
         flavor = catppuccinFlavor;
         accent = catppuccinAccent;
 
+        # Theme variant detection - Latte is light, others are dark
+        isDark = catppuccinFlavor != "latte";
+
         # Export convenient access functions
         inherit getColor getRGB getHSL;
 
