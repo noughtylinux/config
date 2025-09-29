@@ -2,10 +2,12 @@
   config,
   lib,
   pkgs,
+  noughtyConfig,
   ...
 }:
 let
   xkbLayout = "gb";
+  palette = noughtyConfig.catppuccin.palette;
 in
 {
   catppuccin = {
@@ -136,8 +138,8 @@ in
         dim_strength = 0.025;
         shadow = {
           # Subtle shadows
-          color = "rgba(11111baf)";
-          color_inactive = "rgba(1e1e2eaf)";
+          color = "rgba(${palette.getColor "crust"}af)";
+          color_inactive = "rgba(${palette.getColor "base"}af)";
           enabled = true;
           range = 304;
           render_power = 4;
@@ -160,8 +162,9 @@ in
         border_size = 2;
         # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
         "col.active_border" =
-          "rgb(cba6f7) rgb(f38ba8) rgb(eba0ac) rgb(fab387) rgb(f9e2af) rgb(a6e3a1) rgb(94e2d5) rgb(89dceb) rgb(89b4fa) rgb(b4befe) 270deg";
-        "col.inactive_border" = "rgb(45475a) rgb(313244) rgb(45475a) rgb(313244) 270deg";
+          "rgb(${palette.getColor "mauve"}) rgb(${palette.getColor "red"}) rgb(${palette.getColor "maroon"}) rgb(${palette.getColor "peach"}) rgb(${palette.getColor "yellow"}) rgb(${palette.getColor "green"}) rgb(${palette.getColor "teal"}) rgb(${palette.getColor "sky"}) rgb(${palette.getColor "blue"}) rgb(${palette.getColor "lavender"}) 270deg";
+        "col.inactive_border" =
+          "rgb(${palette.getColor "surface2"}) rgb(${palette.getColor "surface1"}) rgb(${palette.getColor "surface2"}) rgb(${palette.getColor "surface1"}) 270deg";
         resize_on_border = true;
         extend_border_grab_area = 10;
         layout = "dwindle";
@@ -200,7 +203,7 @@ in
       };
       misc = {
         animate_manual_resizes = false;
-        background_color = "rgb(30, 30, 46)";
+        background_color = "rgb(${palette.getColor "base"})";
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
         focus_on_activate = true;
@@ -214,7 +217,7 @@ in
       ];
       plugin = {
         hyprtrails = {
-          color = "rgba(a6e3a1aa)";
+          color = "rgba(${palette.getColor "green"}aa)";
           bezier_step = 0.025; # 0.025
           points_per_step = 2; # 2
           history_points = 12; # 20
@@ -275,15 +278,6 @@ in
         "size 960 640 initialTitle:(Polychromatic)"
         "size 880 1010, title:(overskride)"
         "size 886 960, title:(Trayscale)"
-
-        # Apps for streaming from dummy workspace
-        "float, onworkspace:10"
-        "opacity 1.0 0.6 1.0, onworkspace:10"
-        "size 1596 1076, onworkspace:10"
-        "maxsize 1596 1076, onworkspace:10"
-        "minsize 1596 1076, onworkspace:10"
-        "move 322 2, onworkspace:10"
-        "noshadow, onworkspace:10"
       ];
       layerrule = [
         "blur, launcher" # fuzzel
