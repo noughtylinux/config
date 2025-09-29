@@ -2,12 +2,33 @@
   config,
   lib,
   pkgs,
+  noughtyConfig,
   ...
 }:
+let
+  palette = noughtyConfig.catppuccin.palette;
+
+  # Read template file and substitute colors
+  templateContent = builtins.readFile ./rofi-appgrid.rasi.template;
+  
+  # Generate dynamic RASI file with substituted colors
+  rofiAppGridRasi = pkgs.writeText "rofi-appgrid.rasi" (
+    lib.replaceStrings
+      [ "@text_color@" "@background_color@" "@accent_color@" "@surface_color@" "@accent_color_alpha@" ]
+      [ 
+        "${palette.getColor "text"}FF"  # text with full opacity
+        "${palette.getColor "base"}af"   # base background with transparency
+        "${palette.selectedAccent}"     # user's selected accent color
+        "${palette.getColor "overlay0"}af"  # surface with transparency  
+        "${palette.selectedAccent}af"   # accent color with transparency
+      ]
+      templateContent
+  );
+in
 {
   catppuccin.rofi.enable = true;
   home = {
-    file."${config.xdg.configHome}/rofi/launchers/rofi-appgrid/style.rasi".source = ./rofi-appgrid.rasi;
+    file."${config.xdg.configHome}/rofi/launchers/rofi-appgrid/style.rasi".source = rofiAppGridRasi;
   };
 
   programs = {
