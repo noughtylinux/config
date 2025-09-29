@@ -53,6 +53,38 @@ let
 
   # Dynamic Catppuccin kernel parameters for boot-time VT theming
   catppuccinKernelParams = generateVTParams;
+
+  # Generate runtime VT color escape sequences for persistence
+  generateVTColorCommands =
+    let
+      # Generate ANSI escape sequence for each color (0-15)
+      # Format: \e]P<index><RRGGBB> where index is hex 0-F
+      colorCommands = builtins.genList (
+        i:
+        let
+          colorName = builtins.elemAt vtColorMap i;
+          # Use getColor helper to get hex value directly (with #)
+          colorHex = builtins.substring 1 (-1) (palette.getColor colorName);
+          indexHex = if i < 10 then toString i else builtins.substring (i - 10) 1 "ABCDEF";
+        in
+        "printf '\\e]P${indexHex}${colorHex}'"
+      ) 16;
+
+      # Apply to all VT terminals (tty1-tty6)
+      applyToTerminals = terminal: map (cmd: "${cmd} > /dev/${terminal}") colorCommands;
+      allTerminals = [
+        "tty1"
+        "tty2"
+        "tty3"
+        "tty4"
+        "tty5"
+        "tty6"
+      ];
+
+      # Generate commands for all terminals
+      allCommands = builtins.concatLists (map applyToTerminals allTerminals);
+    in
+    builtins.concatStringsSep " 2>/dev/null\n      " allCommands + " 2>/dev/null";
 in
 {
   imports = [
@@ -61,6 +93,32 @@ in
   ];
 
   config = {
+    # System services
+    systemd.services = {
+      # Apply Catppuccin VT colors at runtime for persistence
+      vt-colors = {
+        description = "Apply Catppuccin VT Color Palette";
+        after = [ "multi-user.target" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = pkgs.writeShellScript "apply-vt-colors" ''
+            #!/bin/bash
+            # Apply Catppuccin palette to all VT terminals via ANSI escape sequences
+            # This ensures colors persist beyond boot-time kernel parameters
+
+            ${generateVTColorCommands}
+
+            # Log completion
+            echo "Applied Catppuccin VT color palette to all terminals"
+          '';
+          # Restart on configuration changes (theme switches)
+          RestartIfChanged = true;
+        };
+      };
+    };
+
     environment = {
       etc = {
         # AppArmor profile for bwrap in the Nix store
