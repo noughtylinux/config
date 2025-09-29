@@ -138,8 +138,8 @@ in
         dim_strength = 0.025;
         shadow = {
           # Subtle shadows
-          color = "rgba(${palette.getColor "crust"}af)";
-          color_inactive = "rgba(${palette.getColor "base"}af)";
+          color = "rgba(${palette.getHyprlandColor "crust"}af)";
+          color_inactive = "rgba(${palette.getHyprlandColor "base"}af)";
           enabled = true;
           range = 304;
           render_power = 4;
@@ -162,9 +162,9 @@ in
         border_size = 2;
         # https://wiki.hyprland.org/Configuring/Variables/#variable-types for info about colors
         "col.active_border" =
-          "rgb(${palette.getColor "mauve"}) rgb(${palette.getColor "red"}) rgb(${palette.getColor "maroon"}) rgb(${palette.getColor "peach"}) rgb(${palette.getColor "yellow"}) rgb(${palette.getColor "green"}) rgb(${palette.getColor "teal"}) rgb(${palette.getColor "sky"}) rgb(${palette.getColor "blue"}) rgb(${palette.getColor "lavender"}) 270deg";
+          "rgb(${palette.getHyprlandColor "mauve"}) rgb(${palette.getHyprlandColor "red"}) rgb(${palette.getHyprlandColor "maroon"}) rgb(${palette.getHyprlandColor "peach"}) rgb(${palette.getHyprlandColor "yellow"}) rgb(${palette.getHyprlandColor "green"}) rgb(${palette.getHyprlandColor "teal"}) rgb(${palette.getHyprlandColor "sky"}) rgb(${palette.getHyprlandColor "blue"}) rgb(${palette.getHyprlandColor "lavender"}) 270deg";
         "col.inactive_border" =
-          "rgb(${palette.getColor "surface2"}) rgb(${palette.getColor "surface1"}) rgb(${palette.getColor "surface2"}) rgb(${palette.getColor "surface1"}) 270deg";
+          "rgb(${palette.getHyprlandColor "surface2"}) rgb(${palette.getHyprlandColor "surface1"}) rgb(${palette.getHyprlandColor "surface2"}) rgb(${palette.getHyprlandColor "surface1"}) 270deg";
         resize_on_border = true;
         extend_border_grab_area = 10;
         layout = "dwindle";
@@ -203,7 +203,7 @@ in
       };
       misc = {
         animate_manual_resizes = false;
-        background_color = "rgb(${palette.getColor "base"})";
+        background_color = "rgb(${palette.getHyprlandColor "base"})";
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
         focus_on_activate = true;
@@ -217,7 +217,7 @@ in
       ];
       plugin = {
         hyprtrails = {
-          color = "rgba(${palette.getColor "green"}aa)";
+          color = "rgba(${palette.getHyprlandColor "green"}aa)";
           bezier_step = 0.025; # 0.025
           points_per_step = 2; # 2
           history_points = 12; # 20

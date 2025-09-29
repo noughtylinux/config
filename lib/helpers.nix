@@ -72,6 +72,9 @@ in
       getColor = colorName: palette.${colorName}.hex;
       getRGB = colorName: palette.${colorName}.rgb;
       getHSL = colorName: palette.${colorName}.hsl;
+      
+      # Hyprland-specific helper that removes # from hex colors
+      getHyprlandColor = colorName: builtins.substring 1 (-1) palette.${colorName}.hex;
 
       # Build complete palette structure
       catppuccinPalette = {
@@ -86,7 +89,7 @@ in
         isDark = catppuccinFlavor != "latte";
 
         # Export convenient access functions
-        inherit getColor getRGB getHSL;
+        inherit getColor getRGB getHSL getHyprlandColor;
 
         # Current user's selected accent
         selectedAccent = getColor catppuccinAccent;
