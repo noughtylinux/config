@@ -7,7 +7,7 @@
 let
   shellAliases = {
     htop = "${pkgs.bottom}/bin/btm --basic --tree --hide_table_gap --dot_marker";
-    top = "${pkgs.bottom}/bin/btm --basic --tree --hide_table_gap --dot_marker --mem_as_value";
+    top = "${pkgs.bottom}/bin/btm --basic --tree --hide_table_gap --dot_marker";
   };
 in
 {
