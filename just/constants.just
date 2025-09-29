@@ -30,6 +30,7 @@ GLYPH_BUILD := BLUE + '☭ ' + RESET
 GLYPH_CANCEL := MAGENTA + '⌧ ' + RESET
 GLYPH_CONFIG := BLUE + '🖬 ' + RESET
 GLYPH_DAMAGE := YELLOW + '🗲 ' + RESET
+GLYPH_ERASE := MAGENTA + '⌦ ' + RESET
 GLYPH_EYE := BLUE + '⏿ ' + RESET
 GLYPH_FLAKE := BLUE + '❆ ' + RESET
 GLYPH_FONT := BLUE + '🗚 ' + RESET

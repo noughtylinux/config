@@ -20,8 +20,8 @@
 
 ## Modules
 
-- [ ] Create a noughtyConfig module
-- [ ] Expose Catppuccin colors to use in other themes
+- [ ] ~~Create a noughtyConfig module~~ - *This over complicated the configuration*
+- [x] Expose Catppuccin colors to use in other themes
 - [ ] What existing style/theme modules might be suitable?
 
 ## Home Manager
@@ -46,7 +46,7 @@
 - [x] AppArmor profile for SUID binaries in the Nix store
 - [x] AppArmor profile for bwrap
 - [x] Add screen clearing to `agetty`
-- [ ] ~~Use `agetty` in `kmscon` from Nixpkgs~~
+- [ ] ~~Use `agetty` in `kmscon` from Nixpkgs~~ - *didn't work*
 - [x] Enable `kmscon` on all VTs
 - [x] Add Symbola and Nerd Font symbols fonts in system-manager
 - [x] Theme kernel colors with Catppuccin

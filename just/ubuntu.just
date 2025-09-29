@@ -18,6 +18,8 @@ ubuntu-pre: _header _is_compatible _has_config
     #!/usr/bin/env bash
     set -euo pipefail
 
+    sudo true
+
     is_package_installed() {
         local package="$1"
         dpkg-query -W -f='${Status}' "${package}" 2>/dev/null | grep -q "install ok installed"
@@ -98,6 +100,23 @@ ubuntu-pre: _header _is_compatible _has_config
         sudo chmod 600 /usr/lib/netplan/00-network-manager-all.yaml
         sudo systemctl disable systemd-networkd
         echo -e "{{SUCCESS}}Successfully configured netplan to use NetworkManager!"
+    fi
+
+    state_file="/var/lib/system-manager/state/system-manager-state.json"
+    if [[ -e "$state_file" ]]; then
+        echo -e "{{INFO}}Processing managed files in /etc..."
+        sudo cat "$state_file" | \
+            jq -r '.fileTree | .. | objects | select(.status == "managed") | .path' 2>/dev/null | \
+            while IFS= read -r filepath; do
+                [[ -z "$filepath" ]] && continue
+                # Skip sym-links
+                [[ -L "$filepath" ]] && continue
+                if [[ -f "$filepath" ]]; then
+                    echo -e "{{GLYPH_ERASE}}Removing {{RESET}}{{DIM}}$filepath{{RESET}}"
+                    sudo rm -f "$filepath"
+                fi
+            done
+        echo -e "{{SUCCESS}}File cleanup complete{{RESET}}"
     fi
 
 [private]
