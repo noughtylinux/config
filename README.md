@@ -101,7 +101,7 @@ This roadmap is a work in progress 🚧
 
 ### Phase 3️⃣
 
-- [ ] Choice of Catppuccin flavour and accent.
+- [x] Choice of Catppuccin flavour and accent.
 - [ ] Choice of terminal text editor.
 - [ ] Choice of desktop IDE.
 - [ ] Website refresh
@@ -110,7 +110,7 @@ This roadmap is a work in progress 🚧
 
 - [ ] Choice of Wayland compositor.
 - [ ] Shell configuration via `config.yaml`.
-- [ ] Custom package list.
+- [x] Custom package list.
 - [ ] Opt-in for a selection of popular desktop applications
 
 ## Reference
