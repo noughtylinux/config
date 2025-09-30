@@ -239,11 +239,15 @@ in
 
     nix = {
       # Disable NixOS module management; Determinate Nix will handle configuration
+      # https://github.com/numtide/system-manager/issues/267#issuecomment-3335147957
       enable = false;
       package = pkgs.nix;
     };
 
     nixpkgs = {
+      config = {
+        allowUnfree = true;
+      };
       # Set the host platform architecture
       hostPlatform = pkgs.system;
       overlays = [
@@ -252,9 +256,6 @@ in
         outputs.overlays.modifiedPackages
         outputs.overlays.unstablePackages
       ];
-      config = {
-        allowUnfree = true;
-      };
     };
 
     # Enable system-graphics support
