@@ -9,26 +9,10 @@ let
   # Access Catppuccin palette from noughtyConfig
   palette = noughtyConfig.catppuccin.palette;
 
-  # VT color mapping (16 colors: 0-15) - used for runtime color persistence
-  # Standard ANSI colors followed by bright variants
-  vtColorMap = [
-    "surface1" # 0: black
-    "red" # 1: red
-    "green" # 2: green
-    "yellow" # 3: yellow
-    "blue" # 4: blue
-    "pink" # 5: magenta
-    "teal" # 6: cyan
-    "subtext0" # 7: light grey
-    "surface2" # 8: dark grey (bright black)
-    "red" # 9: bright red
-    "green" # 10: bright green
-    "yellow" # 11: bright yellow
-    "blue" # 12: bright blue
-    "pink" # 13: bright magenta
-    "teal" # 14: bright cyan
-    "text" # 15: white
-  ];
+  # Use centralized VT color mapping from palette
+  vtColorMap = palette.vtColorMap;
+
+  # Generate runtime VT color escape sequences for persistence
 
   # Generate runtime VT color escape sequences for persistence
   generateVTColorCommands =

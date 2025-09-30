@@ -141,13 +141,25 @@ ubuntu-post:
     sudo fc-cache --system-only --really-force
     echo -e "{{SUCCESS}}Font cache updated!"
 
+    # Deploy console-setup configuration for initramfs
+    if [ -f /etc/noughty/console-setup ]; then
+        echo -e "{{GLYPH_PAINT}}Deploying console setup configuration..."
+        sudo cp /etc/noughty/console-setup /etc/default/console-setup
+        echo -e "{{SUCCESS}}Console setup configured!"
+    fi
+
     # Only deploy GRUB theme if GRUB is available
     if [ -d /boot/grub ] && command -v update-grub &>/dev/null; then
         echo -e "{{GLYPH_PAINT}}Deploying GRUB theme to /boot..."
         sudo mkdir -p /boot/grub/themes/catppuccin 2>/dev/null || true
         sudo cp -rfL /etc/noughty/grub/themes/catppuccin/* /boot/grub/themes/catppuccin/ 2>/dev/null || true
         echo -e "{{SUCCESS}}GRUB theme deployed!"
+
+        echo -e "{{GLYPH_PAINT}}Updating GRUB configuration..."
         sudo update-grub &> /dev/null || true
+
+        echo -e "{{GLYPH_SYSTEM}}Updating initramfs (console font)..."
+        sudo update-initramfs -u &> /dev/null || true
         echo -e "{{SUCCESS}}System is up to date!"
     else
         echo -e "{{WARNING}}Skipping GRUB operations - GRUB not detected"

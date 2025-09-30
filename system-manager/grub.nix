@@ -14,26 +14,8 @@ let
   grubThemeEnabled = noughtyConfig.boot.grub_theme or true;
   grubTimeout = noughtyConfig.boot.grub_timeout or 5;
 
-  # VT color mapping (16 colors: 0-15)
-  # Standard ANSI colors followed by bright variants
-  vtColorMap = [
-    "base" # 0: black (default background)
-    "red" # 1: red
-    "green" # 2: green
-    "yellow" # 3: yellow
-    "blue" # 4: blue
-    "pink" # 5: magenta
-    "teal" # 6: cyan
-    "subtext0" # 7: light grey
-    "surface1" # 8: dark grey (bright black)
-    "red" # 9: bright red
-    "green" # 10: bright green
-    "yellow" # 11: bright yellow
-    "blue" # 12: bright blue
-    "pink" # 13: bright magenta
-    "teal" # 14: bright cyan
-    "text" # 15: white
-  ];
+  # Use centralized VT color mapping from palette
+  vtColorMap = palette.vtColorMap;
 
   # Helper to extract RGB values for VT kernel parameters
   getRGBForVT = colorName: palette.getRGB colorName;
@@ -58,6 +40,31 @@ let
 
   # Dynamic Catppuccin kernel parameters for boot-time VT theming
   catppuccinKernelParams = generateVTParams;
+
+  # Console font configuration based on grub_theme setting
+  consoleFontFace = if grubThemeEnabled then "Terminus" else "Fixed";
+  consoleFontSize = if grubThemeEnabled then "16x32" else "8x16";
+  kernelConsoleFontParam = if grubThemeEnabled then "fbcon=font:TER16x32" else "";
+
+  # Console setup configuration template
+  consoleSetupConfig = ''
+    # CONFIGURATION FILE FOR SETUPCON
+
+    # Consult the console-setup(5) manual page.
+
+    ACTIVE_CONSOLES="/dev/tty[1-6]"
+
+    CHARMAP="UTF-8"
+
+    CODESET="guess"
+    FONTFACE="${consoleFontFace}"
+    FONTSIZE="${consoleFontSize}"
+
+    VIDEOMODE=
+
+    # The following is an example how to use a braille font
+    # FONT='lat9w-08.psf.gz brl-8x8.psf'
+  '';
 
   # Get upstream catppuccin-grub package for static assets
   upstreamTheme = pkgs.catppuccin-grub.override {
@@ -172,9 +179,12 @@ in
         GRUB_TIMEOUT=${toString grubTimeout}
         GRUB_TIMEOUT_STYLE="menu"
 
-        # Dynamic Catppuccin kernel VT colors
-        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ${catppuccinKernelParams}"
+        # Dynamic Catppuccin kernel VT colors and console font
+        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ${catppuccinKernelParams} ${kernelConsoleFontParam}"
       '';
+
+      # Deploy console-setup configuration for initramfs
+      "noughty/console-setup".text = consoleSetupConfig;
     }
 
     # Conditionally deploy theme assets

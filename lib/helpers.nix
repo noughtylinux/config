@@ -72,7 +72,7 @@ in
       getColor = colorName: palette.${colorName}.hex;
       getRGB = colorName: palette.${colorName}.rgb;
       getHSL = colorName: palette.${colorName}.hsl;
-      
+
       # Hyprland-specific helper that removes # from hex colors
       getHyprlandColor = colorName: builtins.substring 1 (-1) palette.${colorName}.hex;
 
@@ -89,10 +89,37 @@ in
         isDark = catppuccinFlavor != "latte";
 
         # Export convenient access functions
-        inherit getColor getRGB getHSL getHyprlandColor;
+        inherit
+          getColor
+          getRGB
+          getHSL
+          getHyprlandColor
+          ;
 
         # Current user's selected accent
         selectedAccent = getColor catppuccinAccent;
+
+        # VT color mapping (16 ANSI colors: 0-15)
+        # Standard ANSI colors followed by bright variants
+        # Note: Index 0 is used as default background, so it must be "base"
+        vtColorMap = [
+          "base" # 0: black (also used as default background)
+          "red" # 1: red
+          "green" # 2: green
+          "yellow" # 3: yellow
+          "blue" # 4: blue
+          "pink" # 5: magenta
+          "teal" # 6: cyan
+          "subtext0" # 7: light grey
+          "surface1" # 8: dark grey (bright black)
+          "red" # 9: bright red
+          "green" # 10: bright green
+          "yellow" # 11: bright yellow
+          "blue" # 12: bright blue
+          "pink" # 13: bright magenta
+          "teal" # 14: bright cyan
+          "text" # 15: white
+        ];
 
         # Pre-defined color sets for common use cases
         backgrounds = {
