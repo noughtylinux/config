@@ -90,8 +90,6 @@ in
             # Log completion
             echo "Applied Catppuccin VT color palette to all terminals"
           '';
-          # Restart on configuration changes (theme switches)
-          RestartIfChanged = true;
         };
       };
     };

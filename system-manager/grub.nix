@@ -17,7 +17,7 @@ let
   # VT color mapping (16 colors: 0-15)
   # Standard ANSI colors followed by bright variants
   vtColorMap = [
-    "surface1" # 0: black
+    "base" # 0: black (default background)
     "red" # 1: red
     "green" # 2: green
     "yellow" # 3: yellow
@@ -25,7 +25,7 @@ let
     "pink" # 5: magenta
     "teal" # 6: cyan
     "subtext0" # 7: light grey
-    "surface2" # 8: dark grey (bright black)
+    "surface1" # 8: dark grey (bright black)
     "red" # 9: bright red
     "green" # 10: bright green
     "yellow" # 11: bright yellow
