@@ -62,8 +62,7 @@ in
       systemPackages = [
         pkgs.kmscon
       ];
-
-      etc."kmscon/kmscon.conf".text = kmsconConfig;
+      etc."noughty/kmscon/kmscon.conf".text = kmsconConfig;
     };
 
     # Create kmsconvt@ttyX.services that closely mimics Ubuntu's implementation
@@ -96,7 +95,7 @@ in
                 "PATH=${pkgs.dbus}/bin:${pkgs.coreutils}/bin:/usr/bin:/bin"
                 "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket"
               ];
-              ExecStart = "${kmsconBin} \"--vt=${tty}\" --seats=seat0 --configdir /etc/kmscon --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
+              ExecStart = "${kmsconBin} \"--vt=${tty}\" --seats=seat0 --configdir /etc/noughty/kmscon --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
               TTYPath = "/dev/${tty}";
               TTYReset = "yes";
               TTYVHangup = "yes";

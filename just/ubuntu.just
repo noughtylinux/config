@@ -102,6 +102,14 @@ ubuntu-pre: _header _is_compatible _has_config
         echo -e "{{SUCCESS}}Successfully configured netplan to use NetworkManager!"
     fi
 
+    # Workarounds for system-manager file tracking
+    for DIR in "/etc/noughty/kmscon"; do
+        if [[ ! -d "${DIR}" ]]; then
+            echo -e "{{GLYPH_FOLDER}}Creating directory {{RESET}}{{DIM}}${DIR}{{RESET}}"
+            sudo mkdir -p "${DIR}" 2>/dev/null || true
+        fi
+    done
+
     state_file="/var/lib/system-manager/state/system-manager-state.json"
     if [[ -e "$state_file" ]]; then
         echo -e "{{INFO}}Processing managed files in /etc..."
