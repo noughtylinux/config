@@ -43,7 +43,7 @@ ubuntu-pre: _header _is_compatible _has_config
     for PACKAGE in bluez cups dconf-gsettings-backend fontconfig gstreamer1.0-pipewire \
         libfdk-aac2 libldacbt-abr2 libldacbt-enc2 libopenaptx0 \
         libspa-0.2-bluetooth libspa-0.2-jack network-manager \
-        pipewire-audio-client-libraries udisks2 whiptail wireplumber; do
+        pipewire-audio-client-libraries plymouth-theme-spinner udisks2 whiptail wireplumber; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi
@@ -120,11 +120,11 @@ ubuntu-pre: _header _is_compatible _has_config
                 # Skip sym-links
                 [[ -L "$filepath" ]] && continue
                 if [[ -f "$filepath" ]]; then
-                    echo -e "{{GLYPH_ERASE}}Removing {{RESET}}{{DIM}}$filepath{{RESET}}"
+                    echo -e "{{GLYPH_PROCESS}}Processing {{RESET}}{{DIM}}$filepath{{RESET}}"
                     sudo rm -f "$filepath"
                 fi
             done
-        echo -e "{{SUCCESS}}File cleanup complete{{RESET}}"
+        echo -e "{{SUCCESS}}Files processed{{RESET}}"
     fi
 
 [private]
@@ -143,9 +143,27 @@ ubuntu-post:
 
     # Deploy console-setup configuration for initramfs
     if [ -f /etc/noughty/console-setup ]; then
-        echo -e "{{GLYPH_PAINT}}Deploying console setup configuration..."
         sudo cp /etc/noughty/console-setup /etc/default/console-setup
-        echo -e "{{SUCCESS}}Console setup configured!"
+    fi
+
+    # Deploy Plymouth theme from bundled assets
+    PLYMOUTH_FLAVOR=$(tq -f config.toml catppuccin.flavor)
+    if [ -d "assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}" ]; then
+        echo -e "{{GLYPH_SCREEN}}Deploying Plymouth theme (${PLYMOUTH_FLAVOR})..."
+
+        # Deploy bundled Plymouth theme assets
+        sudo rm -rf /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}
+        sudo mkdir -p /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}
+        sudo cp -rf assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/* /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
+
+        # Set as default Plymouth theme using update-alternatives
+        sudo update-alternatives --quiet --install \
+            /usr/share/plymouth/themes/default.plymouth default.plymouth \
+            /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/catppuccin-${PLYMOUTH_FLAVOR}.plymouth 100
+        sudo update-alternatives --quiet --set default.plymouth \
+            /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/catppuccin-${PLYMOUTH_FLAVOR}.plymouth
+
+        echo -e "{{SUCCESS}}Plymouth theme deployed!"
     fi
 
     # Only deploy GRUB theme if GRUB is available
@@ -153,12 +171,10 @@ ubuntu-post:
         echo -e "{{GLYPH_PAINT}}Deploying GRUB theme to /boot..."
         sudo mkdir -p /boot/grub/themes/catppuccin 2>/dev/null || true
         sudo cp -rfL /etc/noughty/grub/themes/catppuccin/* /boot/grub/themes/catppuccin/ 2>/dev/null || true
+        sudo update-grub &> /dev/null || true
         echo -e "{{SUCCESS}}GRUB theme deployed!"
 
-        echo -e "{{GLYPH_PAINT}}Updating GRUB configuration..."
-        sudo update-grub &> /dev/null || true
-
-        echo -e "{{GLYPH_SYSTEM}}Updating initramfs (console font)..."
+        echo -e "{{GLYPH_SYSTEM}}Updating initramfs..."
         sudo update-initramfs -u &> /dev/null || true
         echo -e "{{SUCCESS}}System is up to date!"
     else

@@ -186,7 +186,7 @@ in
 
         # Dynamic Catppuccin kernel VT colors and console font
         # quiet loglevel=3 suppress EFI stub and early boot messages
-        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet loglevel=3 ${catppuccinKernelParams} ${kernelConsoleFontParam}"
+        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet splash loglevel=3 ${catppuccinKernelParams} ${kernelConsoleFontParam}"
       '';
 
       # Deploy console-setup configuration for initramfs

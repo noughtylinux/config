@@ -51,6 +51,7 @@ in
     ./fonts.nix
     ./grub.nix
     ./kmscon.nix
+    ./plymouth.nix
   ];
 
   config = {
