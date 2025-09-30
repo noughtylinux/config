@@ -179,8 +179,14 @@ in
         GRUB_TIMEOUT=${toString grubTimeout}
         GRUB_TIMEOUT_STYLE="menu"
 
+        # Set GRUB terminal background to Catppuccin base color
+        GRUB_BACKGROUND="${palette.getColor "base"}"
+        GRUB_COLOR_NORMAL="${palette.getColor "text"}/${palette.getColor "base"}"
+        GRUB_COLOR_HIGHLIGHT="${palette.getColor "base"}/${palette.selectedAccent}"
+
         # Dynamic Catppuccin kernel VT colors and console font
-        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ${catppuccinKernelParams} ${kernelConsoleFontParam}"
+        # quiet loglevel=3 suppress EFI stub and early boot messages
+        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet loglevel=3 ${catppuccinKernelParams} ${kernelConsoleFontParam}"
       '';
 
       # Deploy console-setup configuration for initramfs

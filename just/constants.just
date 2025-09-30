@@ -38,6 +38,7 @@ GLYPH_FONT := BLUE + '🗚 ' + RESET
 GLYPH_HOME := BLUE + BOLD + '⌂ ' + RESET
 GLYPH_INSTALL := BLUE + '⮯ ' + RESET
 GLYPH_KEY := YELLOW + '⚿ ' + RESET
+GLYPH_KEYBOARD := BLUE + '⌨ ' + RESET
 GLYPH_NET := BLUE + '🖀 ' + RESET
 GLYPH_PAINT := BLUE + '🌢 ' + RESET
 GLYPH_SHELL := BLUE + '﹩ ' + RESET

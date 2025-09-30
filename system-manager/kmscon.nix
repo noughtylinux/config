@@ -31,7 +31,7 @@ let
   # Generate kmscon config content
   kmsconConfig = ''
     no-drm
-    no-reset-env
+    no-switchvt
     font-name=FiraCode Nerd Font Mono
     font-size=16
     palette=custom
@@ -105,6 +105,26 @@ in
             };
             wantedBy = [ "getty.target" ];
             restartIfChanged = false;
+          };
+        })
+        [
+          "tty1"
+          "tty2"
+          "tty3"
+          "tty4"
+          "tty5"
+          "tty6"
+        ]
+    );
+
+    # Mask Ubuntu's default getty services by symlinking them to /dev/null
+    # This prevents conflicts with our kmscon setup
+    systemd.tmpfiles.settings."10-mask-getty" = builtins.listToAttrs (
+      map
+        (tty: {
+          name = "/etc/systemd/system/getty@${tty}.service";
+          value = {
+            L.argument = "/dev/null";
           };
         })
         [
