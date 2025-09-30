@@ -50,7 +50,7 @@
 - [x] Enable `kmscon` on all VTs
 - [x] Add Symbola and Nerd Font symbols fonts in system-manager
 - [x] Theme kernel colors with Catppuccin
-- [ ] Theme GRUB
+- [x] Theme GRUB
 - [ ] Display Manager
 - [x] Fix `sudo` finding executables from the user profile
 - [x] Fix kmscon restart on theme change

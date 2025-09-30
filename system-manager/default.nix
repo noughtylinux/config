@@ -9,7 +9,7 @@ let
   # Access Catppuccin palette from noughtyConfig
   palette = noughtyConfig.catppuccin.palette;
 
-  # VT color mapping (16 colors: 0-15)
+  # VT color mapping (16 colors: 0-15) - used for runtime color persistence
   # Standard ANSI colors followed by bright variants
   vtColorMap = [
     "surface1" # 0: black
@@ -29,30 +29,6 @@ let
     "teal" # 14: bright cyan
     "text" # 15: white
   ];
-
-  # Helper to extract RGB values for VT kernel parameters
-  getRGBForVT = colorName: palette.getRGB colorName;
-
-  # Generate VT kernel parameters with dynamic Catppuccin colors
-  generateVTParams =
-    let
-      # Get RGB values for all 16 colors
-      rgbValues = map getRGBForVT vtColorMap;
-
-      # Extract red, green, blue components separately
-      reds = map (rgb: toString rgb.r) rgbValues;
-      greens = map (rgb: toString rgb.g) rgbValues;
-      blues = map (rgb: toString rgb.b) rgbValues;
-
-      # Join with commas for kernel parameters
-      redParams = builtins.concatStringsSep "," reds;
-      greenParams = builtins.concatStringsSep "," greens;
-      blueParams = builtins.concatStringsSep "," blues;
-    in
-    "vt.default_red=${redParams} vt.default_grn=${greenParams} vt.default_blu=${blueParams}";
-
-  # Dynamic Catppuccin kernel parameters for boot-time VT theming
-  catppuccinKernelParams = generateVTParams;
 
   # Generate runtime VT color escape sequences for persistence
   generateVTColorCommands =
@@ -89,6 +65,7 @@ in
 {
   imports = [
     ./fonts.nix
+    ./grub.nix
     ./kmscon.nix
   ];
 
@@ -210,13 +187,6 @@ in
             profile nix_store_compat /nix/store/**/bin/* flags=(unconfined) {
               userns,
             }
-          '';
-          mode = "0644";
-        };
-        "default/grub.d/99-catppuccin.cfg" = {
-          text = ''
-            # Dynamic Catppuccin theme for kernel VT - managed by Nix
-            GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT ${catppuccinKernelParams}"
           '';
           mode = "0644";
         };

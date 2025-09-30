@@ -103,7 +103,7 @@ ubuntu-pre: _header _is_compatible _has_config
     fi
 
     # Workarounds for system-manager file tracking
-    for DIR in "/etc/noughty/kmscon"; do
+    for DIR in "/etc/noughty/kmscon" "/etc/noughty/grub/themes/catppuccin/"; do
         if [[ ! -d "${DIR}" ]]; then
             echo -e "{{GLYPH_FOLDER}}Creating directory {{RESET}}{{DIM}}${DIR}{{RESET}}"
             sudo mkdir -p "${DIR}" 2>/dev/null || true
@@ -139,8 +139,19 @@ ubuntu-post:
 
     echo -e "{{GLYPH_FONT}}Updating font cache..."
     sudo fc-cache --system-only --really-force
-    sudo update-grub &> /dev/null || true
-    echo -e "{{SUCCESS}}System is up to date!"
+    echo -e "{{SUCCESS}}Font cache updated!"
+
+    # Only deploy GRUB theme if GRUB is available
+    if [ -d /boot/grub ] && command -v update-grub &>/dev/null; then
+        echo -e "{{GLYPH_PAINT}}Deploying GRUB theme to /boot..."
+        sudo mkdir -p /boot/grub/themes/catppuccin 2>/dev/null || true
+        sudo cp -rfL /etc/noughty/grub/themes/catppuccin/* /boot/grub/themes/catppuccin/ 2>/dev/null || true
+        echo -e "{{SUCCESS}}GRUB theme deployed!"
+        sudo update-grub &> /dev/null || true
+        echo -e "{{SUCCESS}}System is up to date!"
+    else
+        echo -e "{{WARNING}}Skipping GRUB operations - GRUB not detected"
+    fi
 
 [private]
 install-nala:

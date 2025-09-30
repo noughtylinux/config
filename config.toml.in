@@ -1,5 +1,10 @@
 # Nøughty Linux Configuration
 
+[boot]
+# GRUB boot menu configuration
+grub_theme = true  # Enable Catppuccin GRUB theme
+grub_timeout = 5   # Boot menu timeout in seconds
+
 [browser]
 brave = false
 firefox = true
