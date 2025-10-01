@@ -103,7 +103,10 @@ ubuntu-pre: _header _is_compatible _has_config
     fi
 
     # Workarounds for system-manager file tracking
-    for DIR in "/etc/noughty/kmscon" "/etc/noughty/grub/themes/catppuccin/"; do
+    for DIR in \
+        "/etc/noughty/kmscon" \
+        "/etc/noughty/grub/themes/catppuccin/" \
+        "/etc/noughty/plymouth/"; do
         if [[ ! -d "${DIR}" ]]; then
             echo -e "{{GLYPH_FOLDER}}Creating directory {{RESET}}{{DIM}}${DIR}{{RESET}}"
             sudo mkdir -p "${DIR}" 2>/dev/null || true
@@ -146,15 +149,24 @@ ubuntu-post:
         sudo cp /etc/noughty/console-setup /etc/default/console-setup
     fi
 
-    # Deploy Plymouth theme from bundled assets
+    # Deploy Plymouth theme from dynamically generated config and static assets
     PLYMOUTH_FLAVOR=$(tq -f config.toml catppuccin.flavor)
     if [ -d "assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}" ]; then
         echo -e "{{GLYPH_SCREEN}}Deploying Plymouth theme (${PLYMOUTH_FLAVOR})..."
 
-        # Deploy bundled Plymouth theme assets
-        sudo rm -rf /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}
+        # Create theme directory
         sudo mkdir -p /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}
-        sudo cp -rf assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/* /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
+
+        # Copy static PNG assets from bundled assets
+        sudo cp -rf assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/*.png /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
+
+        # Copy dynamically generated .plymouth theme file from system-manager (dereference symlink)
+        if [ -f /etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}.plymouth ]; then
+            sudo cp -L /etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}.plymouth /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
+        else
+            echo -e "{{WARNING}}Dynamic .plymouth file not found, using static fallback"
+            sudo cp assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/catppuccin-${PLYMOUTH_FLAVOR}.plymouth /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
+        fi
 
         # Set as default Plymouth theme using update-alternatives
         sudo update-alternatives --quiet --install \
