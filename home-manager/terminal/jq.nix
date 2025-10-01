@@ -3,7 +3,8 @@
   ...
 }:
 let
-  catppuccinFlavor = noughtyConfig.catppuccin.flavor or "mocha";
+  # Use validated value from palette (already validated and fallen back if needed)
+  catppuccinFlavor = noughtyConfig.catppuccin.palette.flavor;
 in
 {
   programs = {

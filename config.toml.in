@@ -14,7 +14,7 @@ microsoft-edge = false
 vivaldi = false
 
 [catppuccin]
-accent = "blue"
+accent = "mauve"
 flavor = "mocha"
 gtk = false
 qt = false

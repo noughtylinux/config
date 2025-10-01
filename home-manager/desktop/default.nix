@@ -8,8 +8,9 @@
 let
   buttonLayout =
     if config.wayland.windowManager.hyprland.enable then "appmenu" else "close,minimize,maximize";
-  catppuccinAccent = noughtyConfig.catppuccin.accent or "blue";
-  catppuccinFlavor = noughtyConfig.catppuccin.flavor or "mocha";
+  # Use validated values from palette (these have already been validated and fallen back if needed)
+  catppuccinAccent = noughtyConfig.catppuccin.palette.accent;
+  catppuccinFlavor = noughtyConfig.catppuccin.palette.flavor;
   # Create a Catppuccin cursor package name like "mochaBlue"
   catppuccinCursorPkg =
     catppuccinFlavor

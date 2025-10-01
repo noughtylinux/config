@@ -8,8 +8,9 @@
   ...
 }:
 let
-  catppuccinAccent = noughtyConfig.catppuccin.accent or "blue";
-  catppuccinFlavor = noughtyConfig.catppuccin.flavor or "mocha";
+  # Use validated values from palette (these have already been validated and fallen back if needed)
+  catppuccinAccent = noughtyConfig.catppuccin.palette.accent;
+  catppuccinFlavor = noughtyConfig.catppuccin.palette.flavor;
   selectedShell = noughtyConfig.terminal.shell or "bash";
 in
 {
