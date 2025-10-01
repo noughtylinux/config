@@ -33,6 +33,10 @@ in
 
   home = {
     stateVersion = "25.05";
+    # Enable truecolor for all terminal apps
+    sessionVariables = {
+      COLORTERM = "truecolor";
+    };
   };
 
   news.display = "silent";

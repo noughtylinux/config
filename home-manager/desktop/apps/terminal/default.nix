@@ -1,11 +1,11 @@
 {
   noughtyConfig,
   ...
-}: 
+}:
 let
   # Access Catppuccin palette from noughtyConfig
   palette = noughtyConfig.catppuccin.palette;
-  
+
   # Helper function to get color as hex string
   getColor = colorName: palette.getColor colorName;
 in

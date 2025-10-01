@@ -26,7 +26,7 @@ lib.mkIf (terminalEmulator == "foot") {
           shell = lib.mkIf (
             selectedShell != null && selectedShell != ""
           ) "${pkgs.${selectedShell}}/bin/${selectedShell} ${shellArgs}";
-          term = "xterm-256color";
+          term = "foot";
         };
         cursor = {
           style = "block";

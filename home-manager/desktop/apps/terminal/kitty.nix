@@ -38,7 +38,7 @@ lib.mkIf (terminalEmulator == "kitty") {
         window_margin_width = 0;
         single_window_margin_width = 0;
         sync_to_monitor = "yes";
-        term = "xterm-256color";
+        term = "xterm-kitty";
         # Mouse
         copy_on_select = true;
         mouse_hide_wait = 0;

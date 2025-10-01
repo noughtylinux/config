@@ -26,7 +26,7 @@ lib.mkIf (terminalEmulator == "alacritty") {
           };
         };
         env = {
-          TERM = "xterm-256color";
+          TERM = "alacritty";
         };
         font = {
           normal = {
