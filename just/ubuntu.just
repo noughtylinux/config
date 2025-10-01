@@ -103,24 +103,23 @@ ubuntu-pre: _header _is_compatible _has_config
     fi
 
     # Workarounds for system-manager file tracking
+    echo -e "{{INFO}}Processing managed files in /etc..."
     for DIR in \
         "/etc/noughty/kmscon" \
-        "/etc/noughty/grub/themes/catppuccin/" \
-        "/etc/noughty/plymouth/"; do
+        "/etc/noughty/grub/themes/catppuccin" \
+        "/etc/noughty/plymouth/themes"; do
         if [[ ! -d "${DIR}" ]]; then
             echo -e "{{GLYPH_FOLDER}}Creating directory {{RESET}}{{DIM}}${DIR}{{RESET}}"
             sudo mkdir -p "${DIR}" 2>/dev/null || true
         fi
     done
-
     state_file="/var/lib/system-manager/state/system-manager-state.json"
     if [[ -e "$state_file" ]]; then
-        echo -e "{{INFO}}Processing managed files in /etc..."
         sudo cat "$state_file" | \
             jq -r '.fileTree | .. | objects | select(.status == "managed") | .path' 2>/dev/null | \
             while IFS= read -r filepath; do
                 [[ -z "$filepath" ]] && continue
-                # Skip sym-links
+                # Skip symlinks
                 [[ -L "$filepath" ]] && continue
                 if [[ -f "$filepath" ]]; then
                     echo -e "{{GLYPH_PROCESS}}Processing {{RESET}}{{DIM}}$filepath{{RESET}}"
@@ -149,24 +148,19 @@ ubuntu-post:
         sudo cp /etc/noughty/console-setup /etc/default/console-setup
     fi
 
-    # Deploy Plymouth theme from dynamically generated config and static assets
+    # Deploy Plymouth theme from catppuccin-plymouth package and dynamic config
     PLYMOUTH_FLAVOR=$(tq -f config.toml catppuccin.flavor)
-    if [ -d "assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}" ]; then
+    if [ -L "/etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}" ]; then
         echo -e "{{GLYPH_SCREEN}}Deploying Plymouth theme (${PLYMOUTH_FLAVOR})..."
 
         # Create theme directory
+        sudo rm -rf /usr/share/plymouth/themes/catppuccin-* 2>/dev/null
         sudo mkdir -p /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}
 
-        # Copy static PNG assets from bundled assets
-        sudo cp -rf assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/*.png /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
-
+        # Copy PNG assets from catppuccin-plymouth package (dereference symlink)
+        sudo cp -rL /etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/*.png /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
         # Copy dynamically generated .plymouth theme file from system-manager (dereference symlink)
-        if [ -f /etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}.plymouth ]; then
-            sudo cp -L /etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}.plymouth /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
-        else
-            echo -e "{{WARNING}}Dynamic .plymouth file not found, using static fallback"
-            sudo cp assets/plymouth/catppuccin-${PLYMOUTH_FLAVOR}/catppuccin-${PLYMOUTH_FLAVOR}.plymouth /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
-        fi
+        sudo cp -L /etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}.plymouth /usr/share/plymouth/themes/catppuccin-${PLYMOUTH_FLAVOR}/
 
         # Set as default Plymouth theme using update-alternatives
         sudo update-alternatives --quiet --install \

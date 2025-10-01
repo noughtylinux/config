@@ -1,8 +1,8 @@
 # Catppuccin Plymouth Boot Splash Configuration
-# Dynamically generates .plymouth theme file using Catppuccin palette
-# Static assets (PNG files) remain in assets/plymouth/ and are deployed via ubuntu-post
+# Uses catppuccin-plymouth package for PNG assets with dynamically generated .plymouth file
 {
   noughtyConfig,
+  pkgs,
   lib,
   ...
 }:
@@ -11,6 +11,9 @@ let
 
   # Boot configuration from config.toml
   plymouthEnabled = noughtyConfig.boot.grub_theme or true;
+
+  # Install catppuccin-plymouth with the user's selected flavor (for PNG assets)
+  catppuccinPlymouth = pkgs.catppuccin-plymouth.override { variant = palette.flavor; };
 
   # Convert palette hex color (#RRGGBB) to Plymouth format (0xRRGGBB)
   toPlymouthColor =
@@ -22,7 +25,7 @@ let
     in
     "0x${hexValue}";
 
-  # Generate dynamic .plymouth theme file
+  # Generate dynamic .plymouth theme file using Catppuccin palette colors
   plymouthThemeConfig = ''
     [Plymouth Theme]
     Name=catppuccin-${palette.flavor}
@@ -61,12 +64,22 @@ let
 in
 {
   config = lib.mkIf plymouthEnabled {
+    # Install Plymouth theme package (for PNG assets)
+    environment.systemPackages = [ catppuccinPlymouth ];
+
     # Deploy Plymouth daemon configuration
     environment.etc."plymouth/plymouthd.conf".text = ''
       [Daemon]
       Theme=catppuccin-${palette.flavor}
       ShowDelay=0
     '';
+
+    # Deploy PNG assets from package to staging area
+    systemd.tmpfiles.settings."10-plymouth-assets" = {
+      "/etc/noughty/plymouth/catppuccin-${palette.flavor}"."L+" = {
+        argument = "${catppuccinPlymouth}/share/plymouth/themes/catppuccin-${palette.flavor}";
+      };
+    };
 
     # Deploy dynamically generated .plymouth theme file
     environment.etc."noughty/plymouth/catppuccin-${palette.flavor}.plymouth".text = plymouthThemeConfig;

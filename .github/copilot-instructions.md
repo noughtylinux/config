@@ -34,8 +34,18 @@ The `noughtyConfig` parameter is passed to ALL modules, containing:
 
 ### Development on NixOS
 Typically development is done on NixOS and testing is performed on a remote Ubuntu host.
-NixOS does not export `HOSTNAME` to the environment by default, so you will to coerce it
+NixOS does not export `HOSTNAME` to the environment by default, so you will need to coerce it
 when running nix evaluations and other debugging tasks.
+
+**Building system-manager configuration:**
+```bash
+# NixOS development workstation requires dummy HOSTNAME
+HOSTNAME=test-host nix build --no-update-lock-file --impure .#systemConfigs.default
+
+# The flake reference for system-manager is .#systemConfigs.default (not .#default)
+```
+
+**Important:** Most `just` commands are gated for Ubuntu-only. They will not run on the NixOS development workstation.
 
 ### TOML-Driven Configuration
 All user choices flow through `config.toml`. Access patterns:
@@ -96,6 +106,40 @@ Unlike NixOS, `system-manager` has limited capabilities:
 - Initial setup handled in `bootstrap.sh` (one-time setup)
 - Manual PAM configs via `environment.etc` files
 - Always use `nix-system-graphics` for GPU acceleration
+
+### system-manager Build Output Structure
+
+After building system-manager configuration, files are stored in `result/etcFiles/`:
+```bash
+# View all generated files
+cat result/etcFiles/etcFiles.json | jq '.entries | keys'
+
+# View specific file content
+cat result/etcFiles/etcFiles.json | jq -r '.entries["path/to/file"].text'
+```
+
+**Important:** Files in `/etc/` managed by `environment.etc` are **symlinks** to the Nix store, not real files.
+
+### Copying Files from system-manager Paths
+
+When copying files from system-manager controlled paths (like `/etc/noughty/`) to system locations, you **must dereference symlinks** using the `-L` flag:
+
+```bash
+# ✅ CORRECT: Dereferences symlink, copies actual file content
+sudo cp -L /etc/noughty/plymouth/catppuccin-mocha.plymouth /usr/share/plymouth/themes/
+
+# ❌ WRONG: Copies symlink, which breaks when Nix store path changes
+sudo cp /etc/noughty/plymouth/catppuccin-mocha.plymouth /usr/share/plymouth/themes/
+```
+
+**Why this matters:**
+- Plymouth initramfs hooks need real files, not symlinks to Nix store
+- GRUB themes in `/boot/` must be real files for bootloader access
+- System services may not have access to Nix store paths during early boot
+
+**Examples in codebase:**
+- `just/ubuntu.just` Plymouth deployment: `sudo cp -L /etc/noughty/plymouth/...`
+- `just/ubuntu.just` GRUB deployment: `sudo cp -rfL /etc/noughty/grub/themes/...`
 
 ## Naming Conventions
 
