@@ -7,9 +7,9 @@
 - [x] Install `nala` and use it for `apt` operations
 - [ ] Put guard rails up to prevent installing on Ubuntu Desktop
 - [x] Consolidate duplicated Ubuntu configuration tasks
-- [ ] Plymouth
+- [x] Plymouth
 - [ ] Add `[desktop]` section and use `shell` to enable desktop features
-- [ ] Add `[boot]` section to set Kernel, GRUB and Plymouth options
+- [x] Add `[boot]` section to set Kernel, GRUB and Plymouth options
 - [x] Pipewire & WirePlumber
 - [x] CUPS
 - [x] BlueZ
