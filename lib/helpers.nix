@@ -58,9 +58,47 @@ in
           }
           // tomlConfig;
 
-      # Extract Catppuccin palette if flavor and accent are set
-      catppuccinFlavor = baseConfig.catppuccin.flavor or "mocha";
-      catppuccinAccent = baseConfig.catppuccin.accent or "blue";
+      # Valid Catppuccin options
+      validFlavors = [
+        "latte"
+        "frappe"
+        "macchiato"
+        "mocha"
+      ];
+      validAccents = [
+        "rosewater"
+        "flamingo"
+        "pink"
+        "mauve"
+        "red"
+        "maroon"
+        "peach"
+        "yellow"
+        "green"
+        "teal"
+        "sky"
+        "sapphire"
+        "blue"
+        "lavender"
+      ];
+
+      # Extract Catppuccin palette with validation and fallback
+      rawFlavor = baseConfig.catppuccin.flavor or "mocha";
+      rawAccent = baseConfig.catppuccin.accent or "mauve";
+
+      # Validate flavor with warning and fallback to mocha
+      catppuccinFlavor =
+        if builtins.elem rawFlavor validFlavors then
+          rawFlavor
+        else
+          builtins.trace "WARNING: Invalid Catppuccin flavor '${rawFlavor}'. Valid options: ${builtins.concatStringsSep ", " validFlavors}. Falling back to 'mocha'." "mocha";
+
+      # Validate accent with warning and fallback to blue
+      catppuccinAccent =
+        if builtins.elem rawAccent validAccents then
+          rawAccent
+        else
+          builtins.trace "WARNING: Invalid Catppuccin accent '${rawAccent}'. Valid options: ${builtins.concatStringsSep ", " validAccents}. Falling back to 'mauve'." "mauve";
 
       # Read palette.json from catppuccin package
       paletteJson = builtins.fromJSON (
