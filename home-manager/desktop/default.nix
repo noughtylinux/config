@@ -13,6 +13,45 @@ let
   clockFormat = "24h";
   cursorSize = 32;
   desktopShell = catppuccinThemeGtk || catppuccinThemeQt;
+  blues = [
+    "blue"
+    "sky"
+    "sapphire"
+    "lavender"
+  ];
+  pinks = [
+    "pink"
+    "rosewater"
+    "flamingo"
+  ];
+  reds = [
+    "red"
+    "maroon"
+  ];
+  themeAccent =
+    if lib.elem noughtyConfig.catppuccin.accent blues then
+      ""
+    else if noughtyConfig.catppuccin.accent == "green" then
+      "-Green"
+    else if noughtyConfig.catppuccin.accent == "peach" then
+      "-Orange"
+    else if lib.elem noughtyConfig.catppuccin.accent pinks then
+      "-Pink"
+    else if noughtyConfig.catppuccin.accent == "mauve" then
+      "-Purple"
+    else if lib.elem noughtyConfig.catppuccin.accent reds then
+      "-Red"
+    else if noughtyConfig.catppuccin.accent == "teal" then
+      "-Teal"
+    else if noughtyConfig.catppuccin.accent == "yellow" then
+      "-Yellow"
+    else
+      "";
+  themeShade = if noughtyConfig.catppuccin.palette.isDark then "-Dark" else "-Light";
+  gtkThemeName = "Colloid${themeAccent}${themeShade}-Catppuccin";
+  preferDark = noughtyConfig.catppuccin.palette.isDark;
+  preferDarkDconf = if preferDark then "prefer-dark" else "prefer-light";
+  preferDarkStr = if preferDark then "1" else "0";
 in
 {
   imports = [
@@ -37,13 +76,13 @@ in
   dconf.settings = with lib.hm.gvariant; {
     "org/gnome/desktop/interface" = {
       clock-format = clockFormat;
-      color-scheme = if noughtyConfig.catppuccin.palette.isDark then "prefer-dark" else "prefer-light";
+      color-scheme = preferDarkDconf;
       cursor-size = cursorSize;
       cursor-theme = config.home.pointerCursor.name;
       document-font-name = config.gtk.font.name or "Work Sans 13";
       gtk-enable-primary-paste = true;
       gtk-theme = config.gtk.theme.name;
-      icon-theme = "Papirus-Dark";
+      icon-theme = config.gtk.iconTheme.name;
       monospace-font-name = "FiraCode Nerd Font Mono Medium 13";
       text-scaling-factor = 1.0;
     };
@@ -87,14 +126,14 @@ in
     gtk2 = {
       configLocation = "${config.xdg.configHome}/.gtkrc-2.0";
       extraConfig = ''
-        gtk-application-prefer-dark-theme = "${noughtyConfig.catppuccin.palette.isDark}"
+        gtk-application-prefer-dark-theme = "${preferDarkStr}"
         gtk-button-images = 1
         gtk-decoration-layout = "${buttonLayout}"
       '';
     };
     gtk3 = {
       extraConfig = {
-        gtk-application-prefer-dark-theme = noughtyConfig.catppuccin.palette.isDark;
+        gtk-application-prefer-dark-theme = preferDark;
         gtk-button-images = 1;
         gtk-decoration-layout = "${buttonLayout}";
       };
@@ -112,11 +151,19 @@ in
       };
     };
     theme = {
-      name = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
-      package = pkgs.catppuccin-gtk.override {
-        accents = [ "${config.catppuccin.accent}" ];
-        size = "standard";
-        variant = config.catppuccin.flavor;
+      name = gtkThemeName;
+      package = pkgs.unstable.colloid-gtk-theme.override {
+        colorVariants = [
+          "standard"
+          "light"
+          "dark"
+        ];
+        sizeVariants = [
+          "standard"
+          "compact"
+        ];
+        themeVariants = [ "all" ];
+        tweaks = [ "catppuccin" ];
       };
     };
   };
@@ -204,15 +251,15 @@ in
         target = "qt5ct/qt5ct.conf";
         text = lib.generators.toINI { } {
           Appearance = {
-            icon_theme = "Papirus-Dark";
+            icon_theme = config.gtk.iconTheme.name;
           };
         };
       };
-      qt6ct = lib.mkIf catppuccinThemeQt {
+      qt6ct = {
         target = "qt6ct/qt6ct.conf";
         text = lib.generators.toINI { } {
           Appearance = {
-            icon_theme = "Papirus-Dark";
+            icon_theme = config.gtk.iconTheme.name;
           };
         };
       };
