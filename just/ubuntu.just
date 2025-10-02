@@ -51,7 +51,7 @@ ubuntu-pre: _header _is_compatible _has_config
 
     # Check ubuntu configuration section
     if tq -f config.toml ubuntu >/dev/null 2>&1; then
-        REMOVABLE_PACKAGES=("snapd" "apport" "pollinate" "unattended-upgrades")
+        REMOVABLE_PACKAGES=("apport" "kdump-tools" "pollinate" "snapd" "unattended-upgrades")
         for package in "${REMOVABLE_PACKAGES[@]}"; do
             if is_package_installed "${package}"; then
                 # Package is installed

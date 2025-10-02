@@ -38,7 +38,8 @@ packages = [ "rates" ]
 
 # Ubuntu features to remove/disable
 [ubuntu.remove]
-snapd = false               # Remove Snap package manager
 apport = false              # Remove crash reporting
+kdump-tools = false         # Remove kernel crash dump tools
 pollinate = true            # Remove entropy seeding
+snapd = false               # Remove Snap package manager
 unattended-upgrades = false # Remove automatic updates
