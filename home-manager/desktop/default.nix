@@ -8,16 +8,10 @@
 let
   buttonLayout =
     if config.wayland.windowManager.hyprland.enable then "appmenu" else "close,minimize,maximize";
-  # Use validated values from palette (these have already been validated and fallen back if needed)
-  catppuccinAccent = noughtyConfig.catppuccin.palette.accent;
-  catppuccinFlavor = noughtyConfig.catppuccin.palette.flavor;
-  # Create a Catppuccin cursor package name like "mochaBlue"
-  catppuccinCursorPkg =
-    catppuccinFlavor
-    + (lib.strings.toUpper (builtins.substring 0 1 catppuccinAccent))
-    + (builtins.substring 1 (-1) catppuccinAccent);
   catppuccinThemeGtk = noughtyConfig.catppuccin.gtk or false;
   catppuccinThemeQt = noughtyConfig.catppuccin.qt or false;
+  cursorSize = 32;
+  desktopShell = catppuccinThemeGtk || catppuccinThemeQt;
 in
 {
   imports = [
@@ -28,6 +22,7 @@ in
 
   catppuccin = {
     kvantum.enable = catppuccinThemeQt;
+    cursors.enable = desktopShell;
   };
 
   # Packages whose D-Bus configuration files should be included in the
@@ -42,7 +37,7 @@ in
     "org/gnome/desktop/interface" = lib.mkIf catppuccinThemeGtk {
       clock-format = "24h";
       color-scheme = if noughtyConfig.catppuccin.palette.isDark then "prefer-dark" else "prefer-light";
-      cursor-size = 32;
+      cursor-size = cursorSize;
       cursor-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
       document-font-name = config.gtk.font.name or "Work Sans 13";
       gtk-enable-primary-paste = true;
@@ -71,13 +66,8 @@ in
   };
 
   gtk = {
-    cursorTheme = lib.mkIf catppuccinThemeGtk {
-      name = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
-      package = pkgs.catppuccin-cursors.${catppuccinCursorPkg};
-      size = 32;
-    };
-    enable = true;
-    font = lib.mkIf catppuccinThemeGtk {
+    enable = catppuccinThemeGtk;
+    font = {
       name = "Work Sans";
       size = 13;
       package = pkgs.work-sans;
@@ -102,14 +92,14 @@ in
         gtk-decoration-layout = "${buttonLayout}";
       };
     };
-    iconTheme = lib.mkIf catppuccinThemeGtk {
+    iconTheme = {
       name = "Papirus-Dark";
       package = pkgs.catppuccin-papirus-folders.override {
         flavor = config.catppuccin.flavor;
         accent = config.catppuccin.accent;
       };
     };
-    theme = lib.mkIf catppuccinThemeGtk {
+    theme = {
       name = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
       package = pkgs.catppuccin-gtk.override {
         accents = [ "${config.catppuccin.accent}" ];
@@ -119,7 +109,7 @@ in
     };
   };
 
-  home = lib.mkIf (catppuccinThemeQt || catppuccinThemeGtk) {
+  home = lib.mkIf desktopShell {
     packages =
       with pkgs;
       [
@@ -140,7 +130,6 @@ in
         nautilus
         overskride
         papers
-        papirus-folders
         pwvucontrol
         resources
         seahorse
@@ -154,11 +143,14 @@ in
       ++ (map (pkg: pkgs.${pkg}) (noughtyConfig.desktop.packages or [ ]));
 
     pointerCursor = {
-      name = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
-      package = pkgs.catppuccin-cursors.${catppuccinCursorPkg};
-      size = 32;
-      gtk.enable = true;
-      x11.enable = true;
+      dotIcons.enable = true;
+      gtk.enable = catppuccinThemeGtk;
+      hyprcursor = {
+        enable = config.wayland.windowManager.hyprland.enable;
+        size = cursorSize;
+      };
+      size = cursorSize;
+      x11.enable = desktopShell;
     };
   };
 
