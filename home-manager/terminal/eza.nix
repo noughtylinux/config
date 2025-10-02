@@ -18,6 +18,7 @@ in
       enableFishIntegration = config.programs.fish.enable;
       enableZshIntegration = config.programs.zsh.enable;
       extraOptions = [
+        "--color=always"
         "--group-directories-first"
         "--header"
         "--time-style=long-iso"

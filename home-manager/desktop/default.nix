@@ -87,14 +87,14 @@ in
     gtk2 = {
       configLocation = "${config.xdg.configHome}/.gtkrc-2.0";
       extraConfig = ''
-        gtk-application-prefer-dark-theme = 1
+        gtk-application-prefer-dark-theme = "${noughtyConfig.catppuccin.palette.isDark}"
         gtk-button-images = 1
         gtk-decoration-layout = "${buttonLayout}"
       '';
     };
     gtk3 = {
       extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
+        gtk-application-prefer-dark-theme = noughtyConfig.catppuccin.palette.isDark;
         gtk-button-images = 1;
         gtk-decoration-layout = "${buttonLayout}";
       };
