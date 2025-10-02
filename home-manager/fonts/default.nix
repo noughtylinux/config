@@ -9,6 +9,29 @@ let
 in
 {
   home = {
+    file.".config/fontconfig/fonts.conf".text = lib.mkIf fontsConfigure ''
+      <?xml version="1.0"?>
+      <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+      <fontconfig>
+        <match target="font">
+          <edit name="antialias" mode="assign">
+            <bool>true</bool>
+          </edit>
+          <edit name="hinting" mode="assign">
+            <bool>true</bool>
+          </edit>
+          <edit name="hintstyle" mode="assign">
+            <const>hintslight</const>
+          </edit>
+          <edit name="rgba" mode="assign">
+            <const>rgb</const>
+          </edit>
+          <edit name="lcdfilter" mode="assign">
+            <const>lcddefault</const>
+          </edit>
+        </match>
+      </fontconfig>
+    '';
     packages = with pkgs; [
       corefonts
       fira

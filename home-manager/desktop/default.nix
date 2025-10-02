@@ -10,6 +10,7 @@ let
     if config.wayland.windowManager.hyprland.enable then "appmenu" else "close,minimize,maximize";
   catppuccinThemeGtk = noughtyConfig.catppuccin.gtk or false;
   catppuccinThemeQt = noughtyConfig.catppuccin.qt or false;
+  clockFormat = "24h";
   cursorSize = 32;
   desktopShell = catppuccinThemeGtk || catppuccinThemeQt;
 in
@@ -22,7 +23,7 @@ in
 
   catppuccin = {
     kvantum.enable = catppuccinThemeQt;
-    cursors.enable = desktopShell;
+    cursors.enable = true;
   };
 
   # Packages whose D-Bus configuration files should be included in the
@@ -34,14 +35,14 @@ in
   };
 
   dconf.settings = with lib.hm.gvariant; {
-    "org/gnome/desktop/interface" = lib.mkIf catppuccinThemeGtk {
-      clock-format = "24h";
+    "org/gnome/desktop/interface" = {
+      clock-format = clockFormat;
       color-scheme = if noughtyConfig.catppuccin.palette.isDark then "prefer-dark" else "prefer-light";
       cursor-size = cursorSize;
-      cursor-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-cursors";
+      cursor-theme = config.home.pointerCursor.name;
       document-font-name = config.gtk.font.name or "Work Sans 13";
       gtk-enable-primary-paste = true;
-      gtk-theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
+      gtk-theme = config.gtk.theme.name;
       icon-theme = "Papirus-Dark";
       monospace-font-name = "FiraCode Nerd Font Mono Medium 13";
       text-scaling-factor = 1.0;
@@ -51,17 +52,28 @@ in
       theme-name = "freedesktop";
     };
 
-    "org/gnome/desktop/wm/preferences" = lib.mkIf catppuccinThemeGtk {
+    "org/gnome/desktop/wm/preferences" = {
       button-layout = "${buttonLayout}";
-      theme = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
+      theme = config.gtk.theme.name;
     };
 
     "org/gtk/gtk4/Settings/FileChooser" = {
-      clock-format = "24h";
+      clock-format = clockFormat;
     };
 
     "org/gtk/Settings/FileChooser" = {
-      clock-format = "24h";
+      clock-format = clockFormat;
+    };
+  };
+
+  home = {
+    sessionVariables = {
+      GDK_BACKEND = "wayland,x11";
+      MOZ_ENABLE_WAYLAND = "1";
+      NIXOS_OZONE_WL = "1";
+      QT_QPA_PLATFORM = "wayland;xcb";
+      QT_STYLE_OVERRIDE = "kvantum";
+      QT_WAYLAND_DISABLE_WINDOWDECORATION = if config.wayland.windowManager.hyprland.enable then 1 else 0;
     };
   };
 
@@ -109,7 +121,7 @@ in
     };
   };
 
-  home = lib.mkIf desktopShell {
+  home = {
     packages =
       with pkgs;
       [
@@ -124,8 +136,10 @@ in
         gnome-calculator
         gnome-disk-utility
         gnome-font-viewer
-        libsForQt5.qtstyleplugin-kvantum
+        kdePackages.qt6ct
+        kdePackages.qtstyleplugin-kvantum
         libsForQt5.qt5ct
+        libsForQt5.qtstyleplugin-kvantum
         loupe
         nautilus
         overskride
@@ -155,11 +169,11 @@ in
   };
 
   qt = {
-    enable = true;
-    platformTheme = lib.mkIf catppuccinThemeQt {
-      name = "kvantum";
+    enable = catppuccinThemeQt;
+    platformTheme = {
+      name = config.qt.style.name;
     };
-    style = lib.mkIf catppuccinThemeQt {
+    style = {
       name = "kvantum";
     };
   };
@@ -181,16 +195,12 @@ in
     };
   };
 
-  systemd.user.sessionVariables = lib.mkIf catppuccinThemeQt {
-    QT_STYLE_OVERRIDE = "kvantum";
-  };
-
   xdg = {
     autostart = {
       enable = true;
     };
     configFile = {
-      qt5ct = lib.mkIf catppuccinThemeQt {
+      qt5ct = {
         target = "qt5ct/qt5ct.conf";
         text = lib.generators.toINI { } {
           Appearance = {
@@ -216,14 +226,33 @@ in
         name = "Qt5 Settings";
         noDisplay = true;
       };
+      qt6ct = {
+        name = "Qt6 Settings";
+        noDisplay = true;
+      };
     };
     portal = {
       config = {
         common = {
-          default = [
-            "gtk"
-          ];
+          default =
+            if config.wayland.windowManager.hyprland.enable then
+              [
+                "hyprland"
+                "gtk"
+              ]
+            else
+              [ "gtk" ];
+          # For "Open With" dialogs. GTK portal provides the familiar GNOME-style app chooser.
+          "org.freedesktop.impl.portal.AppChooser" = [ "gtk" ];
+          "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+          # Inhibit is useful for preventing sleep during media playback
+          "org.freedesktop.impl.portal.Inhibit" = [ "gtk" ];
+          # GTK portal gives you proper print dialogs.
+          "org.freedesktop.impl.portal.Print" = [ "gtk" ];
+          # Security/credentials
           "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+          # GTK portal provides desktop settings that GTK apps query (fonts, themes, colour schemes).
+          "org.freedesktop.impl.portal.Settings" = [ "gtk" ];
         };
       };
       # Add xset to satisfy xdg-screensaver requirements
@@ -231,6 +260,13 @@ in
         pkgs.xorg.xset
       ];
       enable = true;
+      extraPortals = [
+        pkgs.xdg-desktop-portal
+        pkgs.xdg-desktop-portal-gtk
+      ]
+      ++ lib.optionals config.wayland.windowManager.hyprland.enable [
+        pkgs.xdg-desktop-portal-hyprland
+      ];
       xdgOpenUsePortal = true;
     };
   };

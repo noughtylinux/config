@@ -304,20 +304,13 @@ in
   xdg = {
     portal = {
       config = {
-        hyprland = {
-          default = [
-            "hyprland"
-            "gtk"
-          ];
-          "org.freedesktop.impl.portal.Secret" = [ "gnome-keyring" ];
+        common = {
+          # Hyprland-specific interfaces
+          "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+          "org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
         };
       };
       configPackages = [ config.wayland.windowManager.hyprland.package ];
-      extraPortals = [
-        pkgs.xdg-desktop-portal
-        pkgs.xdg-desktop-portal-gtk
-        pkgs.xdg-desktop-portal-hyprland
-      ];
     };
   };
 }
