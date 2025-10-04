@@ -20,6 +20,8 @@ gtk = false
 qt = false
 
 [desktop]
+# Enable greetd display manager (defaults to true)
+display-manager = true
 # One of alacritty, foot, kitty
 terminal-emulator = "kitty"
 # Additional desktop packages to install via home-manager

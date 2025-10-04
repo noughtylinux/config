@@ -49,6 +49,13 @@ ubuntu-pre: _header _is_compatible _has_config
         fi
     done
 
+    # Install greetd from Ubuntu if display manager is enabled
+    if tq -f config.toml desktop.display-manager &>/dev/null && [ "$(tq -f config.toml desktop.display-manager)" = "true" ]; then
+        if ! is_package_installed "greetd"; then
+            PACKAGES_TO_INSTALL+=("greetd")
+        fi
+    fi
+
     # Check ubuntu configuration section
     if tq -f config.toml ubuntu >/dev/null 2>&1; then
         REMOVABLE_PACKAGES=("apport" "kdump-tools" "pollinate" "snapd" "unattended-upgrades")
@@ -106,6 +113,7 @@ ubuntu-pre: _header _is_compatible _has_config
     echo -e "{{INFO}}Processing managed files in /etc..."
     for DIR in \
         "/etc/noughty/kmscon" \
+        "/etc/noughty/greetd" \
         "/etc/noughty/grub/themes/catppuccin" \
         "/etc/noughty/plymouth/themes"; do
         if [[ ! -d "${DIR}" ]]; then
@@ -133,6 +141,7 @@ ubuntu-pre: _header _is_compatible _has_config
 ubuntu-post:
     #!/usr/bin/env bash
     set -euo pipefail
+
     echo -e "{{GLYPH_SHIELD}}Reloading AppArmor profiles for Nix..."
     for profile in /etc/apparmor.d/nix_*; do
         sudo apparmor_parser -r "$profile"
@@ -143,6 +152,31 @@ ubuntu-post:
     sudo fc-cache --system-only --really-force
     echo -e "{{SUCCESS}}Font cache updated!"
 
+    # Enable greetd service if display manager is enabled
+    if tq -f config.toml desktop.display-manager &>/dev/null && [ "$(tq -f config.toml desktop.display-manager)" = "true" ]; then
+        echo -e "{{GLYPH_SYSTEM}}Configuring greetd display manager..."
+
+        # Use dpkg-divert to safely override the package-managed config file
+        if [ -f /etc/noughty/greetd/config.toml ]; then
+            # Check if diversion already exists
+            if ! dpkg-divert --list /etc/greetd/config.toml | grep -q "by noughty"; then
+                echo -e "{{GLYPH_DIVERT}}Setting up dpkg diversion for greetd config..."
+                sudo dpkg-divert --add --rename --divert /etc/greetd/config.toml.distrib --package noughty /etc/greetd/config.toml
+            fi
+            # Deploy our configuration (dereference symlink)
+            sudo cp -L /etc/noughty/greetd/config.toml /etc/greetd/config.toml
+        fi
+
+        # Deploy Wayland session desktop file for greeter discovery
+        if [ -f /etc/noughty/greetd/hyprland.desktop ]; then
+            echo -e "{{GLYPH_DESKTOP}}Deploying Wayland session file..."
+            sudo mkdir -p /usr/share/wayland-sessions
+            sudo cp -L /etc/noughty/greetd/hyprland.desktop /usr/share/wayland-sessions/noughty-hyprland.desktop
+            echo -e "{{SUCCESS}}Wayland session file deployed!"
+        fi
+        echo -e "{{SUCCESS}}greetd display manager configured."
+    fi
+
     # Deploy console-setup configuration for initramfs
     if [ -f /etc/noughty/console-setup ]; then
         sudo cp /etc/noughty/console-setup /etc/default/console-setup
@@ -151,7 +185,7 @@ ubuntu-post:
     # Deploy Plymouth theme from catppuccin-plymouth package and dynamic config
     PLYMOUTH_FLAVOR=$(tq -f config.toml catppuccin.flavor)
     if [ -L "/etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}" ]; then
-        echo -e "{{GLYPH_SCREEN}}Deploying Plymouth theme (${PLYMOUTH_FLAVOR})..."
+        echo -e "{{GLYPH_LOADING}}Deploying Plymouth theme..."
 
         # Create theme directory
         sudo rm -rf /usr/share/plymouth/themes/catppuccin-* 2>/dev/null
@@ -174,7 +208,7 @@ ubuntu-post:
 
     # Only deploy GRUB theme if GRUB is available
     if [ -d /boot/grub ] && command -v update-grub &>/dev/null; then
-        echo -e "{{GLYPH_PAINT}}Deploying GRUB theme to /boot..."
+        echo -e "{{GLYPH_BOOT}}Deploying GRUB theme to /boot..."
         sudo mkdir -p /boot/grub/themes/catppuccin 2>/dev/null || true
         sudo cp -rfL /etc/noughty/grub/themes/catppuccin/* /boot/grub/themes/catppuccin/ 2>/dev/null || true
         sudo update-grub &> /dev/null || true

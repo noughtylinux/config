@@ -141,10 +141,26 @@ function install_nala() {
   echo -e "${SUCCESS}nala package manager installed successfully."
 }
 
+function get_login_def() {
+  # Extract specified value from /etc/login.defs, with fallback default
+  local key="$1"
+  local default="${2:-60000}"
+  local value
+  value=$(grep -E "^${key}" /etc/login.defs 2>/dev/null | awk '{print $2}')
+  echo "${value:-$default}"
+}
+
 function install_determinate_nix() {
   echo -e "${GLYPH_NIX}Installing Determinate Nix..."
+
+  # Calculate UID and GID bases from system configuration
+  local uid_base=$(($(get_login_def "UID_MAX") + 1))
+  local gid_base=$(($(get_login_def "GID_MAX") + 1))
+
   curl -sSfL https://install.determinate.systems/nix | sh -s -- install \
-    --determinate --no-confirm
+    --determinate --no-confirm \
+    --nix-build-user-id-base "${uid_base}" \
+    --nix-build-group-id "${gid_base}"
   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 }
 

@@ -9,6 +9,29 @@ let
   # Use Nixpkgs kmscon
   kmsconBin = "${pkgs.kmscon}/bin/kmscon";
 
+  # Check if display manager is enabled (if so, don't use tty1)
+  displayManagerEnabled = noughtyConfig.desktop.display-manager or true;
+
+  # TTY list - exclude tty1 if display manager is enabled
+  ttyList =
+    if displayManagerEnabled then
+      [
+        "tty2"
+        "tty3"
+        "tty4"
+        "tty5"
+        "tty6"
+      ]
+    else
+      [
+        "tty1"
+        "tty2"
+        "tty3"
+        "tty4"
+        "tty5"
+        "tty6"
+      ];
+
   # Access Catppuccin palette from noughtyConfig
   palette = noughtyConfig.catppuccin.palette;
 
@@ -67,58 +90,49 @@ in
 
     # Create kmsconvt@ttyX.services that closely mimics Ubuntu's implementation
     systemd.services = builtins.listToAttrs (
-      map
-        (tty: {
-          name = "kmsconvt@${tty}";
-          value = {
-            description = "KMS System Console on ${tty}";
-            documentation = [ "man:kmscon(1)" ];
-            after = [
-              "systemd-user-sessions.service"
-              "plymouth-quit-wait.service"
-              "getty-pre.target"
-              "dbus.service"
-              "systemd-localed.service"
-            ];
-            before = [ "getty.target" ];
-            conflicts = [
-              "rescue.service"
-              "getty@${tty}.service"
-            ];
-            onFailure = [ "getty@${tty}.service" ];
-            unitConfig = {
-              IgnoreOnIsolate = "yes";
-              ConditionPathExists = "/dev/tty0";
-            };
-            serviceConfig = {
-              Environment = [
-                "PATH=${pkgs.dbus}/bin:${pkgs.coreutils}/bin:/usr/bin:/bin"
-                "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket"
-              ];
-              ExecStart = "${kmsconBin} \"--vt=${tty}\" --seats=seat0 --configdir /etc/noughty/kmscon --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
-              TTYPath = "/dev/${tty}";
-              TTYReset = "yes";
-              TTYVHangup = "yes";
-              TTYVTDisallocate = "yes";
-              Type = "idle";
-              UtmpIdentifier = "${tty}";
-            };
-            wantedBy = [ "getty.target" ];
-            restartIfChanged = false;
+      map (tty: {
+        name = "kmsconvt@${tty}";
+        value = {
+          description = "KMS System Console on ${tty}";
+          documentation = [ "man:kmscon(1)" ];
+          after = [
+            "systemd-user-sessions.service"
+            "plymouth-quit-wait.service"
+            "getty-pre.target"
+            "dbus.service"
+            "systemd-localed.service"
+          ];
+          before = [ "getty.target" ];
+          conflicts = [
+            "rescue.service"
+            "getty@${tty}.service"
+          ];
+          onFailure = [ "getty@${tty}.service" ];
+          unitConfig = {
+            IgnoreOnIsolate = "yes";
+            ConditionPathExists = "/dev/tty0";
           };
-        })
-        [
-          "tty1"
-          "tty2"
-          "tty3"
-          "tty4"
-          "tty5"
-          "tty6"
-        ]
+          serviceConfig = {
+            Environment = [
+              "PATH=${pkgs.dbus}/bin:${pkgs.coreutils}/bin:/usr/bin:/bin"
+              "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket"
+            ];
+            ExecStart = "${kmsconBin} \"--vt=${tty}\" --seats=seat0 --configdir /etc/noughty/kmscon --login -- ${agettyBin} --issue ${noughtyIssue} --login-options '-p -- \\\\u' - xterm-256color";
+            TTYPath = "/dev/${tty}";
+            TTYReset = "yes";
+            TTYVHangup = "yes";
+            TTYVTDisallocate = "yes";
+            Type = "idle";
+            UtmpIdentifier = "${tty}";
+          };
+          wantedBy = [ "getty.target" ];
+          restartIfChanged = false;
+        };
+      }) ttyList
     );
 
     # Mask Ubuntu's default getty services by symlinking them to /dev/null
-    # This prevents conflicts with our kmscon setup
+    # This prevents conflicts with our kmscon/greetd setup
     systemd.tmpfiles.settings."10-mask-getty" = builtins.listToAttrs (
       map
         (tty: {

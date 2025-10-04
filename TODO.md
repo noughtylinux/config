@@ -13,10 +13,12 @@
 - [x] Pipewire & WirePlumber
 - [x] CUPS
 - [x] BlueZ
+- [X] Display Manager
 - [x] Clean up `justfile`. Maybe break it up
 - [x] Relocate `bootstrap.sh` in the config repository
 - [x] Add `tarball` command to `justfile`
 - [ ] Use tarballs as the distribution/update mechanism
+- [ ] Install Tailscale
 
 ## Modules
 
@@ -36,6 +38,7 @@
 - [x] Make `halp` find help flags other that `--help`
 - [x] Choose a browser
 - [ ] Choose a terminal editor
+- [x] XDG Desktop Portals
 - [x] User defined packages to install
 - [x] User owned custom Nix config
 - [x] Pin Nixpkgs in `nosh` et al to the stable channel
@@ -51,10 +54,15 @@
 - [x] Add Symbola and Nerd Font symbols fonts in system-manager
 - [x] Theme kernel colors with Catppuccin
 - [x] Theme GRUB
-- [ ] Display Manager
 - [x] Fix `sudo` finding executables from the user profile
 - [x] Fix kmscon restart on theme change
 - [x] Fix kernel VT colour not preserving on reboot/shutdown
+
+## Helpers
+
+- [ ] Add iconTheme to `noughtyConfig.catppuccin`: `iconTheme = if isDark then "Papirus-Dark" else "Papirus-Light";`
+- [ ] Add monospaceFont, sansFonts and sansSerifFont to `noughtyConfig`.
+- [ ] Add cursorSize to `noughtyConfig`.
 
 # Challenges
 

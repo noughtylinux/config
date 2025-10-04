@@ -49,6 +49,7 @@ in
 {
   imports = [
     ./fonts.nix
+    ./greetd.nix
     ./grub.nix
     ./kmscon.nix
     ./plymouth.nix

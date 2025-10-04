@@ -245,6 +245,100 @@ in
     };
   };
 
+  # XDG Desktop Portal systemd services - required on non-NixOS
+  systemd.user.services = {
+    xdg-desktop-portal = {
+      Unit = {
+        Description = "Portal service (Flatpak and others)";
+        Documentation = "man:xdg-desktop-portal(1)";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.portal.Desktop";
+        ExecStart = "${pkgs.xdg-desktop-portal}/libexec/xdg-desktop-portal";
+        Restart = "on-failure";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    xdg-desktop-portal-gtk = {
+      Unit = {
+        Description = "Portal service (GTK/GNOME implementation)";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.impl.portal.desktop.gtk";
+        ExecStart = "${pkgs.xdg-desktop-portal-gtk}/libexec/xdg-desktop-portal-gtk";
+        Restart = "on-failure";
+        Slice = "session.slice";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    xdg-desktop-portal-hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
+      Unit = {
+        Description = "Portal service (Hyprland implementation)";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+        ConditionEnvironment = "WAYLAND_DISPLAY";
+      };
+      Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.impl.portal.desktop.hyprland";
+        ExecStart = "${pkgs.xdg-desktop-portal-hyprland}/libexec/xdg-desktop-portal-hyprland";
+        Restart = "on-failure";
+        Slice = "session.slice";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    xdg-document-portal = {
+      Unit = {
+        Description = "Portal service (document access for sandboxed apps)";
+        Documentation = "man:xdg-document-portal(1)";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.portal.Documents";
+        ExecStart = "${pkgs.xdg-desktop-portal}/libexec/xdg-document-portal";
+        Restart = "on-failure";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+
+    xdg-permission-store = {
+      Unit = {
+        Description = "Permission store for XDG desktop portals";
+        Documentation = "man:xdg-permission-store(1)";
+        PartOf = [ "graphical-session.target" ];
+        After = [ "graphical-session.target" ];
+      };
+      Service = {
+        Type = "dbus";
+        BusName = "org.freedesktop.impl.portal.PermissionStore";
+        ExecStart = "${pkgs.xdg-desktop-portal}/libexec/xdg-permission-store";
+        Restart = "on-failure";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
+  };
+
   xdg = {
     autostart = {
       enable = true;
