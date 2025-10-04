@@ -226,12 +226,15 @@ in
   };
 
   services = {
-    # https://nixos.wiki/wiki/Bluetooth#Using_Bluetooth_headsets_with_PulseAudio
-    # This is managed by the Ubuntu-pre setup
-    mpris-proxy = {
-      enable = false;
-    };
     gnome-keyring = {
+      enable = true;
+    };
+    # https://nixos.wiki/wiki/Bluetooth#Using_Bluetooth_headsets_with_PulseAudio
+    # This is managed by Ubuntu
+    mpris-proxy = {
+      enable = lib.mkForce false;
+    };
+    polkit-gnome = {
       enable = true;
     };
     udiskie = {

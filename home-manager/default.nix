@@ -33,8 +33,8 @@ in
 
   home = {
     stateVersion = "25.05";
-    # Enable truecolor for all terminal apps
     sessionVariables = {
+      # Enable truecolor for all terminal apps
       COLORTERM = "truecolor";
     };
   };
