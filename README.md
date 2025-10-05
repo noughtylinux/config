@@ -94,7 +94,7 @@ This roadmap is a work in progress 🚧
 ### Phase 2️⃣
 
 - [x] Create kmscon
-- [ ] Create a display manager
+- [x] Create a display manager
 - [x] Create a basic desktop shell.
 - [ ] Comprehensive desktop shell.
 - [x] Choice of web browser.

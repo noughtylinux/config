@@ -1,17 +1,3 @@
-# I solemnly swear that I am up to no good
-mischief: _header _is_compatible
-    #!/usr/bin/env bash
-    if [[ "${USER}" != "martin" ]]; then
-        echo -e "{{GLYPH_CANCEL}}Only the user {{BOLD}}martin{{RESET}} can get up to mischief! {{GLYPH_DAMAGE}}"
-        exit 0
-    fi
-    echo -e "{{GLYPH_DAMAGE}}I solemnly swear that I am up to no good..."
-    sudo nala remove --assume-yes --simple --purge cups
-    sudo nala install --assume-yes --simple pollinate
-    sudo apt-get -y purge --autoremove nala whiptail 2> /dev/null || true
-    sudo rm -f /usr/lib/netplan/00-network-manager-all.yaml
-    echo -e "{{GLYPH_DAMAGE}}Mischief managed!"
-
 # Perform Ubuntu setup based on config.toml
 [private]
 ubuntu-pre: _header _is_compatible _has_config
@@ -19,6 +5,9 @@ ubuntu-pre: _header _is_compatible _has_config
     set -euo pipefail
 
     sudo true
+
+    # Check that this is Ubuntu Server, not Desktop
+    just _is_ubuntu_server
 
     is_package_installed() {
         local package="$1"
@@ -130,7 +119,7 @@ ubuntu-pre: _header _is_compatible _has_config
                 # Skip symlinks
                 [[ -L "$filepath" ]] && continue
                 if [[ -f "$filepath" ]]; then
-                    echo -e "{{GLYPH_PROCESS}}Processing {{RESET}}{{DIM}}$filepath{{RESET}}"
+                    echo -e "{{GLYPH_DELETE}}Processing {{RESET}}{{DIM}}$filepath{{RESET}}"
                     sudo rm -f "$filepath"
                 fi
             done
@@ -229,6 +218,17 @@ ubuntu-post:
         echo -e "{{SUCCESS}}System is up to date!"
     else
         echo -e "{{WARNING}}Skipping GRUB operations - GRUB not detected"
+    fi
+
+    # Create activation marker with metadata
+    if [ ! -f /var/lib/noughty/activated ]; then
+        echo -e "{{GLYPH_CREATE}}Creating activation marker..."
+        sudo mkdir -p /var/lib/noughty
+        printf "activated_at=%s\nactivated_by=%s\nhostname=%s\n" \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            "${USER}" \
+            "${HOSTNAME}" | sudo tee /var/lib/noughty/activated > /dev/null
+        echo -e "{{SUCCESS}}Nøughty Linux activated!"
     fi
 
 [private]
