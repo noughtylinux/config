@@ -1,3 +1,46 @@
+# Roadmap
+
+## Phase 0️⃣
+
+- [x] Name
+- [x] Domain
+- [x] Placeholder Website
+- [ ] Logo
+- [x] GitHub Organisation
+- [x] GitHub Template
+- [ ] Deployment pipeline
+- [x] TOML parser PoC
+
+## Phase 1️⃣
+
+- [x] Initial bootstrap script to prepare Ubuntu with required tooling.
+- [x] Create templated `config.yaml` via system introspection.
+- [x] Basic Nix flake providing essential terminal environment.
+- [x] Choice of `bash`, `fish` or `zsh` as default shell.
+
+## Phase 2️⃣
+
+- [x] Create kmscon
+- [x] Create a display manager
+- [x] Create a basic desktop shell.
+- [ ] Comprehensive desktop shell.
+- [x] Choice of web browser.
+- [ ] Update/upgrade mechanisms.
+
+## Phase 3️⃣
+
+- [x] Choice of Catppuccin flavour and accent.
+- [ ] Choice of terminal text editor.
+- [ ] Choice of desktop IDE.
+- [ ] Website refresh
+
+## Phase 🔮
+
+- [ ] Choice of Wayland compositor.
+- [ ] Shell configuration via `config.yaml`.
+- [x] Custom package list.
+- [ ] Opt-in for a selection of popular desktop applications
+
 # TODO
 
 ## bootstrap / flake / justfile
@@ -57,6 +100,7 @@
 - [x] Fix `sudo` finding executables from the user profile
 - [x] Fix kmscon restart on theme change
 - [x] Fix kernel VT colour not preserving on reboot/shutdown
+- [ ] Enable mouse support in kmscon
 
 ## Helpers
 
