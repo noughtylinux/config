@@ -182,6 +182,7 @@ in
         file-roller
         gnome-calculator
         gnome-disk-utility
+        gnome-firmware
         gnome-font-viewer
         kdePackages.qt6ct
         kdePackages.qtstyleplugin-kvantum
