@@ -9,12 +9,12 @@
   modifiedPackages = _final: prev: {
     # Acquire latest Aetf/kmscon which includes various fixes and improvements
     kmscon = prev.kmscon.overrideAttrs (oldAttrs: {
-      version = "9.0.1-unstable-2025-09-18";
+      version = "9.0.1-unstable-2025-10-03";
       src = prev.fetchFromGitHub {
         owner = "Aetf";
         repo = "kmscon";
-        rev = "f99c5a0279738fa23e8e13c34d590a7b43e67e5a";
-        sha256 = "sha256-RwfFXGRPDlO5WYTD2JWsZnKs3QngbMjc6kWRzCUR1gw=";
+        rev = "1275f4466b58aead9b90f22800ec6fb13c599fa3";
+        sha256 = "";
       };
     });
 
