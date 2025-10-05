@@ -152,9 +152,9 @@ ubuntu-post:
     sudo fc-cache --system-only --really-force
     echo -e "{{SUCCESS}}Font cache updated!"
 
-    # Enable greetd service if display manager is enabled
+    # Configure greetd service based on display-manager setting
     if tq -f config.toml desktop.display-manager &>/dev/null && [ "$(tq -f config.toml desktop.display-manager)" = "true" ]; then
-        echo -e "{{GLYPH_SYSTEM}}Configuring greetd display manager..."
+        echo -e "{{GLYPH_SCREEN}}Configuring greetd display manager..."
 
         # Use dpkg-divert to safely override the package-managed config file
         if [ -f /etc/noughty/greetd/config.toml ]; then
@@ -174,7 +174,17 @@ ubuntu-post:
             sudo cp -L /etc/noughty/greetd/hyprland.desktop /usr/share/wayland-sessions/noughty-hyprland.desktop
             echo -e "{{SUCCESS}}Wayland session file deployed!"
         fi
-        echo -e "{{SUCCESS}}greetd display manager configured."
+
+        # Enable and start greetd service
+        sudo systemctl enable greetd.service &>/dev/null || true
+        echo -e "{{SUCCESS}}greetd display manager configured and enabled."
+    else
+        # Only disable/stop greetd if it's currently enabled
+        if systemctl is-enabled greetd.service &>/dev/null; then
+            echo -e "{{GLYPH_SCREEN}}Disabling greetd display manager..."
+            sudo systemctl disable greetd.service &>/dev/null || true
+            echo -e "{{SUCCESS}}greetd display manager disabled and stopped."
+        fi
     fi
 
     # Deploy console-setup configuration for initramfs
