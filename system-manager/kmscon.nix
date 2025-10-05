@@ -126,7 +126,6 @@ in
 
     # Mask Ubuntu's default getty services by symlinking them to /dev/null
     # This prevents conflicts with our kmscon/greetd setup
-    # Revolutionary VT scheme: VT1-8 for kmscon console workspaces, VT9 for greetd
     systemd.tmpfiles.settings."10-mask-getty" = builtins.listToAttrs (
       map
         (tty: {
