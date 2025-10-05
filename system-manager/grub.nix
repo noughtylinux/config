@@ -13,6 +13,10 @@ let
   # Boot configuration from config.toml
   grubThemeEnabled = noughtyConfig.boot.grub_theme or true;
   grubTimeout = noughtyConfig.boot.grub_timeout or 5;
+  displayManagerEnabled = noughtyConfig.desktop.display-manager or true;
+
+  # Revolutionary VT allocation: VT9 for graphical when display manager enabled, VT1 otherwise
+  vtHandoff = if displayManagerEnabled then "9" else "1";
 
   # Use centralized VT color mapping from palette
   vtColorMap = palette.vtColorMap;
@@ -186,8 +190,8 @@ in
 
         # Dynamic Catppuccin kernel VT colors and console font
         # quiet loglevel=3 suppress EFI stub and early boot messages
-        # vt.handoff=9 enables smooth Plymouth transition to display manager on VT9
-        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet splash loglevel=3 vt.handoff=9 ${catppuccinKernelParams} ${kernelConsoleFontParam}"
+        # vt.handoff enables smooth Plymouth transition (VT9 for display manager, VT1 otherwise)
+        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet splash loglevel=3 vt.handoff=${vtHandoff} ${catppuccinKernelParams} ${kernelConsoleFontParam}"
       '';
 
       # Deploy console-setup configuration for initramfs
