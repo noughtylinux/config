@@ -84,7 +84,10 @@ lib.mkIf enabled {
       "noughty/greetd/config.toml" = {
         text = ''
           [terminal]
-          vt = 1
+          # Revolutionary VT allocation: VT9 for graphical session
+          # This allows VT1-8 to serve as console "workspaces" matching Hyprland's 8 workspaces
+          # Keyboard mapping: Ctrl+Alt+F1-F8 = console workspaces, Ctrl+Alt+F9 = graphical
+          vt = 9
 
           [default_session]
           command = "${greetdCommand}"

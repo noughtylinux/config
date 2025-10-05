@@ -9,28 +9,21 @@ let
   # Use Nixpkgs kmscon
   kmsconBin = "${pkgs.kmscon}/bin/kmscon";
 
-  # Check if display manager is enabled (if so, don't use tty1)
-  displayManagerEnabled = noughtyConfig.desktop.display-manager or true;
-
-  # TTY list - exclude tty1 if display manager is enabled
-  ttyList =
-    if displayManagerEnabled then
-      [
-        "tty2"
-        "tty3"
-        "tty4"
-        "tty5"
-        "tty6"
-      ]
-    else
-      [
-        "tty1"
-        "tty2"
-        "tty3"
-        "tty4"
-        "tty5"
-        "tty6"
-      ];
+  # Revolutionary VT allocation for workspace consistency:
+  # VT1-8: Console "workspaces" (8 total, matching desktop's 8 workspaces)
+  # VT9: Graphical session (greetd)
+  # This provides identical workspace capacity in console-only and graphical modes
+  # Keyboard mapping: Ctrl+Alt+F1-F8 = console workspaces, Ctrl+Alt+F9 = graphical
+  ttyList = [
+    "tty1"
+    "tty2"
+    "tty3"
+    "tty4"
+    "tty5"
+    "tty6"
+    "tty7"
+    "tty8"
+  ];
 
   # Access Catppuccin palette from noughtyConfig
   palette = noughtyConfig.catppuccin.palette;
@@ -133,6 +126,7 @@ in
 
     # Mask Ubuntu's default getty services by symlinking them to /dev/null
     # This prevents conflicts with our kmscon/greetd setup
+    # Revolutionary VT scheme: VT1-8 for kmscon console workspaces, VT9 for greetd
     systemd.tmpfiles.settings."10-mask-getty" = builtins.listToAttrs (
       map
         (tty: {
@@ -148,6 +142,9 @@ in
           "tty4"
           "tty5"
           "tty6"
+          "tty7"
+          "tty8"
+          "tty9"
         ]
     );
   };

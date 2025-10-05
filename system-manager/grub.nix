@@ -186,7 +186,8 @@ in
 
         # Dynamic Catppuccin kernel VT colors and console font
         # quiet loglevel=3 suppress EFI stub and early boot messages
-        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet splash loglevel=3 ${catppuccinKernelParams} ${kernelConsoleFontParam}"
+        # vt.handoff=9 enables smooth Plymouth transition to display manager on VT9
+        GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT quiet splash loglevel=3 vt.handoff=9 ${catppuccinKernelParams} ${kernelConsoleFontParam}"
       '';
 
       # Deploy console-setup configuration for initramfs
