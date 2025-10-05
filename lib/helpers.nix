@@ -4,7 +4,7 @@
   ...
 }:
 let
-  # Create nixpkgs instances with allowUnfree enabled
+  # Create nixpkgs instances with allowUnfree enabled and overlays applied
   pkgsFor =
     system:
     import inputs.nixpkgs {
@@ -12,6 +12,8 @@ let
       config = {
         allowUnfree = true;
       };
+      # Apply all overlays including local packages (kmscon, libtsm, etc.)
+      overlays = builtins.attrValues outputs.overlays;
     };
 in
 {
