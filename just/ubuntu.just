@@ -52,7 +52,9 @@ ubuntu-pre: _header _is_compatible _has_config
     if grep -q "vendor_id.*:.*GenuineIntel" /proc/cpuinfo; then
         if ! is_package_installed "thermald"; then
             PACKAGES_TO_INSTALL+=("thermald")
-        else
+        fi
+    else
+        if is_package_installed "thermald"; then
             PACKAGES_TO_REMOVE+=("thermald")
         fi
     fi
@@ -61,7 +63,9 @@ ubuntu-pre: _header _is_compatible _has_config
     if [ "$(grep -c "^processor" /proc/cpuinfo)" -gt 1 ]; then
         if ! is_package_installed "irqbalance"; then
             PACKAGES_TO_INSTALL+=("irqbalance")
-        else
+        fi
+    else
+        if is_package_installed "irqbalance"; then
             PACKAGES_TO_REMOVE+=("irqbalance")
         fi
     fi
