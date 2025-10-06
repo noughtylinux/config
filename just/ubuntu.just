@@ -32,8 +32,8 @@ ubuntu-pre: _header _is_compatible _has_config
     for PACKAGE in bluez cups dconf-gsettings-backend fontconfig fwupd \
         gstreamer1.0-pipewire libfdk-aac2 libldacbt-abr2 libldacbt-enc2 \
         libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack network-manager \
-        pipewire-audio-client-libraries plymouth-theme-spinner udisks2 \
-        whiptail wireplumber; do
+        pipewire-audio-client-libraries plymouth-theme-spinner power-profiles-daemon \
+        udisks2 whiptail wireplumber; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi
