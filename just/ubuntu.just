@@ -29,11 +29,11 @@ ubuntu-pre: _header _is_compatible _has_config
     done
 
     # Essential Ubuntu host packages that provide hardware support for Nix integration
-    for PACKAGE in bluez cups dconf-gsettings-backend fontconfig fwupd \
+    for PACKAGE in bluez cups dconf-gsettings-backend fontconfig fwupd geoclue-2.0 \
         gstreamer1.0-pipewire libfdk-aac2 libldacbt-abr2 libldacbt-enc2 \
         libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack network-manager \
         pipewire-audio-client-libraries plymouth-theme-spinner power-profiles-daemon \
-        udisks2 whiptail wireplumber; do
+        smartmontools udisks2 whiptail wireplumber; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi
@@ -43,6 +43,24 @@ ubuntu-pre: _header _is_compatible _has_config
     if tq -f config.toml desktop.display-manager &>/dev/null && [ "$(tq -f config.toml desktop.display-manager)" = "true" ]; then
         if ! is_package_installed "greetd"; then
             PACKAGES_TO_INSTALL+=("greetd")
+        fi
+    fi
+
+    # Install thermald for Intel CPUs
+    if grep -q "vendor_id.*:.*GenuineIntel" /proc/cpuinfo; then
+        if ! is_package_installed "thermald"; then
+            PACKAGES_TO_INSTALL+=("thermald")
+        else
+            PACKAGES_TO_REMOVE+=("thermald")
+        fi
+    fi
+
+    # Install irqbalance for multi-core CPUs
+    if [ "$(grep -c "^processor" /proc/cpuinfo)" -gt 1 ]; then
+        if ! is_package_installed "irqbalance"; then
+            PACKAGES_TO_INSTALL+=("irqbalance")
+        else
+            PACKAGES_TO_REMOVE+=("irqbalance")
         fi
     fi
 
