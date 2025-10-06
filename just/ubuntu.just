@@ -28,12 +28,14 @@ ubuntu-pre: _header _is_compatible _has_config
         fi
     done
 
-    # Essential Ubuntu host packages that provide hardware support for Nix integration
-    for PACKAGE in bluez cups dconf-gsettings-backend fontconfig fwupd geoclue-2.0 \
-        gstreamer1.0-pipewire libfdk-aac2 libldacbt-abr2 libldacbt-enc2 \
-        libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack network-manager \
-        pipewire-audio-client-libraries plymouth-theme-spinner power-profiles-daemon \
-        smartmontools udisks2 whiptail wireplumber; do
+    # Essential packages that provide the Ubuntu system boundary
+    for PACKAGE in avahi-daemon bluetooth bolt colord cups dconf-gsettings-backend \
+        dnsmasq-base fontconfig fwupd fwupd-signed geoclue-2.0 gvfs-backends \
+        iio-sensor-proxy libfdk-aac2 libmbim-utils libmtp-runtime libnss-mdns \
+        libpam-systemd libqmi-utils modemmanager network-manager pipewire-audio \
+        plymouth-theme-spinner polkitd power-profiles-daemon ppp secureboot-db \
+        smartmontools software-properties-common udisks2 usb-modeswitch whiptail \
+        wireless-regdb wpasupplicant; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
         fi
@@ -104,7 +106,7 @@ ubuntu-pre: _header _is_compatible _has_config
     if [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
         echo -e "{{GLYPH_UPDATE}}Installing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to install: ${PACKAGES_TO_INSTALL[*]}{{RESET}}"
-        sudo nala install --assume-yes --simple "${PACKAGES_TO_INSTALL[@]}"
+        sudo nala install --assume-yes --no-install-recommends --simple "${PACKAGES_TO_INSTALL[@]}"
         echo -e "{{SUCCESS}}Successfully installed ${#PACKAGES_TO_INSTALL[@]} packages!"
     fi
 

@@ -113,12 +113,6 @@ declarative configuration where it matters.
 
 **Defensive Installations:**
 
-**gvfs**
-- GNOME Virtual File System—provides virtual filesystem backends (MTP, SMB, archive mounting, etc.)
-- File managers and desktop environments commonly pull this in as a dependency
-- Installed via apt, but user services managed by Home Manager
-- Prevents "which gvfs is handling this mount?" confusion
-
 **mpris-proxy**
 - Bridges to MPRIS D-Bus media control interface
 - Allows media keys and desktop widgets to control PipeWire audio sources
@@ -128,6 +122,22 @@ declarative configuration where it matters.
 - PipeWire session manager, already in Ubuntu system boundary
 - Desktop packages often depend on wireplumber being present
 - Installing via apt prevents conflicts with packages that expect PipeWire integration
+
+## Ubuntu User-Space Infrastructure
+
+Some packages provide foundational user-space services that, while running per-user,
+are better managed by Ubuntu to prevent conflicts and ensure compatibility:
+
+**gvfs**
+- Virtual filesystem backends for file managers
+- Installed via apt, GIO modules referenced in Home Manager session variables
+- Prevents conflicts when installing GUI apps via apt
+- All applications (Nix or apt) use the same gvfs instance
+
+**Why Ubuntu?** These services are fundamental desktop infrastructure. Having a
+single, stable source prevents apt and Nix packages from fighting over the same
+user-space resources. Your Home Manager configuration still controls which backends
+are active via environment variables.
 
 ## Home Manager: User-Space Paradise
 

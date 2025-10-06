@@ -106,8 +106,18 @@ in
   };
 
   home = {
+    sessionPath = [
+      "/usr/lib/gvfs"
+    ];
     sessionVariables = {
       GDK_BACKEND = "wayland,x11";
+      GIO_EXTRA_MODULES =
+        if pkgs.stdenv.hostPlatform.isx86_64 then
+          "/usr/lib/x86_64-linux-gnu/gio/modules"
+        else if pkgs.stdenv.hostPlatform.isAarch64 then
+          "/usr/lib/aarch64-linux-gnu/gio/modules"
+        else
+          throw "Unsupported architecture for Ubuntu gvfs integration";
       MOZ_ENABLE_WAYLAND = "1";
       NIXOS_OZONE_WL = "1";
       QT_QPA_PLATFORM = "wayland;xcb";
