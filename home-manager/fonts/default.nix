@@ -9,7 +9,7 @@ let
 in
 {
   home = {
-    file.".config/fontconfig/fonts.conf".text = lib.mkIf fontsConfigure ''
+    file.".config/fontconfig/fonts.conf".text = ''
       <?xml version="1.0"?>
       <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
       <fontconfig>
@@ -54,7 +54,7 @@ in
   fonts = {
     fontconfig = {
       enable = true;
-      defaultFonts = lib.mkIf fontsConfigure {
+      defaultFonts = {
         serif = [
           "Source Serif"
           "Noto Color Emoji"
