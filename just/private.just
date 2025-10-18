@@ -37,7 +37,7 @@ _is_compatible:
 
     # Check for supported Ubuntu versions
     case "${VERSION_ID:-}" in
-        "24.04"|"25.04")
+        "24.04"|"25.04"|"25.10"|"26.04")
             echo -e "{{SUCCESS}}${NAME} ${VERSION_ID} is supported!"
             ;;
         *)
