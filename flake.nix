@@ -39,6 +39,7 @@
             pkgs.git
             pkgs.gnugrep
             pkgs.home-manager
+            pkgs.jq
             pkgs.just
             pkgs.nix-output-monitor
             pkgs.sd
