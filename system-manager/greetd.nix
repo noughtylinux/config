@@ -5,8 +5,7 @@
   ...
 }:
 let
-  enabled = noughtyConfig.desktop.display-manager or true;
-
+  enabled = if builtins.isString noughtyConfig.desktop.compositor then true else false;
   # Extract theming configuration
   flavor = noughtyConfig.catppuccin.flavor;
   accent = noughtyConfig.catppuccin.accent;

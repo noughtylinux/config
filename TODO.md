@@ -51,7 +51,7 @@
 - [x] Put guard rails up to prevent installing on Ubuntu Desktop
 - [x] Consolidate duplicated Ubuntu configuration tasks
 - [x] Plymouth
-- [ ] Add `[desktop]` section and use `shell` to enable desktop features
+- [x] Add `[desktop]` section and use `compositor` to enable desktop features
 - [x] Add `[boot]` section to set Kernel, GRUB and Plymouth options
 - [x] Pipewire & WirePlumber
 - [x] CUPS

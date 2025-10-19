@@ -14,19 +14,16 @@ microsoft-edge = false
 vivaldi = false
 
 [catppuccin]
-accent = "mauve"
+accent = "blue"
 flavor = "mocha"
-gtk = false
-qt = false
 
 [desktop]
-# Enable greetd display manager (defaults to true)
-display-manager = true
-# One of alacritty, foot, kitty
-terminal-emulator = "kitty"
+# Desktop compositor; one of "hyprland", "wayfire" or ""
+compositor = ""
 # Additional desktop packages to install via home-manager
 packages = []
-
+# One of alacritty, foot, kitty
+terminal-emulator = "kitty"
 
 [terminal]
 # Your preferred shell (bash, fish or zsh)

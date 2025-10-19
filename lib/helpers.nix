@@ -84,9 +84,15 @@ in
         "lavender"
       ];
 
+      # Valid desktop compositor options
+      validDesktopCompositors = [
+        "hyprland"
+        "wayfire"
+      ];
+
       # Extract Catppuccin palette with validation and fallback
       rawFlavor = baseConfig.catppuccin.flavor or "mocha";
-      rawAccent = baseConfig.catppuccin.accent or "mauve";
+      rawAccent = baseConfig.catppuccin.accent or "blue";
 
       # Validate flavor with warning and fallback to mocha
       catppuccinFlavor =
@@ -101,6 +107,18 @@ in
           rawAccent
         else
           builtins.trace "WARNING: Invalid Catppuccin accent '${rawAccent}'. Valid options: ${builtins.concatStringsSep ", " validAccents}. Falling back to 'mauve'." "mauve";
+
+      # Extract and validate desktop shell
+      rawDesktopCompositor = baseConfig.desktop.compositor or "";
+
+      # Validate desktop shell with warning and set to null if invalid or empty
+      desktopCompositor =
+        if rawDesktopCompositor == "" then
+          null
+        else if builtins.elem rawDesktopCompositor validDesktopCompositors then
+          rawDesktopCompositor
+        else
+          builtins.trace "WARNING: Invalid desktop compositor '${rawDesktopCompositor}'. Valid options: ${builtins.concatStringsSep ", " validDesktopCompositors}. Desktop features will be disabled." null;
 
       # Read palette.json from catppuccin package
       paletteJson = builtins.fromJSON (
@@ -212,11 +230,14 @@ in
         );
       };
     in
-    # Return base config with palette embedded
+    # Return base config with palette embedded and validated desktop shell
     baseConfig
     // {
       catppuccin = (baseConfig.catppuccin or { }) // {
         palette = catppuccinPalette;
+      };
+      desktop = (baseConfig.desktop or { }) // {
+        compositor = desktopCompositor;
       };
     };
 
