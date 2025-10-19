@@ -137,7 +137,7 @@ let
         buildInputs = [ pkgs.imagemagick ];
       }
       ''
-        convert -size 640x480 "xc:${palette.getColor "base"}" -depth 8 PNG8:$out
+        magick convert -size 640x480 "xc:${palette.getColor "base"}" -depth 8 PNG8:$out
       '';
 
   # Generate selection graphics using ImageMagick for GRUB-compatible PNG
@@ -148,7 +148,7 @@ let
         buildInputs = [ pkgs.imagemagick ];
       }
       ''
-        convert -size 8x36 "xc:${palette.getColor "surface1"}" -depth 8 PNG8:$out
+        magick convert -size 8x36 "xc:${palette.getColor "surface1"}" -depth 8 PNG8:$out
       '';
 
   selectEPng =
@@ -157,7 +157,7 @@ let
         buildInputs = [ pkgs.imagemagick ];
       }
       ''
-        convert -size 5x36 "xc:${palette.getColor "surface1"}" -depth 8 PNG8:$out
+        magick convert -size 5x36 "xc:${palette.getColor "surface1"}" -depth 8 PNG8:$out
       '';
 
   selectWPng =
@@ -166,7 +166,7 @@ let
         buildInputs = [ pkgs.imagemagick ];
       }
       ''
-        convert -size 5x36 "xc:${palette.getColor "surface1"}" -depth 8 PNG8:$out
+        magick convert -size 5x36 "xc:${palette.getColor "surface1"}" -depth 8 PNG8:$out
       '';
 in
 {
