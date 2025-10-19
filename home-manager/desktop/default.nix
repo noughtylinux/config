@@ -7,46 +7,23 @@
 }:
 let
   buttonLayout =
-    if config.wayland.windowManager.hyprland.enable then "appmenu" else "close,minimize,maximize";
+    if config.wayland.windowManager.hyprland.enable then ":appmenu" else ":close,minimize,maximize";
   clockFormat = "24h";
   cursorSize = 32;
   desktopCompositor = noughtyConfig.desktop.compositor;
-  blues = [
-    "blue"
-    "sky"
-    "sapphire"
-    "lavender"
-  ];
-  pinks = [
-    "pink"
-    "rosewater"
-    "flamingo"
-  ];
-  reds = [
-    "red"
-    "maroon"
-  ];
-  themeAccent =
-    if lib.elem noughtyConfig.catppuccin.accent blues then
-      ""
-    else if noughtyConfig.catppuccin.accent == "green" then
-      "-Green"
-    else if noughtyConfig.catppuccin.accent == "peach" then
-      "-Orange"
-    else if lib.elem noughtyConfig.catppuccin.accent pinks then
-      "-Pink"
-    else if noughtyConfig.catppuccin.accent == "mauve" then
-      "-Purple"
-    else if lib.elem noughtyConfig.catppuccin.accent reds then
-      "-Red"
-    else if noughtyConfig.catppuccin.accent == "teal" then
-      "-Teal"
-    else if noughtyConfig.catppuccin.accent == "yellow" then
-      "-Yellow"
-    else
-      "";
-  themeShade = if noughtyConfig.catppuccin.palette.isDark then "-Dark" else "-Light";
-  gtkThemeName = "Colloid${themeAccent}${themeShade}-Catppuccin";
+  gtkThemeName = "catppuccin-${config.catppuccin.flavor}-${config.catppuccin.accent}-standard";
+  gtkThemePackage = (
+    pkgs.catppuccin-gtk.override {
+      accents = [ "${config.catppuccin.accent}" ];
+      size = "standard";
+      variant = config.catppuccin.flavor;
+    }
+  );
+  iconThemeName = if noughtyConfig.catppuccin.palette.isDark then "Papirus-Dark" else "Papirus-Light";
+  iconThemePackage = pkgs.catppuccin-papirus-folders.override {
+    flavor = config.catppuccin.flavor;
+    accent = config.catppuccin.accent;
+  };
   preferDark = noughtyConfig.catppuccin.palette.isDark;
   preferDarkDconf = if preferDark then "prefer-dark" else "prefer-light";
   preferDarkStr = if preferDark then "1" else "0";
@@ -82,9 +59,9 @@ in
       ./apps/browser
       ./apps/terminal
     ]
-    ++ lib.optional (builtins.pathExists (
-      ./. + "compositor/${desktopCompositor}"
-    )) ./compositor/${desktopCompositor};
+    ++ lib.optional (builtins.pathExists (./. + "/compositor/${desktopCompositor}")) (
+      ./. + "/compositor/${desktopCompositor}"
+    );
 
   # Gate all desktop configuration on compositor being set
   config = lib.mkIf (desktopCompositor != null) {
@@ -185,27 +162,12 @@ in
         };
       };
       iconTheme = {
-        name = "Papirus-Dark";
-        package = pkgs.catppuccin-papirus-folders.override {
-          flavor = config.catppuccin.flavor;
-          accent = config.catppuccin.accent;
-        };
+        name = iconThemeName;
+        package = iconThemePackage;
       };
       theme = {
         name = gtkThemeName;
-        package = pkgs.unstable.colloid-gtk-theme.override {
-          colorVariants = [
-            "standard"
-            "light"
-            "dark"
-          ];
-          sizeVariants = [
-            "standard"
-            "compact"
-          ];
-          themeVariants = [ "all" ];
-          tweaks = [ "catppuccin" ];
-        };
+        package = gtkThemePackage;
       };
     };
 

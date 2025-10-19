@@ -13,17 +13,24 @@ let
   palette = noughtyConfig.catppuccin.palette;
 
   # Build cursor package name
-  cursorPackage =
+  cursorThemeName = "catppuccin-${flavor}-${accent}-cursors";
+  cursorThemePackage =
     pkgs.catppuccin-cursors."${flavor}${lib.toUpper (builtins.substring 0 1 accent)}${
       builtins.substring 1 (-1) accent
     }";
+  gtkThemeName = "catppuccin-${flavor}-${accent}-standard";
   gtkThemePackage = (
     pkgs.catppuccin-gtk.override {
       accents = [ "${accent}" ];
+      size = "standard";
       variant = flavor;
     }
   );
-  iconTheme = if isDark then "Papirus-Dark" else "Papirus-Light";
+  iconThemeName = if noughtyConfig.catppuccin.palette.isDark then "Papirus-Dark" else "Papirus-Light";
+  iconThemePackage = pkgs.catppuccin-papirus-folders.override {
+    inherit flavor;
+    inherit accent;
+  };
 
   # Create Hyprland wrapper with logging
   hyprlandWrapper = pkgs.writeShellScript "hyprland-wrapper" ''
@@ -67,10 +74,10 @@ let
       ${pkgs.coreutils}/bin/mv "$LOG_FILE" "$LOG_FILE.1"
     fi
 
-    export GTK_THEME="catppuccin-${flavor}-${accent}-standard"
-    export XCURSOR_THEME="catppuccin-${flavor}-${accent}-cursors"
+    export GTK_THEME="${gtkThemeName}"
+    export XCURSOR_THEME="${cursorThemeName}"
     export XCURSOR_SIZE="32"
-    export XDG_DATA_DIRS="${gtkThemePackage}/share:${cursorPackage}/share:${pkgs.papirus-icon-theme}/share:$XDG_DATA_DIRS"
+    export XDG_DATA_DIRS="${gtkThemePackage}/share:${cursorThemePackage}/share:${iconThemePackage}/share:$XDG_DATA_DIRS"
     exec ${pkgs.cage}/bin/cage -s -- dbus-run-session ${pkgs.greetd.regreet}/bin/regreet --config /etc/noughty/greetd/regreet.toml --logs "$LOG_FILE" --log-level info
   '';
 
@@ -103,10 +110,10 @@ lib.mkIf enabled {
 
           [GTK]
           application_prefer_dark_theme = ${lib.boolToString isDark}
-          cursor_theme_name = "catppuccin-${flavor}-${accent}-cursors"
+          cursor_theme_name = "${cursorThemeName}"
           font_name = "Work Sans 16"
-          icon_theme_name = "${iconTheme}"
-          theme_name = "catppuccin-${flavor}-${accent}-standard"
+          icon_theme_name = "${iconThemeName}"
+          theme_name = "${gtkThemeName}"
 
           [commands]
           reboot = ["systemctl", "reboot"]
@@ -136,13 +143,11 @@ lib.mkIf enabled {
     };
 
     systemPackages = [
+      cursorThemePackage
+      gtkThemePackage
+      iconThemePackage
       pkgs.greetd.regreet
       pkgs.cage
-      gtkThemePackage
-      pkgs.catppuccin-cursors."${flavor}${lib.toUpper (builtins.substring 0 1 accent)}${
-        builtins.substring 1 (-1) accent
-      }"
-      pkgs.papirus-icon-theme
     ];
   };
 }
