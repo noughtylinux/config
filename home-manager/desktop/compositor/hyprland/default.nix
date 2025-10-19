@@ -47,7 +47,9 @@ in
       bindm = [
         # Move windows with AltGr + LMB (for lefties) and $mod + LMB
         "$mod, mouse:272, movewindow"
+        "$mod, mouse:273, resizewindow"
         "Mod5, mouse:272, movewindow"
+        "Mod5, mouse:273, resizewindow"
       ];
       bind = [
         "CTRL ALT, Q, exit"
@@ -142,7 +144,7 @@ in
         };
       };
       exec-once = [
-        #"hypr-session start"
+        "dconf write /org/gnome/desktop/wm/preferences/button-layout \"':appmenu'\""
       ];
       general = {
         gaps_in = 5;
