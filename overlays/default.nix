@@ -7,6 +7,16 @@
   # Change versions, add patches, set compilation flags, anything really.
   # https://nixos.wiki/wiki/Overlays
   modifiedPackages = _final: prev: {
+    wf-config = prev.wf-config.overrideAttrs (oldAttrs: rec {
+      pname = "wf-config";
+      version = "0.10.0";
+      src = prev.fetchFromGitHub {
+        owner = "WayfireWM";
+        repo = "wf-config";
+        rev = "v${version}";
+        hash = "sha256-WcGt6yl2LpLnAOVtiCyMyWsoMAUMG1MYhvW/m2DDMX4=";
+      };
+    });
     # Override rofi-unwrapped to remove desktop entries (this is where they come from!)
     rofi-unwrapped = prev.rofi-unwrapped.overrideAttrs (oldAttrs: {
       postInstall = (oldAttrs.postInstall or "") + ''

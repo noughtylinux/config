@@ -28,24 +28,21 @@
   # https://github.com/killown/wayfire-rs
   # https://github.com/AR-CADE/wayfire-ipc
   # https://github.com/bluebyt/Wayfire-dots/tree/main/.config/ipc-scripts
-  # TODO: pixdecor
-  # https://github.com/soreau/pixdecor
-  # https://github.com/NixOS/nixpkgs/pull/355376
-  # https://github.com/NixOS/nixpkgs/pull/355376#issuecomment-3290317610
-  # TODO: Wayfire 0.10.0
+  # TODO: Wayfire
   # Integrate this patch for colour picking support
   # https://github.com/WayfireWM/wayfire/pull/2852
   wayland.windowManager.wayfire = {
     enable = true;
     plugins = with pkgs.wayfirePlugins; [
+      pixdecor
       wcm
       wayfire-plugins-extra
     ];
     settings = {
       # Window animations
       animate = {
-        open_animation = "zoom";
-        close_animation = "zoom";
+        open_animation = "zap";
+        close_animation = "spin";
         duration = 300;
       };
       autostart = {
@@ -66,16 +63,18 @@
         command_next = "${lib.getExe pkgs.playerctl} next";
       };
       core = {
+        #plugins = "animate autostart blur command foreign-toplevel grid gtk-shell idle ipc ipc-rules move pixdecor place resize session-lock switcher vswitch wm-actions wobbly xdg-activation";
         plugins = "animate autostart blur command decoration foreign-toplevel grid gtk-shell idle ipc ipc-rules move place resize session-lock switcher vswitch wm-actions wobbly xdg-activation";
         vwidth = 8;
         vheight = 1;
+        preferred_decoration_mode = "client";
       };
       # Window decorations (title bars, borders)
       decoration = {
         # Active window: use crust colour for visibility against surface
         active_color =
           let
-            hex = noughtyConfig.catppuccin.palette.getColor "crust";
+            hex = noughtyConfig.catppuccin.palette.getColor "mantle";
             r = builtins.substring 1 2 hex;
             g = builtins.substring 3 2 hex;
             b = builtins.substring 5 2 hex;
@@ -95,8 +94,77 @@
           "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
         button_order = "minimize maximize close";
         border_size = 2;
-        font = "Work Sans 10 Bold";
+        font = "Work Sans Medium";
         title_height = 32;
+      };
+      pixdecor = {
+        border_size = 2;
+        # Color when focused
+        fg_color =
+          let
+            hex = noughtyConfig.catppuccin.palette.getColor "mantle";
+            r = builtins.substring 1 2 hex;
+            g = builtins.substring 3 2 hex;
+            b = builtins.substring 5 2 hex;
+            toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
+          in
+          "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
+        # Color when not focused
+        bg_color =
+          let
+            hex = noughtyConfig.catppuccin.palette.getColor "base";
+            r = builtins.substring 1 2 hex;
+            g = builtins.substring 3 2 hex;
+            b = builtins.substring 5 2 hex;
+            toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
+          in
+          "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
+        fg_text_color =
+          let
+            hex = noughtyConfig.catppuccin.palette.getColor "text";
+            r = builtins.substring 1 2 hex;
+            g = builtins.substring 3 2 hex;
+            b = builtins.substring 5 2 hex;
+            toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
+          in
+          "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
+        # Color when not focused
+        bg_text_color =
+          let
+            hex = noughtyConfig.catppuccin.palette.getColor "subtext0";
+            r = builtins.substring 1 2 hex;
+            g = builtins.substring 3 2 hex;
+            b = builtins.substring 5 2 hex;
+            toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
+          in
+          "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
+        overlay_engine = "rounded_corners";
+        #rounded_corner_radius = 4;
+        always_decorate = "(app_id is \"kitty\")";
+        #shadow_radius = 8;
+        csd_titlebar_height = 32;
+        shadow_color =
+          let
+            hex = noughtyConfig.catppuccin.palette.getColor "crust";
+            r = builtins.substring 1 2 hex;
+            g = builtins.substring 3 2 hex;
+            b = builtins.substring 5 2 hex;
+            toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
+          in
+          "${toFloat r} ${toFloat g} ${toFloat b} 0.6";
+        effect_type = "smoke";
+        effect_color =
+          let
+            hex = noughtyConfig.catppuccin.palette.getColor noughtyConfig.catppuccin.accent;
+            r = builtins.substring 1 2 hex;
+            g = builtins.substring 3 2 hex;
+            b = builtins.substring 5 2 hex;
+            toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
+          in
+          "${toFloat r} ${toFloat g} ${toFloat b} 0.6";
+        button_layout = ":minimize,maximize,close";
+        title_text_align = 1; # Centered
+        title_font = "Work Sans 10";
       };
       # Grid snapping - position windows in screen regions
       grid = {

@@ -9,6 +9,13 @@ let
   selectedShell = noughtyConfig.terminal.shell or "bash";
   shellArgs = if selectedShell == "fish" || selectedShell == "zsh" then "--interactive" else "";
   terminalEmulator = noughtyConfig.desktop.terminal-emulator or "";
+  windowDecorations =
+    if config.wayland.windowManager.wayfire.enable then
+      "Full"
+    else if config.wayland.windowManager.hyprland.enable then
+      "None"
+    else
+      "Full";
 in
 lib.mkIf (terminalEmulator == "alacritty") {
   catppuccin = {
@@ -73,7 +80,7 @@ lib.mkIf (terminalEmulator == "alacritty") {
           };
         };
         window = {
-          decorations = if config.wayland.windowManager.hyprland.enable then "None" else "Full";
+          decorations = windowDecorations;
           dimensions = {
             columns = 132;
             lines = 50;
