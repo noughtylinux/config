@@ -166,9 +166,10 @@ ubuntu-post:
     sudo fc-cache --system-only --really-force
     echo -e "{{SUCCESS}}Font cache updated!"
 
-    # Configure greetd service based on desktop shell setting
-    if tq -f config.toml desktop.compositor &>/dev/null && [ -n "$(tq -f config.toml desktop.compositor)" ]; then
-        echo -e "{{GLYPH_SCREEN}}Configuring greetd display manager..."
+    # Configure greetd service based on desktop compositor setting
+    DESKTOP_COMPOSITOR=$(tq -f config.toml desktop.compositor 2>/dev/null || echo "")
+    if [ -n "$DESKTOP_COMPOSITOR" ]; then
+        echo -e "{{GLYPH_SCREEN}}Configuring greetd display manager for ${DESKTOP_COMPOSITOR}..."
 
         # Use dpkg-divert to safely override the package-managed config file
         if [ -f /etc/noughty/greetd/config.toml ]; then
@@ -181,18 +182,25 @@ ubuntu-post:
             sudo cp -L /etc/noughty/greetd/config.toml /etc/greetd/config.toml
         fi
 
-        # Deploy Wayland session desktop file for greeter discovery
-        if [ -f /etc/noughty/greetd/hyprland.desktop ]; then
-            echo -e "{{GLYPH_DESKTOP}}Deploying Wayland session file..."
-            sudo mkdir -p /usr/share/wayland-sessions
-            sudo cp -L /etc/noughty/greetd/hyprland.desktop /usr/share/wayland-sessions/noughty-hyprland.desktop
+        # Clean up any existing noughty wayland session files
+        sudo rm -f /usr/share/wayland-sessions/noughty-*.desktop 2>/dev/null || true
+
+        # Deploy Wayland session desktop file for the configured compositor
+        if [ -f "/etc/noughty/greetd/${DESKTOP_COMPOSITOR}.desktop" ]; then
+            echo -e "{{GLYPH_DESKTOP}}Deploying Wayland session for ${DESKTOP_COMPOSITOR}..."
+            sudo mkdir -p /usr/share/wayland-sessions 2>/dev/null || true
+            sudo cp -L "/etc/noughty/greetd/${DESKTOP_COMPOSITOR}.desktop" "/usr/share/wayland-sessions/noughty-${DESKTOP_COMPOSITOR}.desktop"
             echo -e "{{SUCCESS}}Wayland session file deployed!"
+        else
+            echo -e "{{WARNING}}No session file found for compositor: ${DESKTOP_COMPOSITOR}"
         fi
 
         # Enable and start greetd service
         sudo systemctl enable greetd.service &>/dev/null || true
         echo -e "{{SUCCESS}}greetd display manager configured and enabled."
     else
+        # Clean up wayland session files and disable greetd
+        sudo rm -f /usr/share/wayland-sessions/noughty-*.desktop 2>/dev/null || true
         # Only disable/stop greetd if it's currently enabled
         if systemctl is-enabled greetd.service &>/dev/null; then
             echo -e "{{GLYPH_SCREEN}}Disabling greetd display manager..."

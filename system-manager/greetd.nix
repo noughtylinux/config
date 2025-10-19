@@ -6,6 +6,13 @@
 }:
 let
   enabled = if builtins.isString noughtyConfig.desktop.compositor then true else false;
+  compositorExecutable =
+    if noughtyConfig.desktop.compositor == "hyprland" then
+      "${pkgs.hyprland}/bin/Hyprland"
+    else if noughtyConfig.desktop.compositor == "wayfire" then
+      "${pkgs.wayfire}/bin/wayfire"
+    else
+      throw "Unsupported compositor: ${noughtyConfig.desktop.compositor}";
   # Extract theming configuration
   flavor = noughtyConfig.catppuccin.flavor;
   accent = noughtyConfig.catppuccin.accent;
@@ -32,13 +39,13 @@ let
     inherit accent;
   };
 
-  # Create Hyprland wrapper with logging
-  hyprlandWrapper = pkgs.writeShellScript "hyprland-wrapper" ''
+  # Create compositor wrapper with logging
+  compositorWrapper = pkgs.writeShellScript "compositor-wrapper" ''
     # Clear screen with Catppuccin background color using ANSI escape sequences
     printf '\033]11;${palette.getColor "base"}\007\033[2J\033[H'
 
-    LOG_DIR="${noughtyConfig.user.home}/.local/state/hyprland"
-    LOG_FILE="$LOG_DIR/hyprland.log"
+    LOG_DIR="${noughtyConfig.user.home}/.local/state/${noughtyConfig.desktop.compositor}"
+    LOG_FILE="$LOG_DIR/${noughtyConfig.desktop.compositor}.log"
     mkdir -p "$LOG_DIR"
     if [ -f "$LOG_FILE" ]; then
       for i in 9 8 7 6 5 4 3 2 1; do
@@ -49,12 +56,12 @@ let
       ${pkgs.coreutils}/bin/mv "$LOG_FILE" "$LOG_FILE.1"
     fi
 
-    echo "[$(${pkgs.coreutils}/bin/date '+%Y-%m-%d %H:%M:%S')] Starting Hyprland" | ${pkgs.coreutils}/bin/tee -a "$LOG_FILE"
+    echo "[$(${pkgs.coreutils}/bin/date '+%Y-%m-%d %H:%M:%S')] Starting ${noughtyConfig.desktop.compositor}" | ${pkgs.coreutils}/bin/tee -a "$LOG_FILE"
 
-    ${pkgs.expect}/bin/unbuffer ${pkgs.hyprland}/bin/Hyprland "$@" 2>&1 | ${pkgs.coreutils}/bin/tee -a "$LOG_FILE" &>/dev/null
+    ${pkgs.expect}/bin/unbuffer ${compositorExecutable} "$@" 2>&1 | ${pkgs.coreutils}/bin/tee -a "$LOG_FILE" &>/dev/null
     EXIT_CODE=$?
 
-    echo "[$(${pkgs.coreutils}/bin/date '+%Y-%m-%d %H:%M:%S')] Hyprland exited with code $EXIT_CODE" | ${pkgs.coreutils}/bin/tee -a "$LOG_FILE"
+    echo "[$(${pkgs.coreutils}/bin/date '+%Y-%m-%d %H:%M:%S')] ${noughtyConfig.desktop.compositor} exited with code $EXIT_CODE" | ${pkgs.coreutils}/bin/tee -a "$LOG_FILE"
     exit $EXIT_CODE
   '';
 
@@ -91,7 +98,7 @@ lib.mkIf enabled {
         text = ''
           [terminal]
           # Revolutionary VT allocation: VT9 for graphical session
-          # This allows VT1-8 to serve as console "workspaces" matching Hyprland's 8 workspaces
+          # This allows VT1-8 to serve as console "workspaces" matching desktop's 8 workspaces
           # Keyboard mapping: Ctrl+Alt+F1-F8 = console workspaces, Ctrl+Alt+F9 = graphical
           vt = 9
 
@@ -129,15 +136,25 @@ lib.mkIf enabled {
         '';
       };
 
-      # Create Wayland session desktop file for Hyprland
-      "noughty/greetd/hyprland.desktop" = {
+      # Create Wayland desktop session files
+      "noughty/greetd/hyprland.desktop" = lib.mkIf (noughtyConfig.desktop.compositor == "hyprland") {
         text = ''
           [Desktop Entry]
           Name=Nøughty Hyprland
           Comment=An intelligent dynamic tiling Wayland compositor
-          Exec=${hyprlandWrapper}
+          Exec=${compositorWrapper}
           Type=Application
           DesktopNames=Hyprland
+        '';
+      };
+      "noughty/greetd/wayfire.desktop" = lib.mkIf (noughtyConfig.desktop.compositor == "wayfire") {
+        text = ''
+          [Desktop Entry]
+          Name=Nøughty Wayfire
+          Comment=3D Wayland compositor
+          Exec=${compositorWrapper}
+          Type=Application
+          DesktopNames=Wayfire
         '';
       };
     };
