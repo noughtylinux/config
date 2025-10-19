@@ -15,6 +15,13 @@ lib.mkIf (terminalEmulator == "alacritty") {
     alacritty.enable = config.programs.alacritty.enable;
   };
 
+  # User specific dconf terminal-related settings
+  dconf.settings = with lib.hm.gvariant; {
+    "com/github/stunkymonkey/nautilus-open-any-terminal" = {
+      terminal = "${pkgs.alacritty}/bin/alacritty";
+    };
+  };
+
   programs = {
     alacritty = {
       enable = true;
@@ -88,11 +95,22 @@ lib.mkIf (terminalEmulator == "alacritty") {
     };
   };
 
-  wayland.windowManager.hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
-    settings = {
-      bind = [
-        "$mod, T, exec, ${pkgs.alacritty}/bin/alacritty"
-      ];
+  wayland.windowManager = {
+    hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
+      settings = {
+        bind = [
+          "$mod, T, exec, ${pkgs.alacritty}/bin/alacritty"
+        ];
+      };
+    };
+    wayfire = lib.mkIf config.wayland.windowManager.wayfire.enable {
+      settings = {
+        command = {
+          # Super+T launches a terminal
+          binding_terminal = "<super> KEY_T";
+          command_terminal = "${pkgs.alacritty}/bin/alacritty";
+        };
+      };
     };
   };
 

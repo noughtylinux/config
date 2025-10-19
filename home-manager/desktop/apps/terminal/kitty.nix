@@ -15,6 +15,13 @@ lib.mkIf (terminalEmulator == "kitty") {
     kitty.enable = config.programs.kitty.enable;
   };
 
+  # User specific dconf terminal-related settings
+  dconf.settings = with lib.hm.gvariant; {
+    "com/github/stunkymonkey/nautilus-open-any-terminal" = {
+      terminal = "${pkgs.kitty}/bin/kitty --single-instance";
+    };
+  };
+
   programs = {
     kitty = {
       enable = true;
@@ -67,11 +74,22 @@ lib.mkIf (terminalEmulator == "kitty") {
     };
   };
 
-  wayland.windowManager.hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
-    settings = {
-      bind = [
-        "$mod, T, exec, ${pkgs.kitty}/bin/kitty --single-instance"
-      ];
+  wayland.windowManager = {
+    hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
+      settings = {
+        bind = [
+          "$mod, T, exec, ${pkgs.kitty}/bin/kitty --single-instance"
+        ];
+      };
+    };
+    wayfire = lib.mkIf config.wayland.windowManager.wayfire.enable {
+      settings = {
+        command = {
+          # Super+T launches a terminal
+          binding_terminal = "<super> KEY_T";
+          command_terminal = "${pkgs.kitty}/bin/kitty --single-instance";
+        };
+      };
     };
   };
 

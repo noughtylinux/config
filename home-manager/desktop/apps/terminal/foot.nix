@@ -15,6 +15,13 @@ lib.mkIf (terminalEmulator == "foot") {
     foot.enable = config.programs.foot.enable;
   };
 
+  # User specific dconf terminal-related settings
+  dconf.settings = with lib.hm.gvariant; {
+    "com/github/stunkymonkey/nautilus-open-any-terminal" = {
+      terminal = "${pkgs.foot}/bin/foot";
+    };
+  };
+
   programs = {
     foot = {
       enable = true;
@@ -45,11 +52,22 @@ lib.mkIf (terminalEmulator == "foot") {
     };
   };
 
-  wayland.windowManager.hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
-    settings = {
-      bind = [
-        "$mod, T, exec, ${pkgs.foot}/bin/foot"
-      ];
+  wayland.windowManager = {
+    hyprland = lib.mkIf config.wayland.windowManager.hyprland.enable {
+      settings = {
+        bind = [
+          "$mod, T, exec, ${pkgs.foot}/bin/foot"
+        ];
+      };
+    };
+    wayfire = lib.mkIf config.wayland.windowManager.wayfire.enable {
+      settings = {
+        command = {
+          # Super+T launches a terminal
+          binding_terminal = "<super> KEY_T";
+          command_terminal = "$${pkgs.foot}/bin/foot";
+        };
+      };
     };
   };
 
