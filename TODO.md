@@ -86,7 +86,7 @@
 - [x] XDG Desktop Portals
 - [x] User defined packages to install
 - [x] User owned custom Nix config
-- [x] Pin Nixpkgs in `nosh` et al to the stable channel
+- [x] Pin Nixpkgs to the stable channel
 - [ ] Create `nash` a Nix hash getter
 
 ## System Manager
@@ -102,7 +102,7 @@
 - [x] Fix `sudo` finding executables from the user profile
 - [x] Fix kmscon restart on theme change
 - [x] Fix kernel VT colour not preserving on reboot/shutdown
-- [ ] Enable mouse support in kmscon
+- [ ] Enable mouse support in kmscon; *requires upstream contributions*
 
 ## Helpers
 

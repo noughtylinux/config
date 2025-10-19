@@ -101,7 +101,7 @@ _is_ubuntu_server:
                 echo -e "{{GLYPH_FLAG_BLUE}}Proceeding with system checks..."
             fi
         else
-            echo -e "{{SUCCESS}}Nøughty Linux already activated - skipping desktop checks"
+            echo -e "{{SUCCESS}}Nøughty Linux already activated - skipping Ubuntu desktop checks"
             exit 0
         fi
     fi
