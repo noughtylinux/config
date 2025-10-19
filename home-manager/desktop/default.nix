@@ -36,21 +36,41 @@ let
   # Packages whose D-Bus configuration files should be included in the
   # configuration of the D-Bus session-wide message bus.
   dbusPackages = with pkgs; [
-    celluloid # video player
-    dconf-editor # dconf GUI editor
-    decibels # audio player
-    file-roller # archive manager
+    baobab
+    celluloid
+    dconf-editor
+    decibels
+    file-roller
     gcr # pinentry-gnome3 may not work on non-GNOME systems, without gcr registered on D-Bus
     gnome-calculator
+    gnome-calendar
+    gnome-characters
+    gnome-clocks
     gnome-disk-utility
     gnome-font-viewer
-    loupe # image viewer
-    nautilus # file manager
-    papers # document viewer
-    resources # monitor system resources
-    seahorse # GNOME keyring
-    system-config-printer # printer configuration
-    sushi # file previewer
+    gnome-logs
+    gnome-maps
+    gnome-text-editor
+    gnome-weather
+    loupe
+    nautilus
+    papers
+    resources
+    seahorse
+    snapshot
+    system-config-printer
+    sushi
+  ];
+  # Packages without D-Bus configuration files to include in the desktop environment
+  desktopPackages = with pkgs; [
+    gnome-firmware
+    gnome-music
+    gnome-network-displays
+    impression
+    overskride
+    pwvucontrol
+    simple-scan
+    sticky-notes
   ];
 in
 {
@@ -113,6 +133,37 @@ in
     };
 
     home = {
+      packages =
+        with pkgs;
+        [
+          (catppuccin-kvantum.override {
+            accent = config.catppuccin.accent;
+            variant = config.catppuccin.flavor;
+          })
+          kdePackages.qt6ct
+          kdePackages.qtstyleplugin-kvantum
+          libsForQt5.qt5ct
+          libsForQt5.qtstyleplugin-kvantum
+          nautilus-python
+          nautilus-open-any-terminal
+          wdisplays
+          wlr-randr
+          wl-clipboard
+          wtype
+        ]
+        ++ (map (pkg: pkgs.${pkg}) (noughtyConfig.desktop.packages or [ ]))
+        ++ dbusPackages
+        ++ desktopPackages;
+      pointerCursor = {
+        dotIcons.enable = true;
+        gtk.enable = true;
+        hyprcursor = {
+          enable = config.wayland.windowManager.hyprland.enable;
+          size = cursorSize;
+        };
+        size = cursorSize;
+        x11.enable = true;
+      };
       sessionPath = [
         "/usr/lib/gvfs"
       ];
@@ -168,44 +219,6 @@ in
       theme = {
         name = gtkThemeName;
         package = gtkThemePackage;
-      };
-    };
-
-    home = {
-      packages =
-        with pkgs;
-        [
-          (catppuccin-kvantum.override {
-            accent = config.catppuccin.accent;
-            variant = config.catppuccin.flavor;
-          })
-          gnome-firmware
-          kdePackages.qt6ct
-          kdePackages.qtstyleplugin-kvantum
-          libsForQt5.qt5ct
-          libsForQt5.qtstyleplugin-kvantum
-          nautilus-python
-          nautilus-open-any-terminal
-          overskride
-          pwvucontrol
-          simple-scan
-          wdisplays
-          wlr-randr
-          wl-clipboard
-          wtype
-        ]
-        ++ (map (pkg: pkgs.${pkg}) (noughtyConfig.desktop.packages or [ ]))
-        ++ dbusPackages;
-
-      pointerCursor = {
-        dotIcons.enable = true;
-        gtk.enable = true;
-        hyprcursor = {
-          enable = config.wayland.windowManager.hyprland.enable;
-          size = cursorSize;
-        };
-        size = cursorSize;
-        x11.enable = true;
       };
     };
 
