@@ -69,6 +69,10 @@
 - [x] Expose Catppuccin colors to use in other themes
 - [ ] What existing style/theme modules might be suitable?
 
+## Overlays / Packages
+
+- [x] Bundle Catppuccin GTK 1.04
+
 ## Home Manager
 
 - [x] Add atuin
