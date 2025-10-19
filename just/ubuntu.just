@@ -355,4 +355,3 @@ install-nala:
 
     rm -f "$error_log"
     echo -e "{{SUCCESS}}nala package manager installed successfully."
-

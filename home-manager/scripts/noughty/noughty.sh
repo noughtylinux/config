@@ -8,14 +8,14 @@ show_help() {
     cat << 'EOF'
 Usage: noughty <command> [args...]
 
-Noughty Linux utility collection - tools for working with Nix on Ubuntu.
+Nøughty Linux utility collection - tools for working with Nix.
 
 Commands:
-  path <executable>           Show the Nix store path for an executable (was: nook)
-  run [--unstable] <package>  Run a single package from Nixpkgs (was: nout)
-  shell [--unstable] <pkg...> Spawn shell with multiple packages (was: nosh)
-  channel                     Show current stable Nixpkgs channel (was: norm)
-  spawn <program> [args...]   Launch program detached from session (was: nope)
+  path <executable>           Show the Nix store path for an executable
+  run [--unstable] <package>  Run a single package from Nixpkgs
+  shell [--unstable] <pkg...> Spawn shell with multiple packages
+  channel                     Show current stable Nixpkgs channel
+  spawn <program> [args...]   Launch program detached from session
 
 Options:
   -h, --help                  Show this help message
@@ -27,8 +27,6 @@ Examples:
   noughty shell git vim       # Shell with git and vim
   noughty channel             # Show current stable channel
   noughty spawn firefox       # Launch firefox detached
-
-For detailed help on each command, see the individual tool documentation.
 EOF
 }
 
@@ -182,6 +180,7 @@ EOF
 
     # Get main program name
     local main_program
+    echo "Determining main program for '$package_name' from '$nixpkgs_channel'..." >&2
     main_program=$(nix eval --impure "github:nixos/nixpkgs/$nixpkgs_channel#$package_name.meta.mainProgram" --raw 2>/dev/null || echo "$package_name")
 
     export NIXPKGS_ALLOW_UNFREE=1
