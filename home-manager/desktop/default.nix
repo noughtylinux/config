@@ -7,7 +7,7 @@
 }:
 let
   buttonLayout =
-    if config.wayland.windowManager.hyprland.enable then ":appmenu" else ":close,minimize,maximize";
+    if config.wayland.windowManager.hyprland.enable then ":appmenu" else ":minimize,maximize,close";
   clockFormat = "24h";
   cursorSize = 32;
   desktopCompositor = noughtyConfig.desktop.compositor;

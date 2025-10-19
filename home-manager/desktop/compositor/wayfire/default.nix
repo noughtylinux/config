@@ -6,6 +6,11 @@
   ...
 }:
 {
+  home = {
+    packages = with pkgs; [
+      wayland-logout
+    ];
+  };
   # Wayfire is a Wayland compositor and stacking window manager
   # Additional applications are required to create a full desktop shell
   imports = [
@@ -46,7 +51,7 @@
       autostart = {
         # Disable wf-shell autostart, we're using waybar et al instead
         autostart_wf_shell = false;
-        button_layout = "dconf write /org/gnome/desktop/wm/preferences/button-layout \"':close,minimize,maximize'\"";
+        button_layout = "dconf write /org/gnome/desktop/wm/preferences/button-layout \"':minimize,maximize,close'\"";
       };
       command = {
         # Super+E launches the file manager
@@ -78,19 +83,20 @@
           in
           "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
 
-        # Inactive window: use surface1 for subtle, recessed appearance
+        # Inactive window: use base for subtle, recessed appearance
         inactive_color =
           let
-            hex = noughtyConfig.catppuccin.palette.getColor "surface1";
+            hex = noughtyConfig.catppuccin.palette.getColor "base";
             r = builtins.substring 1 2 hex;
             g = builtins.substring 3 2 hex;
             b = builtins.substring 5 2 hex;
             toFloat = hexStr: toString (builtins.div (builtins.fromTOML "x=0x${hexStr}").x 255.0);
           in
           "${toFloat r} ${toFloat g} ${toFloat b} 1.0";
-        font = "Work Sans 12";
-        border_size = 4;
-        title_height = 30;
+        button_order = "minimize maximize close";
+        border_size = 2;
+        font = "Work Sans 10 Bold";
+        title_height = 32;
       };
       # Grid snapping - position windows in screen regions
       grid = {
