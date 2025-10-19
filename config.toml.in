@@ -27,8 +27,6 @@ terminal-emulator = "kitty"
 # Additional desktop packages to install via home-manager
 packages = []
 
-[fonts]
-configure = false
 
 [terminal]
 # Your preferred shell (bash, fish or zsh)

@@ -1,12 +1,7 @@
 {
-  lib,
-  noughtyConfig,
   pkgs,
   ...
 }:
-let
-  fontsConfigure = noughtyConfig.fonts.configure or false;
-in
 {
   home = {
     file.".config/fontconfig/fonts.conf".text = ''
