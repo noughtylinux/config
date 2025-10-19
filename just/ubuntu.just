@@ -41,8 +41,8 @@ ubuntu-pre: _header _is_compatible _has_config
         fi
     done
 
-    # Install greetd from Ubuntu if display manager is enabled
-    if tq -f config.toml desktop.display-manager &>/dev/null && [ "$(tq -f config.toml desktop.display-manager)" = "true" ]; then
+    # Install greetd from Ubuntu if desktop compositor is configured
+    if tq -f config.toml desktop.compositor &>/dev/null && [ -n "$(tq -f config.toml desktop.compositor)" ]; then
         if ! is_package_installed "greetd"; then
             PACKAGES_TO_INSTALL+=("greetd")
         fi
@@ -166,8 +166,8 @@ ubuntu-post:
     sudo fc-cache --system-only --really-force
     echo -e "{{SUCCESS}}Font cache updated!"
 
-    # Configure greetd service based on display-manager setting
-    if tq -f config.toml desktop.display-manager &>/dev/null && [ "$(tq -f config.toml desktop.display-manager)" = "true" ]; then
+    # Configure greetd service based on desktop shell setting
+    if tq -f config.toml desktop.compositor &>/dev/null && [ -n "$(tq -f config.toml desktop.compositor)" ]; then
         echo -e "{{GLYPH_SCREEN}}Configuring greetd display manager..."
 
         # Use dpkg-divert to safely override the package-managed config file
