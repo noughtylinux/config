@@ -35,8 +35,8 @@
     enable = true;
     plugins = with pkgs.wayfirePlugins; [
       pixdecor
-      wcm
       wayfire-plugins-extra
+      wcm
     ];
     settings = {
       # Window animations

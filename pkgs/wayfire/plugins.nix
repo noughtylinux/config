@@ -12,6 +12,7 @@ lib.makeScope pkgs.newScope (
     pixdecor = callPackage ./pixdecor.nix { };
     wayfire-plugins-extra = callPackage ./wayfire-plugins-extra.nix { };
     wcm = callPackage ./wcm.nix { };
+    wf-info = callPackage ./wf-info.nix { };
     wf-shell = callPackage ./wf-shell.nix { };
   }
 )
