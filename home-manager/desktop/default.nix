@@ -27,6 +27,13 @@ let
   preferDark = noughtyConfig.catppuccin.palette.isDark;
   preferDarkDconf = if preferDark then "prefer-dark" else "prefer-light";
   preferDarkStr = if preferDark then "1" else "0";
+  qtQpaPlatform =
+    if config.wayland.windowManager.hyprland.enable then
+      "wayland;xcb"
+    else if config.wayland.windowManager.wayfire.enable then
+      "xcb;wayland"
+    else
+      "wayland;xcb";
 
   audioPlayer = [ "org.gnome.Decibels.desktop" ];
   archiveManager = [ "org.gnome.FileRoller.desktop" ];
@@ -146,6 +153,8 @@ in
           libsForQt5.qtstyleplugin-kvantum
           nautilus-python
           nautilus-open-any-terminal
+          qadwaitadecorations
+          qadwaitadecorations-qt6
           wdisplays
           wlr-randr
           wl-clipboard
@@ -176,12 +185,14 @@ in
             "/usr/lib/aarch64-linux-gnu/gio/modules"
           else
             throw "Unsupported architecture for Ubuntu gvfs integration";
+        GTK_USE_PORTAL = "1";
         MOZ_ENABLE_WAYLAND = "1";
         NAUTILUS_4_EXTENSION_DIR = "${pkgs.nautilus-python}/lib/nautilus/extensions-4";
         NIXOS_OZONE_WL = "1";
         QT_FONT_DPI = "144";
-        QT_QPA_PLATFORM = "wayland;xcb";
+        QT_QPA_PLATFORM = qtQpaPlatform;
         QT_STYLE_OVERRIDE = "kvantum";
+        #QT_WAYLAND_DECORATION = "adwaita";
         QT_WAYLAND_DISABLE_WINDOWDECORATION = if config.wayland.windowManager.hyprland.enable then 1 else 0;
       };
     };
