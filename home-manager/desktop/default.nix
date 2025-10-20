@@ -179,6 +179,7 @@ in
         MOZ_ENABLE_WAYLAND = "1";
         NAUTILUS_4_EXTENSION_DIR = "${pkgs.nautilus-python}/lib/nautilus/extensions-4";
         NIXOS_OZONE_WL = "1";
+        QT_FONT_DPI = "144";
         QT_QPA_PLATFORM = "wayland;xcb";
         QT_STYLE_OVERRIDE = "kvantum";
         QT_WAYLAND_DISABLE_WINDOWDECORATION = if config.wayland.windowManager.hyprland.enable then 1 else 0;
