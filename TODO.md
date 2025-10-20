@@ -36,7 +36,7 @@
 
 ## Phase 🔮
 
-- [ ] Choice of Wayland compositor.
+- [x] Choice of Wayland compositor.
 - [ ] Shell configuration via `config.yaml`.
 - [x] Custom package list.
 - [ ] Opt-in for a selection of popular desktop applications
