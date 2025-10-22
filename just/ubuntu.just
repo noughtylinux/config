@@ -31,7 +31,7 @@ ubuntu-pre: _header _is_compatible _has_config
     # Essential packages that provide the Ubuntu system boundary
     for PACKAGE in avahi-daemon bluetooth bolt colord cups dconf-gsettings-backend \
         dnsmasq-base fontconfig fwupd fwupd-signed geoclue-2.0 gvfs-backends \
-        iio-sensor-proxy libfdk-aac2 libmbim-utils libmtp-runtime libnss-mdns \
+        iio-sensor-proxy iputils-ping libfdk-aac2 libmbim-utils libmtp-runtime libnss-mdns \
         libpam-systemd libqmi-utils modemmanager network-manager pipewire-audio \
         plymouth-theme-spinner polkitd power-profiles-daemon ppp secureboot-db \
         smartmontools software-properties-common udisks2 usb-modeswitch whiptail \
