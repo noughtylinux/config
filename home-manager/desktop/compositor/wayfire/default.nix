@@ -16,14 +16,14 @@
   # Additional applications are required to create a full desktop shell
   imports = [
     ../components/avizo # on-screen display for audio and backlight
-    #  ./fuzzel # app launcher, emoji picker and clipboard manager
+    ../components/fuzzel # app launcher, emoji picker and clipboard manager
     #  ./hyprlock # screen locker
     ../components/hyprpaper # wallpaper setter
     #  ./hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
     ../components/swaync # notification center
     ../components/waybar # status bar
-    #  ./wlogout # session menu
+    ../components/wlogout # session menu
   ];
   #TODO: IPC tooling for wayfire
   # https://github.com/killown/wayfire-rs

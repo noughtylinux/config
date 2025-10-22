@@ -15,6 +15,12 @@
     nix-system-graphics.inputs.nixpkgs.follows = "nixpkgs";
     system-manager.url = "github:numtide/system-manager?rev=e271eedac9a24678ca6cfc61677837422bf474e0";
     system-manager.inputs.nixpkgs.follows = "nixpkgs";
+    bzmenu.url = "https://github.com/e-tho/bzmenu/archive/refs/tags/v0.3.0.tar.gz";
+    bzmenu.inputs.nixpkgs.follows = "nixpkgs";
+    iwmenu.url = "https://github.com/e-tho/iwmenu/archive/refs/tags/v0.3.0.tar.gz";
+    iwmenu.inputs.nixpkgs.follows = "nixpkgs";
+    pwmenu.url = "https://github.com/e-tho/pwmenu/archive/refs/tags/v0.3.0.tar.gz";
+    pwmenu.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
