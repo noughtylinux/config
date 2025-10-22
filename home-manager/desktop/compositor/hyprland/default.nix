@@ -24,7 +24,7 @@ in
   imports = [
     ../components/avizo # on-screen display for audio and backlight
     ../components/fuzzel # app launcher, emoji picker and clipboard manager
-    ../components/hyprlock # screen locker
+    #../components/hyprlock # screen locker
     ../components/hyprpaper # wallpaper setter
     ../components/hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
