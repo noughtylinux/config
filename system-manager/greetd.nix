@@ -112,8 +112,8 @@ lib.mkIf enabled {
         text = ''
           [background]
           # Reuse the same background image created for GRUB
-          path = "/etc/noughty/grub/themes/catppuccin/background.png"
-          fit = "Fill"
+          path = "/etc/noughty/backgrounds/Catppuccin-1920x1200.png"
+          fit = "Cover"
 
           [GTK]
           application_prefer_dark_theme = ${lib.boolToString isDark}

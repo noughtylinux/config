@@ -25,7 +25,7 @@ in
     #  ./avizo # on-screen display for audio and backlight
     #  ./fuzzel # app launcher, emoji picker and clipboard manager
     #  ./hyprlock # screen locker
-    #  ./hyprpaper # wallpaper setter
+    ../components/hyprpaper # wallpaper setter
     #  ./hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
     #  ./swaync # notification center

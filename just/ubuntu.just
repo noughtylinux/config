@@ -214,6 +214,16 @@ ubuntu-post:
         sudo cp /etc/noughty/console-setup /etc/default/console-setup
     fi
 
+    if [ -f assets/Catppuccin-1920x1080.png ]; then
+        echo -e "{{GLYPH_PICTURE}}Deploying background image..."
+        sudo mkdir -p /etc/noughty/backgrounds 2>/dev/null || true
+        sudo rm -f /etc/noughty/backgrounds/* 2>/dev/null || true
+        sudo cp assets/*.png /etc/noughty/backgrounds/
+        echo -e "{{SUCCESS}}Background image deployed!"
+    else
+        echo -e "{{WARNING}}Background image not found, skipping copy."
+    fi
+
     # Deploy Plymouth theme from catppuccin-plymouth package and dynamic config
     PLYMOUTH_FLAVOR=$(tq -f config.toml catppuccin.flavor)
     if [ -L "/etc/noughty/plymouth/catppuccin-${PLYMOUTH_FLAVOR}" ]; then
