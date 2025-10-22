@@ -46,7 +46,7 @@ in
   };
   programs = {
     waybar = {
-      enable = true;
+      enable = config.wayland.windowManager.hyprland.enable;
       style = ''
         * {
           font-family: FiraCode Nerd Font Mono;
@@ -288,9 +288,9 @@ in
           ];
           "custom/launcher" = {
             format = "<big></big>";
-            on-click = "${pkgs.procps}/bin/pkill rofi || ${pkgs.unstable.rofi}/bin/rofi -theme ${config.xdg.configHome}/rofi/launchers/rofi-appgrid/style.rasi -show drun";
+            on-click = "${pkgs.unstable.rofi}/bin/rofi -theme ${config.xdg.configHome}/rofi/launchers/rofi-appgrid/style.rasi -show drun";
             #on-click-right = "hypr-activity-menu";
-            tooltip-format = " Applications Menu";
+            tooltip-format = "󰀻 Applications Menu";
           };
           # https://github.com/bluebyt/Wayfire-dots/blob/main/.config/waybar/config_wayfire_now.ini#L162
           "hyprland/workspaces" = lib.mkIf config.wayland.windowManager.hyprland.enable {
@@ -551,7 +551,7 @@ in
         }
       ];
       systemd = {
-        enable = true;
+        enable = config.wayland.windowManager.hyprland.enable;
         target =
           if config.wayland.windowManager.hyprland.enable then
             "hyprland-session.target"

@@ -22,7 +22,7 @@ in
   # Hyprland is a Wayland compositor and dynamic tiling window manager
   # Additional applications are required to create a full desktop shell
   imports = [
-    #  ./avizo # on-screen display for audio and backlight
+    ../components/avizo # on-screen display for audio and backlight
     #  ./fuzzel # app launcher, emoji picker and clipboard manager
     #  ./hyprlock # screen locker
     ../components/hyprpaper # wallpaper setter

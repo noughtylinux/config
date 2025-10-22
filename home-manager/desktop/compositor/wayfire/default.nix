@@ -15,7 +15,7 @@
   # Wayfire is a Wayland compositor and stacking window manager
   # Additional applications are required to create a full desktop shell
   imports = [
-    #  ./avizo # on-screen display for audio and backlight
+    ../components/avizo # on-screen display for audio and backlight
     #  ./fuzzel # app launcher, emoji picker and clipboard manager
     #  ./hyprlock # screen locker
     ../components/hyprpaper # wallpaper setter
@@ -49,6 +49,7 @@
       autostart = {
         # Disable wf-shell autostart, we're using waybar et al instead
         autostart_wf_shell = false;
+        bar = "${pkgs.waybar}/bin/waybar";
         button_layout = "dconf write /org/gnome/desktop/wm/preferences/button-layout \"':minimize,maximize,close'\"";
       };
       command = {
@@ -56,11 +57,11 @@
         binding_files = "<super> KEY_E";
         command_files = "${lib.getExe pkgs.nautilus} --new-window";
         # Media controls
-        binding_play_pause = "XF86AudioPlay";
-        command_play_pause = "${lib.getExe pkgs.playerctl} play-pause";
-        binding_previous = "XF86AudioPrev";
+        binding_playpause = "KEY_PLAYPAUSE";
+        command_playpause = "${lib.getExe pkgs.playerctl} play-pause";
+        binding_previous = "KEY_PREVIOUS";
         command_previous = "${lib.getExe pkgs.playerctl} previous";
-        binding_next = "XF86AudioNext";
+        binding_next = "KEY_NEXT";
         command_next = "${lib.getExe pkgs.playerctl} next";
       };
       core = {
@@ -244,9 +245,9 @@
         #toggle_sticky = "<super> KEY_S";
       };
     };
-    systemd = {
-      variables = [ "-all" ];
-    };
+    #systemd = {
+    #  variables = [ "-all" ];
+    #};
     xwayland.enable = true;
   };
   xdg = {
