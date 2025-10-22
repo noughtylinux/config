@@ -9,6 +9,7 @@
   home = {
     packages = with pkgs; [
       wayland-logout
+      wlr-randr
     ];
   };
   # Wayfire is a Wayland compositor and stacking window manager
@@ -21,7 +22,7 @@
     #  ./hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
     #  ./swaync # notification center
-    #  ./waybar # status bar
+    ../components/waybar # status bar
     #  ./wlogout # session menu
   ];
   #TODO: IPC tooling for wayfire
@@ -96,6 +97,11 @@
         border_size = 2;
         font = "Work Sans Medium";
         title_height = 32;
+      };
+      idle = {
+        toggle = "<super> KEY_Z"; # Super+Z to prevent idle
+        screensaver_timeout = 300; # Activate screensaver after 300 seconds
+        dpms_timeout = 600; # Turn off display after 600 seconds
       };
       pixdecor = {
         border_size = 2;
@@ -237,6 +243,9 @@
         #toggle_always_on_top = "<super> KEY_A";
         #toggle_sticky = "<super> KEY_S";
       };
+    };
+    systemd = {
+      variables = [ "-all" ];
     };
     xwayland.enable = true;
   };

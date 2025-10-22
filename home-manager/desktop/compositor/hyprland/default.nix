@@ -29,7 +29,7 @@ in
     #  ./hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
     #  ./swaync # notification center
-    #  ./waybar # status bar
+    ../components/waybar # status bar
     #  ./wlogout # session menu
   ];
 
