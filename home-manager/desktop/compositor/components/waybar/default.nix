@@ -46,7 +46,7 @@ in
   };
   programs = {
     waybar = {
-      enable = config.wayland.windowManager.hyprland.enable;
+      enable = true;
       style = ''
         * {
           font-family: FiraCode Nerd Font Mono;

@@ -21,7 +21,7 @@
     ../components/hyprpaper # wallpaper setter
     #  ./hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
-    #  ./swaync # notification center
+    ../components/swaync # notification center
     ../components/waybar # status bar
     #  ./wlogout # session menu
   ];
