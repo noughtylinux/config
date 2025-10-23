@@ -65,7 +65,7 @@ lib.mkIf (terminalEmulator == "foot") {
         command = {
           # Super+T launches a terminal
           binding_terminal = "<super> KEY_T";
-          command_terminal = "$${pkgs.foot}/bin/foot";
+          command_terminal = "${pkgs.foot}/bin/foot";
         };
       };
     };
