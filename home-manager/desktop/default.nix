@@ -86,9 +86,9 @@ in
       ./apps/browser
       ./apps/terminal
     ]
-    ++ lib.optional (builtins.pathExists (./. + "/compositor/${desktopCompositor}")) (
-      ./. + "/compositor/${desktopCompositor}"
-    );
+    ++ lib.optional (
+      desktopCompositor != null && builtins.pathExists (./. + "/compositor/${desktopCompositor}")
+    ) (./. + "/compositor/${desktopCompositor}");
 
   # Gate all desktop configuration on compositor being set
   config = lib.mkIf (desktopCompositor != null) {
