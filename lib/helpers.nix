@@ -29,7 +29,7 @@ in
   # Use builtins.getEnv (impure) to get system facts from environment
   mkConfig =
     {
-      tomlPath ? ../config.toml,
+      tomlPath ? builtins.getEnv "HOME" + "/NoughtyLinux/config.toml",
       system,
     }:
     let
@@ -239,6 +239,7 @@ in
       desktop = (baseConfig.desktop or { }) // {
         compositor = desktopCompositor;
       };
+      fonts = baseConfig.fonts or { };
     };
 
   # Helper function for generating home-manager configs
