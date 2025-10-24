@@ -14,8 +14,8 @@ let
     else
       throw "Unsupported compositor: ${noughtyConfig.desktop.compositor}";
   # Extract theming configuration
-  flavor = noughtyConfig.catppuccin.flavor;
-  accent = noughtyConfig.catppuccin.accent;
+  flavor = noughtyConfig.catppuccin.palette.flavor;
+  accent = noughtyConfig.catppuccin.palette.accent;
   isDark = noughtyConfig.catppuccin.palette.isDark;
   palette = noughtyConfig.catppuccin.palette;
 
