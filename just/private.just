@@ -191,7 +191,7 @@ _has_config:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    if [[ ! -f "config.toml" ]]; then
+    if [[ ! -f "${HOME}/NoughtyLinux/config.toml" ]]; then
         echo -e "{{ERROR}}{{DIM}}config.toml{{RESET}} not found! Please run: {{BOLD}}just generate{{RESET}}."
         exit 1
     fi
