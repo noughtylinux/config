@@ -6,7 +6,9 @@
   ...
 }:
 let
-  xkbLayout = "gb";
+  xkbLayout = let
+    envLayout = builtins.getEnv "NOUGHTY_KEYBOARD_LAYOUT";
+  in if envLayout != "" then envLayout else "gb";
   palette = noughtyConfig.catppuccin.palette;
 in
 {
