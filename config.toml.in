@@ -24,10 +24,14 @@ compositor = ""
 packages = []
 # One of alacritty, foot, kitty
 terminal-emulator = "kitty"
+# Global desktop font size (optional, defaults to 13)
+# font_size = 13
 
 [terminal]
 # Your preferred shell (bash, fish or zsh)
 shell = "fish"
+# Terminal font size (optional, defaults to 16)
+# font_size = 16
 # Additional terminal packages to install via home-manager
 packages = [ "rates" ]
 
