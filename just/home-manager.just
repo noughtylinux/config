@@ -7,6 +7,7 @@ build-home: _header _is_compatible _has_config
     export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
     export USER="${USER}"
     export HOME="${HOME}"
+    export NOUGHTY_KEYBOARD_LAYOUT="$(localectl status | grep "X11 Layout" | awk '{print $3}' || echo "gb")"
     nom build {{NIX_OPTS}} ".#homeConfigurations.${USER}@${HOSTNAME}.activationPackage"
     rm result 2> /dev/null || true
 
@@ -19,5 +20,6 @@ switch-home: build-home
     export HOSTNAME="${HOSTNAME:-$(hostname -s)}"
     export USER="${USER}"
     export HOME="${HOME}"
+    export NOUGHTY_KEYBOARD_LAYOUT="$(localectl status | grep "X11 Layout" | awk '{print $3}' || echo "gb")"
     home-manager --impure -b noughty-{{STAMP}} --flake ".#${USER}@${HOSTNAME}" switch 2> /dev/null
     rm result 2> /dev/null || true
