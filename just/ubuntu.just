@@ -14,10 +14,6 @@ ubuntu-pre: _header _is_compatible _has_config
         dpkg-query -W -f='${Status}' "${package}" 2>/dev/null | grep -q "install ok installed"
     }
 
-    if ! is_package_installed "nala"; then
-        just install-nala
-    fi
-
     PACKAGES_TO_REMOVE=()
     PACKAGES_TO_INSTALL=()
 
@@ -30,11 +26,11 @@ ubuntu-pre: _header _is_compatible _has_config
 
     # Essential packages that provide the Ubuntu system boundary
     for PACKAGE in avahi-daemon bluetooth bolt colord cups dconf-gsettings-backend \
-        dnsmasq-base fontconfig fwupd fwupd-signed geoclue-2.0 gvfs-backends \
+        dbus-user-session dnsmasq-base fontconfig fwupd fwupd-signed geoclue-2.0 gvfs-backends \
         iio-sensor-proxy iputils-ping libfdk-aac2 libmbim-utils libmtp-runtime libnss-mdns \
         libpam-systemd libqmi-utils modemmanager network-manager pipewire-audio \
         plymouth-theme-spinner polkitd power-profiles-daemon ppp secureboot-db \
-        smartmontools software-properties-common udisks2 usb-modeswitch whiptail \
+        smartmontools software-properties-common swaylock udisks2 usb-modeswitch whiptail \
         wireless-regdb wpasupplicant; do
         if ! is_package_installed "${PACKAGE}"; then
             PACKAGES_TO_INSTALL+=("${PACKAGE}")
@@ -79,11 +75,6 @@ ubuntu-pre: _header _is_compatible _has_config
                 if [[ "$(tq -f config.toml ubuntu.remove.${package} 2>/dev/null || echo 'false')" == "true" ]]; then
                     PACKAGES_TO_REMOVE+=("${package}")
                 fi
-            else
-                # Package is not installed
-                if [[ "$(tq -f config.toml ubuntu.remove.${package} 2>/dev/null || echo 'false')" == "false" ]]; then
-                    PACKAGES_TO_INSTALL+=("${package}")
-                fi
             fi
         done
     else
@@ -92,14 +83,26 @@ ubuntu-pre: _header _is_compatible _has_config
     fi
 
     if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]] || [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
-        sudo nala update
+        sudo apt-get update
     fi
 
     if [[ ${#PACKAGES_TO_REMOVE[@]} -gt 0 ]]; then
+        simulation=$(mktemp)
+        trap 'rm -f "$simulation"' EXIT
+        if ! sudo apt-get --simulate remove --purge "${PACKAGES_TO_REMOVE[@]}" | tee "$simulation"; then
+            echo -e "{{ERROR}}APT could not simulate the removal transaction; nothing was removed."
+            exit 1
+        fi
+
+        if ! ./scripts/check-apt-removal.sh "$simulation"; then
+            echo -e "{{ERROR}}Refusing package removal: the simulated transaction removes protected Ubuntu boundary packages."
+            exit 1
+        fi
+
         echo -e "{{GLYPH_CANCEL}}Removing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to remove: ${PACKAGES_TO_REMOVE[*]}{{RESET}}"
-        sudo nala remove --purge --simple --assume-yes "${PACKAGES_TO_REMOVE[@]}"
-        sudo nala clean
+        sudo env DEBIAN_FRONTEND=noninteractive apt-get remove --purge --yes "${PACKAGES_TO_REMOVE[@]}"
+        sudo apt-get clean
         # If snapd was removed, also remove snap directories
         if [[ " ${PACKAGES_TO_REMOVE[*]} " == *" snapd "* ]]; then
             sudo rm -rf /usr/lib/snapd /snap /var/lib/snapd /var/snap
@@ -110,7 +113,7 @@ ubuntu-pre: _header _is_compatible _has_config
     if [[ ${#PACKAGES_TO_INSTALL[@]} -gt 0 ]]; then
         echo -e "{{GLYPH_UPDATE}}Installing Ubuntu packages..."
         echo -e "{{YELLOW}}{{DIM}}Packages to install: ${PACKAGES_TO_INSTALL[*]}{{RESET}}"
-        sudo nala install --assume-yes --no-install-recommends --simple "${PACKAGES_TO_INSTALL[@]}"
+        sudo env DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends "${PACKAGES_TO_INSTALL[@]}"
         echo -e "{{SUCCESS}}Successfully installed ${#PACKAGES_TO_INSTALL[@]} packages!"
     fi
 
@@ -119,8 +122,23 @@ ubuntu-pre: _header _is_compatible _has_config
         echo -e "{{GLYPH_NET}}Configuring netplan to use NetworkManager..."
         echo -e "network:\n  version: 2\n  renderer: NetworkManager" | sudo tee /usr/lib/netplan/00-network-manager-all.yaml >/dev/null
         sudo chmod 600 /usr/lib/netplan/00-network-manager-all.yaml
-        sudo systemctl disable systemd-networkd
+        echo -e "{{WARNING}}Leaving systemd-networkd enabled until NetworkManager takeover is verified."
         echo -e "{{SUCCESS}}Successfully configured netplan to use NetworkManager!"
+    fi
+
+    # NetworkManager and systemd-networkd may coexist during migration, but
+    # networkd-wait-online can block boot forever once NetworkManager owns the
+    # active interface. Disable only the wait helper after proving that
+    # NetworkManager is running and has a connected device; retain networkd as
+    # a recovery path until the complete networking matrix has passed.
+    if systemctl is-active --quiet NetworkManager.service \
+        && nmcli --terse --fields STATE general | grep -qx connected \
+        && nmcli --terse --fields DEVICE,STATE device status | grep -q ':connected$'; then
+        echo -e "{{GLYPH_NET}}NetworkManager takeover verified; disabling systemd-networkd-wait-online..."
+        sudo systemctl disable --now systemd-networkd-wait-online.service
+        echo -e "{{SUCCESS}}NetworkManager owns a connected device; boot wait helper disabled."
+    else
+        echo -e "{{WARNING}}NetworkManager takeover is not yet verified; retaining systemd-networkd-wait-online."
     fi
 
     # Workarounds for system-manager file tracking
@@ -135,26 +153,27 @@ ubuntu-pre: _header _is_compatible _has_config
             sudo mkdir -p "${DIR}" 2>/dev/null || true
         fi
     done
-    state_file="/var/lib/system-manager/state/system-manager-state.json"
-    if [[ -e "$state_file" ]]; then
-        sudo cat "$state_file" | \
-            jq -r '.fileTree | .. | objects | select(.status == "managed") | .path' 2>/dev/null | \
-            while IFS= read -r filepath; do
-                [[ -z "$filepath" ]] && continue
-                # Skip symlinks
-                [[ -L "$filepath" ]] && continue
-                if [[ -f "$filepath" ]]; then
-                    echo -e "{{GLYPH_DELETE}}Processing {{RESET}}{{DIM}}$filepath{{RESET}}"
-                    sudo rm -f "$filepath"
-                fi
-            done
-        echo -e "{{SUCCESS}}Files processed{{RESET}}"
-    fi
+    # Never pre-delete paths from system-manager's previous generation. Doing so
+    # makes a subsequent build or activation failure non-transactional and can
+    # remove unrelated Ubuntu configuration.
 
 [private]
 ubuntu-post:
     #!/usr/bin/env bash
     set -euo pipefail
+
+    # NetworkManager may only become active during the first switch, after
+    # ubuntu-pre has already checked the takeover. Check again at the end of
+    # activation so the next boot does not wait for an unconfigured networkd.
+    if systemctl is-active --quiet NetworkManager.service \
+        && nmcli --terse --fields STATE general | grep -qx connected \
+        && nmcli --terse --fields DEVICE,STATE device status | grep -q ':connected$'; then
+        echo -e "{{GLYPH_NET}}NetworkManager takeover verified; disabling systemd-networkd-wait-online..."
+        sudo systemctl disable --now systemd-networkd-wait-online.service
+        echo -e "{{SUCCESS}}NetworkManager owns a connected device; boot wait helper disabled."
+    else
+        echo -e "{{WARNING}}NetworkManager takeover is not verified; retaining systemd-networkd-wait-online."
+    fi
 
     echo -e "{{GLYPH_SHIELD}}Reloading AppArmor profiles for Nix..."
     for profile in /etc/apparmor.d/nix_*; do
@@ -273,103 +292,3 @@ ubuntu-post:
             "${HOSTNAME}" | sudo tee /var/lib/noughty/activated > /dev/null
         echo -e "{{SUCCESS}}Nøughty Linux activated!"
     fi
-
-[private]
-install-nala:
-    #!/usr/bin/env bash
-
-    function ensure_sudo_access() {
-        if sudo -n true 2>/dev/null; then
-            echo -e "{{GLYPH_KEY}}sudo credentials are already cached."
-            return 0
-        fi
-
-    echo -e "{{GLYPH_KEY}}This script requires elevated permissions for package management."
-    echo "Please enter your password to cache sudo credentials:"
-    if ! sudo -v; then
-        echo -e "{{ERROR}}Failed to obtain sudo credentials."
-        exit 1
-    fi
-    }
-
-    function spinner() {
-        local pid=$1
-        local delay=0.1
-        local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
-        local message="${2:-Working...}"
-
-        while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-            local temp=${spinstr#?}
-            printf "\r%s %s " "${spinstr%"$temp"}" "$message"
-            local spinstr=$temp${spinstr%"$temp"}
-            sleep $delay
-        done
-        printf "\r\033[K"
-    }
-
-    if command -v nala &> /dev/null; then
-        echo -e "{{SUCCESS}}nala is already installed, skipping installation."
-        return 0
-    fi
-
-    tmp_dir=$(mktemp -d)
-    base_url="https://deb.volian.org/volian/pool/main/v/volian-archive/"
-
-    # Buffer for error output
-    error_log=$(mktemp)
-
-    # Dynamically get the latest version
-    echo -e "{{GLYPH_EYE}}Detecting latest nala version..."
-    version=$(curl -sSfL "$base_url" 2>>"$error_log" | grep -o 'volian-archive-nala_[0-9]\+\.[0-9]\+\.[0-9]\+_all\.deb' | sed 's/volian-archive-nala_\([0-9]\+\.[0-9]\+\.[0-9]\+\)_all\.deb/\1/' | sort -V | tail -n1)
-
-    if [[ -z "$version" ]]; then
-        echo -e "{{ERROR}}Failed to detect nala version from ${base_url}"
-        cat "$error_log" 2>/dev/null
-        rm -rf "$tmp_dir" "$error_log"
-        exit 1
-    fi
-
-    archive="volian-archive-nala_${version}_all.deb"
-    keyring="volian-archive-keyring_${version}_all.deb"
-
-    # Download packages with spinner
-    echo -e "{{INFO}}Found nala version: ${version}"
-    {
-        curl -sSfL "${base_url}${archive}" -o "${tmp_dir}/${archive}" 2>>"$error_log" &&
-        curl -sSfL "${base_url}${keyring}" -o "${tmp_dir}/${keyring}" 2>>"$error_log"
-    } &
-    download_pid=$!
-    spinner $download_pid "Downloading nala packages…"
-    wait $download_pid
-    download_result=$?
-
-    if [ $download_result -ne 0 ]; then
-        echo -e "{{ERROR}}Failed to download nala packages:"
-        cat "$error_log"
-        rm -rf "$tmp_dir" "$error_log"
-        exit 1
-    fi
-
-    # Install packages with spinner
-    {
-        sudo apt-get install -y "${tmp_dir}/${archive}" "${tmp_dir}/${keyring}" >/dev/null 2>>"$error_log" &&
-        sudo apt-get update >/dev/null 2>>"$error_log" &&
-        sudo apt-get install -y nala whiptail >/dev/null 2>>"$error_log"
-    } &
-    install_pid=$!
-    spinner $install_pid "Installing nala…"
-    wait $install_pid
-    install_result=$?
-
-    # Clean up temporary files
-    rm -rf "$tmp_dir"
-
-    if [ $install_result -ne 0 ]; then
-        echo -e "{{ERROR}}Failed to install nala:"
-        cat "$error_log"
-        rm -f "$error_log"
-        exit 1
-    fi
-
-    rm -f "$error_log"
-    echo -e "{{SUCCESS}}nala package manager installed successfully."
