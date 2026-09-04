@@ -12,10 +12,10 @@ function session_start() {
   if [ -z "$LAYOUT" ]; then
     LAYOUT="gb"
   fi
-  if [[ "${IS_HYPRLAND}" != "yes" ]]; then
+  if [[ "${IS_HYPRLAND}" == "yes" ]]; then
     hyprctl keyword input:kb_layout "${LAYOUT}"
-    dconf write /org/gnome/desktop/wm/preferences/button-layout "':appmenu'"
   fi
+  dconf write /org/gnome/desktop/wm/preferences/button-layout "':appmenu'"
 
 }
 
@@ -40,6 +40,11 @@ case "$OPT" in
         sleep 0.5
         if [[ "${IS_HYPRLAND}" == "yes" ]]; then
           hyprlock --immediate
+        elif [[ "${IS_WAYFIRE}" == "yes" ]]; then
+          /usr/bin/swaylock --daemonize --color 1e1e2e
+        else
+          echo "Unable to identify a supported Wayland compositor" >&2
+          exit 1
         fi
         ;;
     logout)
@@ -54,10 +59,10 @@ case "$OPT" in
         ;;
     reboot)
         session_stop
-        /run/current-system/sw/bin/systemctl reboot;;
+        systemctl reboot;;
     shutdown)
         session_stop
-        /run/current-system/sw/bin/systemctl poweroff;;
+        systemctl poweroff;;
     *) echo "Usage: $(basename "$0") {start|lock|logout|reboot|shutdown}";
         exit 1;;
 esac

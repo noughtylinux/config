@@ -58,7 +58,10 @@ let
   };
   fuzzelWifi = pkgs.writeShellApplication {
     name = "fuzzel-wifi";
-    text = ''iwmenu --launcher custom --launcher-command "fuzzel --dmenu --width=40 --prompt '󱚾 ' {password_flag:--password}"'';
+    runtimeInputs = [ pkgs.networkmanagerapplet ];
+    # Ubuntu owns networking through NetworkManager. iwmenu only supports iwd
+    # and fails with net.connman.iwd ServiceUnknown on this platform.
+    text = ''exec nm-connection-editor'';
   };
 in
 {
@@ -72,7 +75,6 @@ in
       with pkgs;
       [
         inputs.bzmenu.packages.${pkgs.system}.default
-        inputs.iwmenu.packages.${pkgs.system}.default
         inputs.pwmenu.packages.${pkgs.system}.default
         fuzzelActions
         fuzzelBluetooth

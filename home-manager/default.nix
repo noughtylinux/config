@@ -115,7 +115,10 @@ in
       # Create age keys directory for SOPS
       tmpfiles = {
         rules = [
-          "d ${config.home.homeDirectory}/.config/sops/age 0755 ${config.home.username} users - -"
+          # User tmpfiles cannot change ownership. The user manager already
+          # creates this path as the correct account, so leave owner/group
+          # unchanged instead of requesting a privileged chown.
+          "d ${config.home.homeDirectory}/.config/sops/age 0755 - - - -"
         ];
       };
     };

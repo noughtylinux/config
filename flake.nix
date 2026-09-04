@@ -3,8 +3,6 @@
   inputs = {
     catppuccin.url = "github:catppuccin/nix/release-25.05";
     catppuccin.inputs.nixpkgs.follows = "nixpkgs";
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
-    determinate.inputs.nixpkgs.follows = "nixpkgs-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
@@ -17,8 +15,6 @@
     system-manager.inputs.nixpkgs.follows = "nixpkgs";
     bzmenu.url = "https://github.com/e-tho/bzmenu/archive/refs/tags/v0.3.0.tar.gz";
     bzmenu.inputs.nixpkgs.follows = "nixpkgs";
-    iwmenu.url = "https://github.com/e-tho/iwmenu/archive/refs/tags/v0.3.0.tar.gz";
-    iwmenu.inputs.nixpkgs.follows = "nixpkgs";
     pwmenu.url = "https://github.com/e-tho/pwmenu/archive/refs/tags/v0.3.0.tar.gz";
     pwmenu.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -39,7 +35,6 @@
         let
           pkgs = helper.pkgsFor system;
           corePackages = [
-            inputs.determinate.packages.${system}.default
             inputs.system-manager.packages.${system}.default
             pkgs.curl
             pkgs.git

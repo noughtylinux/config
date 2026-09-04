@@ -1,8 +1,22 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   pngFiles = builtins.filter (file: builtins.match ".*\\.png" file != null) (
     builtins.attrNames (builtins.readDir ./.)
   );
+  lockEntry = {
+    label = "lock";
+    action = "wayland-session lock";
+    text = "  Lock  ";
+    keybind = "l";
+    height = 0.5;
+  };
+  suspendEntry = {
+    label = "suspend";
+    action = "systemctl suspend";
+    text = "Suspend";
+    keybind = "u";
+    height = 0.5;
+  };
 in
 {
   # Copy .png files in the current directory to the wlogout configuration directory
@@ -18,26 +32,16 @@ in
   programs = {
     wlogout = {
       enable = true;
-      layout = [
-        {
-          label = "lock";
-          action = "wayland-session lock";
-          text = "  Lock  ";
-          keybind = "l";
-          height = 0.5;
-        }
+      # Locking is supported by both compositors. Keep suspend hidden in
+      # Wayfire until its hardware resume path has been exercised separately.
+      layout = [ lockEntry ]
+      ++ lib.optionals config.wayland.windowManager.hyprland.enable [ suspendEntry ]
+      ++ [
         {
           label = "logout";
           action = "wayland-session logout";
           text = " Logout ";
           keybind = "e";
-          height = 0.5;
-        }
-        {
-          label = "suspend";
-          action = "systemctl suspend";
-          text = "Suspend";
-          keybind = "u";
           height = 0.5;
         }
         {
