@@ -41,6 +41,8 @@ let
 
   # Create compositor wrapper with logging
   compositorWrapper = pkgs.writeShellScript "compositor-wrapper" ''
+    set -o pipefail
+
     # Clear screen with Catppuccin background color using ANSI escape sequences
     printf '\033]11;${palette.getColor "base"}\007\033[2J\033[H'
 
@@ -92,6 +94,13 @@ let
   greetdCommand = "${regreetWrapper}";
 in
 lib.mkIf enabled {
+  systemd.tmpfiles.rules = [
+    # The greeter runs as _greetd and cannot create directories directly
+    # beneath /var. Create its persistent log and state directories as root.
+    "d /var/log/regreet 0750 _greetd _greetd - -"
+    "d /var/lib/regreet 0750 _greetd _greetd - -"
+  ];
+
   environment = {
     etc = {
       "noughty/greetd/config.toml" = {
