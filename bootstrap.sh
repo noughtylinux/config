@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -eu -o pipefail
 
-NOUGHTYLINUX_DIR="${HOME}/NoughtyLinux"
+NOUGHTYLINUX_DIR="${NOUGHTYLINUX_DIR:-${HOME}/NoughtyLinux}"
+NOUGHTYLINUX_REPOSITORY="${NOUGHTYLINUX_REPOSITORY:-https://github.com/noughtylinux/config}"
+NOUGHTYLINUX_REF="${NOUGHTYLINUX_REF:-}"
+NOUGHTYLINUX_SOURCE="${NOUGHTYLINUX_SOURCE:-}"
 
 # Colours
 BLACK='\033[30m'
@@ -53,94 +56,6 @@ function ensure_sudo_access() {
   fi
 }
 
-function spinner() {
-  local pid=$1
-  local delay=0.1
-  local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
-  local message="${2:-Working...}"
-
-  while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-    local temp=${spinstr#?}
-    printf "\r%s %s " "${spinstr%"$temp"}" "$message"
-    local spinstr=$temp${spinstr%"$temp"}
-    sleep $delay
-  done
-  printf "\r\033[K"
-}
-
-function install_nala() {
-  if command -v nala &> /dev/null; then
-    echo -e "${SUCCESS}nala is already installed, skipping installation."
-    return 0
-  fi
-
-  # Create temporary directory for downloads
-  local tmp_dir
-  tmp_dir=$(mktemp -d)
-  local base_url="https://deb.volian.org/volian/pool/main/v/volian-archive/"
-
-  # Buffer for error output
-  local error_log
-  error_log=$(mktemp)
-
-  # Dynamically get the latest version
-  echo -e "${GLYPH_EYE}Detecting latest nala version..."
-  local version
-  version=$(curl -sSfL "$base_url" 2>>"$error_log" | grep -o 'volian-archive-nala_[0-9]\+\.[0-9]\+\.[0-9]\+_all\.deb' | sed 's/volian-archive-nala_\([0-9]\+\.[0-9]\+\.[0-9]\+\)_all\.deb/\1/' | sort -V | tail -n1)
-
-  if [[ -z "$version" ]]; then
-    echo -e "${ERROR}Failed to detect nala version from ${base_url}"
-    cat "$error_log" 2>/dev/null
-    rm -rf "$tmp_dir" "$error_log"
-    exit 1
-  fi
-
-  local archive="volian-archive-nala_${version}_all.deb"
-  local keyring="volian-archive-keyring_${version}_all.deb"
-
-  # Download packages with spinner
-  echo -e "${INFO}Found nala version: ${version}"
-  {
-    curl -sSfL "${base_url}${archive}" -o "${tmp_dir}/${archive}" 2>>"$error_log" &&
-    curl -sSfL "${base_url}${keyring}" -o "${tmp_dir}/${keyring}" 2>>"$error_log"
-  } &
-  local download_pid=$!
-  spinner $download_pid "Downloading nala packages…"
-  wait $download_pid
-  local download_result=$?
-
-  if [ $download_result -ne 0 ]; then
-    echo -e "${ERROR}Failed to download nala packages:"
-    cat "$error_log"
-    rm -rf "$tmp_dir" "$error_log"
-    exit 1
-  fi
-
-  # Install packages with spinner
-  {
-    sudo apt-get install -y "${tmp_dir}/${archive}" "${tmp_dir}/${keyring}" >/dev/null 2>>"$error_log" &&
-    sudo apt-get update >/dev/null 2>>"$error_log" &&
-    sudo apt-get install -y nala whiptail >/dev/null 2>>"$error_log"
-  } &
-  local install_pid=$!
-  spinner $install_pid "Installing nala…"
-  wait $install_pid
-  local install_result=$?
-
-  # Clean up temporary files
-  rm -rf "$tmp_dir"
-
-  if [ $install_result -ne 0 ]; then
-    echo -e "${ERROR}Failed to install nala:"
-    cat "$error_log"
-    rm -f "$error_log"
-    exit 1
-  fi
-
-  rm -f "$error_log"
-  echo -e "${SUCCESS}nala package manager installed successfully."
-}
-
 function get_login_def() {
   # Extract specified value from /etc/login.defs, with fallback default
   local key="$1"
@@ -148,6 +63,24 @@ function get_login_def() {
   local value
   value=$(grep -E "^${key}" /etc/login.defs 2>/dev/null | awk '{print $2}')
   echo "${value:-$default}"
+}
+
+function apt_simulation_crosses_ubuntu_boundary() {
+  local simulation="$1"
+  local action package
+  while read -r action package _; do
+    [[ "${action}" == "Remv" ]] || continue
+    package="${package%%:*}"
+    case "${package}" in
+      apt|dpkg|sudo|ubuntu-server|ubuntu-server-minimal|openssh-*|systemd|systemd-*|\
+      netplan.io|network-manager|libpam-*|passwd|login|linux-image-*|linux-generic*|\
+      grub-*|shim-*|init|init-system-helpers)
+        printf '  %s\n' "${package}" >&2
+        return 0
+        ;;
+    esac
+  done < "${simulation}"
+  return 1
 }
 
 function install_determinate_nix() {
@@ -200,9 +133,6 @@ fi
 # Ensure sudo access early - this will prompt for password if needed
 ensure_sudo_access
 
-# Install nala package manager first
-install_nala
-
 # Check for conflicting Ubuntu Nix packages and remove them
 echo -e "${GLYPH_CHECK}Checking for conflicting Ubuntu packages..."
 conflicting_packages=()
@@ -217,10 +147,14 @@ fi
 
 if [[ ${#conflicting_packages[@]} -gt 0 ]]; then
   echo -e "${WARNING}Found conflicting Ubuntu Nix packages: ${conflicting_packages[*]}"
-  for package in "${conflicting_packages[@]}"; do
-    echo -e "${GLYPH_MINUS}Purging ${package}..."
-    sudo nala purge --assume-yes --simple "${package}"
-  done
+  simulation=$(mktemp)
+  trap 'rm -f "$simulation"' EXIT
+  sudo apt-get --simulate remove --purge "${conflicting_packages[@]}" | tee "$simulation"
+  if apt_simulation_crosses_ubuntu_boundary "$simulation"; then
+    echo -e "${ERROR}Refusing to remove Ubuntu Nix packages because the simulated transaction crosses the protected Ubuntu boundary."
+    exit 1
+  fi
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get remove --purge --yes "${conflicting_packages[@]}"
 
   echo -e "${SUCCESS}Conflicting packages removed successfully."
 fi
@@ -244,6 +178,8 @@ fi
 # Clone the repository if it doesn't exist
 if [[ -e "${NOUGHTYLINUX_DIR}/config.toml" ]]; then
   echo -e "${INFO}Directory ${NOUGHTYLINUX_DIR} appears to exist and is bootstrapped."
+elif [[ -n "${NOUGHTYLINUX_SOURCE}" && -f "${NOUGHTYLINUX_DIR}/flake.nix" && -f "${NOUGHTYLINUX_DIR}/justfile" ]]; then
+  echo -e "${INFO}Continuing with the previously staged local source in ${NOUGHTYLINUX_DIR}."
 elif [[ "$(basename $0)" == "noughty-bootstrap.sh" ]] && [[ -e "${NOUGHTYLINUX_DIR}/justfile" ]]; then
   echo -e "${INFO}Directory ${NOUGHTYLINUX_DIR} exists and we appear to be bootstrapping remotely."
 elif [[ -d "${NOUGHTYLINUX_DIR}/.git" ]] && [[ -f "${NOUGHTYLINUX_DIR}/.git/config" ]]; then
@@ -252,14 +188,35 @@ elif [[ -d "${NOUGHTYLINUX_DIR}/.git" ]] && [[ -f "${NOUGHTYLINUX_DIR}/.git/conf
     nix shell nixpkgs#git --command git pull --rebase
   popd 1>/dev/null
 else
-  echo -e "${INFO}Cloning Nøughty Linux configuration repository into ${NOUGHTYLINUX_DIR}..."
-  nix shell nixpkgs#git --command git clone https://github.com/noughtylinux/config "${NOUGHTYLINUX_DIR}"
+  if [[ -n "${NOUGHTYLINUX_SOURCE}" ]]; then
+    if [[ ! -f "${NOUGHTYLINUX_SOURCE}/flake.nix" || ! -f "${NOUGHTYLINUX_SOURCE}/justfile" ]]; then
+      echo -e "${ERROR}NOUGHTYLINUX_SOURCE is not a Nøughty Linux config checkout: ${NOUGHTYLINUX_SOURCE}"
+      exit 1
+    fi
+    if [[ -e "${NOUGHTYLINUX_DIR}" ]]; then
+      echo -e "${ERROR}Refusing to copy local source over existing path: ${NOUGHTYLINUX_DIR}"
+      exit 1
+    fi
+    echo -e "${INFO}Copying local Nøughty Linux source from ${NOUGHTYLINUX_SOURCE}..."
+    mkdir -p "${NOUGHTYLINUX_DIR}"
+    cp -a "${NOUGHTYLINUX_SOURCE}/." "${NOUGHTYLINUX_DIR}/"
+  else
+    echo -e "${INFO}Cloning Nøughty Linux configuration from ${NOUGHTYLINUX_REPOSITORY} into ${NOUGHTYLINUX_DIR}..."
+    clone_args=(clone)
+    if [[ -n "${NOUGHTYLINUX_REF}" ]]; then
+      clone_args+=(--branch "${NOUGHTYLINUX_REF}" --single-branch)
+    fi
+    clone_args+=("${NOUGHTYLINUX_REPOSITORY}" "${NOUGHTYLINUX_DIR}")
+    nix shell nixpkgs#git --command git "${clone_args[@]}"
+  fi
 fi
 
-# Run just generate and just switch
+# Generate the initial configuration when needed, then always converge the
+# machine.  A previous switch may have failed after creating config.toml, so
+# its presence alone is not evidence of a completed bootstrap.
 pushd "${NOUGHTYLINUX_DIR}" 1>/dev/null
   if [[ ! -f "config.toml" ]]; then
     nix develop --no-update-lock-file --impure --command just generate
-    nix develop --no-update-lock-file --impure --command just switch
   fi
+  nix develop --no-update-lock-file --impure --command just switch
 popd 1>/dev/null
