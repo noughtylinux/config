@@ -10,7 +10,7 @@
 1. Standard Ubuntu Server installation
 2. Bootstrap Nøughty Linux
 ```shell
-curl -fsSL https://noughtylinux.org/bootstrap | bash
+curl -fsSL https://raw.githubusercontent.com/noughtylinux/config/main/bootstrap.sh | bash
 ```
 3. Reboot into Nøughty Linux
 
