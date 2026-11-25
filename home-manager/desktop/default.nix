@@ -201,7 +201,7 @@ in
       enable = true;
       font = {
         name = "Work Sans";
-        size = 13;
+        size = noughtyConfig.desktop.font_size or 13;
         package = pkgs.work-sans;
       };
       gtk2 = {

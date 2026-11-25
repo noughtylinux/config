@@ -34,7 +34,7 @@ lib.mkIf (terminalEmulator == "kitty") {
       enable = true;
       font = {
         name = "FiraCode Nerd Font Mono";
-        size = 16;
+        size = noughtyConfig.terminal.font_size or 16;
       };
       settings = {
         cursor_blink_interval = 0.75;
