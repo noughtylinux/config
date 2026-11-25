@@ -5,9 +5,58 @@
   pkgs,
   ...
 }:
+let
+  keyboardLayout = noughtyConfig.desktop.keyboard-layout or "gb";
+  wayfireScreenshot = pkgs.writeShellApplication {
+    name = "wayfire-screenshot";
+    runtimeInputs = with pkgs; [
+      grim
+      libnotify
+      slurp
+    ];
+    text = ''
+      mode="''${1:-region}"
+      pictures_dir="''${XDG_PICTURES_DIR:-$HOME/Pictures}"
+      mkdir -p "$pictures_dir"
+      output="$pictures_dir/Screenshot_$(date +%Y-%m-%d_%H-%M-%S).png"
+
+      case "$mode" in
+        region)
+          geometry="$(slurp)" || exit 0
+          [[ -n "$geometry" ]] || exit 0
+          grim -g "$geometry" "$output"
+          ;;
+        output)
+          grim "$output"
+          ;;
+        *)
+          printf 'Usage: wayfire-screenshot {region|output}\n' >&2
+          exit 2
+          ;;
+      esac
+
+      notify-send --app-name=wayfire-screenshot \
+        --icon="$output" "Screenshot saved" "$output"
+    '';
+  };
+in
 {
+  # Lock through Ubuntu PAM before logind suspends the machine, including lid
+  # close. The Nix-built locker does not authenticate against Ubuntu reliably.
+  services.swayidle = {
+    enable = true;
+    events = [
+      {
+        event = "before-sleep";
+        command = "/usr/bin/swaylock --daemonize --color 1e1e2e";
+      }
+    ];
+  };
+
   home = {
     packages = with pkgs; [
+      swaybg
+      wayfireScreenshot
       wayland-logout
       wlr-randr
     ];
@@ -18,7 +67,6 @@
     ../components/avizo # on-screen display for audio and backlight
     ../components/fuzzel # app launcher, emoji picker and clipboard manager
     #  ./hyprlock # screen locker
-    ../components/hyprpaper # wallpaper setter
     #  ./hyprshot # screenshot grabber and annotator
     ../components/rofi # application launcher
     ../components/swaync # notification center
@@ -50,9 +98,13 @@
         # Disable wf-shell autostart, we're using waybar et al instead
         autostart_wf_shell = false;
         bar = "${pkgs.waybar}/bin/waybar";
+        background = "${lib.getExe pkgs.swaybg} -m fill -i /etc/noughty/backgrounds/Catppuccin-1920x1200.png";
         button_layout = "dconf write /org/gnome/desktop/wm/preferences/button-layout \"':minimize,maximize,close'\"";
       };
       command = {
+        # Super+L locks through Ubuntu PAM while Wayfire retains the session.
+        binding_lock = "<super> KEY_L";
+        command_lock = "wayland-session lock";
         # Super+E launches the file manager
         binding_files = "<super> KEY_E";
         command_files = "${lib.getExe pkgs.nautilus} --new-window";
@@ -63,6 +115,11 @@
         command_previous = "${lib.getExe pkgs.playerctl} previous";
         binding_next = "KEY_NEXT";
         command_next = "${lib.getExe pkgs.playerctl} next";
+        # Print selects a region; Shift+Print captures the complete output.
+        binding_screenshot = "KEY_SYSRQ";
+        command_screenshot = "${lib.getExe wayfireScreenshot} region";
+        binding_screenshot_output = "<shift> KEY_SYSRQ";
+        command_screenshot_output = "${lib.getExe wayfireScreenshot} output";
       };
       core = {
         #plugins = "animate autostart blur command foreign-toplevel grid gtk-shell idle ipc ipc-rules move pixdecor place resize session-lock switcher vswitch wm-actions wobbly xdg-activation";
@@ -190,7 +247,7 @@
         restore = "<super> KEY_DOWN"; # Restore original size
       };
       input = {
-        xkb_layout = "gb";
+        xkb_layout = keyboardLayout;
         repeat_delay = 300;
         repeat_rate = 30;
         cursor_size = 32;

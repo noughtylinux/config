@@ -18,8 +18,10 @@ accent = "blue"
 flavor = "mocha"
 
 [desktop]
-# Desktop compositor; one of "hyprland", "wayfire" or ""
-compositor = ""
+# Desktop compositor; one of "wayfire", "hyprland" or ""
+compositor = "wayfire"
+# XKB keyboard layout used by the compositor (for example "gb" or "us")
+keyboard-layout = "gb"
 # Additional desktop packages to install via home-manager
 packages = []
 # One of alacritty, foot, kitty
@@ -39,6 +41,6 @@ apport = false              # Remove crash reporting
 cloud-init = false          # Remove cloud-init
 kdump-tools = false         # Remove kernel crash dump tools
 multipath-tools = false     # Remove tools for disk multipath device maps
-pollinate = true            # Remove entropy seeding
+pollinate = false           # Remove entropy seeding
 snapd = false               # Remove Snap package manager
 unattended-upgrades = false # Remove automatic updates

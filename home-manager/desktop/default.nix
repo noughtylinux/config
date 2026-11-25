@@ -94,7 +94,10 @@ in
   config = lib.mkIf (desktopCompositor != null) {
     catppuccin = {
       kvantum.enable = true;
-      cursors.enable = true;
+      # Catppuccin's generated cursor package currently pulls in the Whiskers
+      # Rust toolchain at activation time. Keep the desktop independently
+      # buildable and use the standard cursor shipped by the package set.
+      cursors.enable = false;
     };
 
     # Packages whose D-Bus configuration files should be included in the
@@ -170,6 +173,8 @@ in
           enable = config.wayland.windowManager.hyprland.enable;
           size = cursorSize;
         };
+        name = "Adwaita";
+        package = pkgs.adwaita-icon-theme;
         size = cursorSize;
         x11.enable = true;
       };
@@ -189,7 +194,6 @@ in
         MOZ_ENABLE_WAYLAND = "1";
         NAUTILUS_4_EXTENSION_DIR = "${pkgs.nautilus-python}/lib/nautilus/extensions-4";
         NIXOS_OZONE_WL = "1";
-        QT_FONT_DPI = "144";
         QT_QPA_PLATFORM = qtQpaPlatform;
         QT_STYLE_OVERRIDE = "kvantum";
         #QT_WAYLAND_DECORATION = "adwaita";

@@ -40,7 +40,6 @@
       noto-fonts-monochrome-emoji
       poppins
       source-serif
-      symbola
       ubuntu_font_family
       work-sans
     ];

@@ -26,11 +26,18 @@ check: _header
     nix flake check --log-format internal-json -v --all-systems {{NIX_OPTS}} |& nom --json
     nix flake show --all-systems {{NIX_OPTS}}
 
+# Fast checks for Ubuntu-boundary and Wayfire regressions
+safety-check:
+    @./scripts/check-safety.sh
+    @./scripts/test-apt-removal-guard.sh
+
 # Build configuration
 build: build-system build-home
 
-# Switch to new configuration
-switch: ubuntu-pre switch-system switch-home ubuntu-post
+# Build both closures before any Ubuntu preparation or live activation. The
+# switch recipes retain their own build dependencies so calling either private
+# recipe directly remains safe; just executes a dependency only once per run.
+switch: build-system build-home ubuntu-pre switch-system switch-home ubuntu-post
 
 # Generate config.toml
 generate: _header _is_compatible

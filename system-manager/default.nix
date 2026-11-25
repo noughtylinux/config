@@ -186,7 +186,6 @@ in
         };
       };
       systemPackages = [
-        inputs.determinate.packages.${pkgs.system}.default
         inputs.system-manager.packages.${pkgs.system}.default
       ];
     };
